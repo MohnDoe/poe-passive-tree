@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "pinia": "^3.0.4",
+    "pixi-viewport": "^6.0.3",
+    "pixi.js": "^8.18.1",
     "vue": "^3.5.32"
   },
   "devDependencies": {
