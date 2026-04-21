@@ -1,7 +1,7 @@
 import type { PassiveTree } from "@/domain/models/passiveTree";
 import { Circle, Graphics } from "pixi.js";
 import type { PixiStageController } from "./stage";
-import type { PassiveNode } from "@/domain/models/passiveNode";
+import type { NodeId, PassiveNode } from "@/domain/models/passiveNode";
 
 
 type NodeVisualStyle = {
@@ -12,7 +12,7 @@ type NodeVisualStyle = {
 export function renderTree(stage: PixiStageController, tree: PassiveTree) {
   clearStage(stage);
 
-  renderLinks(stage, tree.nodes);
+  renderLinks(stage, tree);
   renderNodes(stage, tree.nodes);
 }
 
@@ -21,21 +21,19 @@ function clearStage(stage: PixiStageController) {
   stage.linkLayer.removeChildren();
 }
 
-function renderLinks(stage: PixiStageController, nodes: PassiveTree['nodes']) {
+function renderLinks(stage: PixiStageController, tree: PassiveTree) {
   const links = new Graphics();
-  for (const [nodeId, node] of nodes) {
-    for (const targetId of node.outgoing) {
-      // if (node.id >= targetId) continue;
-      if (!node.position) continue;
 
-      const target = nodes.get(targetId);
-      if (!target) continue;
-      if (!target.position) continue;
+  for (const [nodeAId, nodeBId] of uniqueEdgesFromAdjacency(tree.adjacency)) {
+    const nodeA = tree.nodes.get(nodeAId);
+    const nodeB = tree.nodes.get(nodeBId);
 
-      links
-        .moveTo(node.position.x, node.position.y)
-        .lineTo(target.position.x, target.position.y)
-    }
+    if (!nodeA || !nodeB) continue;
+    if (!nodeA.position || !nodeB.position) continue;
+
+    links
+      .moveTo(nodeA.position.x, nodeA.position.y)
+      .lineTo(nodeB.position.x, nodeB.position.y)
   }
 
   links.stroke({
@@ -45,6 +43,22 @@ function renderLinks(stage: PixiStageController, nodes: PassiveTree['nodes']) {
   })
 
   stage.linkLayer.addChild(links);
+}
+
+type Edge = readonly [NodeId, NodeId];
+
+function uniqueEdgesFromAdjacency(adj: PassiveTree['adjacency']): Edge[] {
+  const edges: Edge[] = [];
+
+  for (const [nodeAId, neighbors] of adj) {
+    for (const nodeBId of neighbors) {
+      if (nodeAId < nodeBId) {
+        edges.push([nodeAId, nodeBId])
+      }
+    }
+  }
+
+  return edges;
 }
 
 function renderNodes(stage: PixiStageController, nodes: PassiveTree['nodes']) {
@@ -64,20 +78,20 @@ function renderNodes(stage: PixiStageController, nodes: PassiveTree['nodes']) {
 function getNodeVisualeStyle(node: PassiveNode): NodeVisualStyle {
   if (node.type === 'keystone') {
     return {
-      radius: 20,
+      radius: 80,
       fill: 0xc9a44b
     }
   }
 
   if (node.type === 'notable') {
     return {
-      radius: 15,
-      fill: 0x7f8bb3
+      radius: 55,
+      fill: 0x0f8bb3
     }
   }
 
   return {
-    radius: 10,
+    radius: 40,
     fill: 0x94a3b8
   }
 }
