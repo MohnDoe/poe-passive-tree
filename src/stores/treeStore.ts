@@ -1,4 +1,4 @@
-import { loadPassiveTree } from "@/data/mapping/treeLoader";
+import { loadPassiveTree } from "@/data/loaders/loadPassiveTree";
 import type { ClassId } from "@/domain/models/passiveClass";
 import type { NodeId } from "@/domain/models/passiveNode";
 import type { PassiveTree } from "@/domain/models/passiveTree";

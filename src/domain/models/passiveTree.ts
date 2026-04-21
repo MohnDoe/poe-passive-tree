@@ -2,10 +2,18 @@ import type { ClassId, PassiveClass } from "./passiveClass";
 import type { GroupId, PassiveGroup } from "./passiveGroup";
 import type { NodeId, PassiveNode, PassiveRootNode } from "./passiveNode";
 
+export type PassiveTreeAdjacency = ReadonlyMap<NodeId, NodeId[]>;
+
+export type PassiveTreeNodesById = ReadonlyMap<NodeId, PassiveNode>;
+
 export interface PassiveTree {
-  nodes: ReadonlyMap<NodeId, PassiveNode>
+  nodesById: PassiveTreeNodesById
   groups: ReadonlyMap<GroupId, PassiveGroup>
   classes: ReadonlyMap<ClassId, PassiveClass>
-  adjacency: ReadonlyMap<NodeId, NodeId[]>
+  adjacency: {
+    full: PassiveTreeAdjacency
+    main: PassiveTreeAdjacency
+    ascendancy: PassiveTreeAdjacency
+  }
   root: PassiveRootNode
 }
