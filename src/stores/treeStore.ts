@@ -39,6 +39,7 @@ export const useTreeStore = defineStore("treeStore", {
       }
     },
     selectClass(classId: ClassId) {
+      this.resetAllocations();
       this.selectedClassId = classId;
     },
     allocateNode(nodeId: NodeId) {
