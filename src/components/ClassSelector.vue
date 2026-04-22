@@ -12,6 +12,7 @@ const { selectedClassId } = storeToRefs(treeStore);
       :key="classId"
       @click="treeStore.selectClass(classId)"
     >
+      {{ pClass.id }} -
       {{ pClass.name }}
       <span v-if="selectedClassId === classId">[active]</span>
     </button>

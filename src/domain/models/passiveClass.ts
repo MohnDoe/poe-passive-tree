@@ -1,9 +1,9 @@
 import type { NodeId } from "./passiveNode";
 
-export type ClassId = string;
+export type ClassId = number;
 
 export interface PassiveClass {
-  id: ClassId
-  name: string
-  startNodeIds: NodeId[]
+  id: ClassId;
+  name: string;
+  startNodeIds: Set<NodeId>;
 }

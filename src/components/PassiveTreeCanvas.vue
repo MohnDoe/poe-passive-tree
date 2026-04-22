@@ -1,13 +1,29 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from "vue";
 import { useTreeStore } from "@/stores/treeStore";
 import { PassiveTreeStage } from "@/pixi/PassiveTreeStage";
 import { createTreeSceneRenderModel } from "@/pixi/sceneModel.mapper";
+import { storeToRefs } from "pinia";
 
 const hostRef = ref<HTMLDivElement | null>(null);
+const hasBeenFittedOnce = ref(false);
 const stage = new PassiveTreeStage();
 
 const treeStore = useTreeStore();
+
+const { tree, selectedClassId, allocatedNodeIds } = storeToRefs(treeStore);
+
+const sceneModal = computed(() => {
+  if (!tree.value) return null;
+
+  return createTreeSceneRenderModel({
+    tree: tree.value,
+    allocatedNodeIds: allocatedNodeIds.value,
+    selectedClassId: selectedClassId.value,
+    highlightedPathNodeIds: [],
+    hoveredNodeId: null,
+  });
+});
 
 onMounted(async () => {
   if (!hostRef.value) return;
@@ -25,16 +41,22 @@ onMounted(async () => {
 
   await treeStore.loadTree();
 
-  stage.render(
-    createTreeSceneRenderModel({
-      allocatedNodeIds: treeStore.allocatedNodeIds,
-      selectedClassId: treeStore.selectedClassId,
-      tree: treeStore.tree!,
-      highlightedPathNodeIds: [],
-      hoveredNodeId: null,
-    }),
-  );
-  stage.fitToBounds(treeStore.tree!.bounds);
+  watchEffect(() => {
+    const scene = sceneModal.value;
+    if (!scene) return;
+
+    if (!hasBeenFittedOnce.value) {
+      stage.render(scene);
+      stage.fitToBounds(tree.value!.bounds);
+      hasBeenFittedOnce.value = true;
+    }
+  });
+});
+
+watchEffect(() => {
+  const scene = sceneModal.value;
+  if (!scene) return;
+  stage.updateNodeStates(scene);
 });
 
 onBeforeUnmount(() => {

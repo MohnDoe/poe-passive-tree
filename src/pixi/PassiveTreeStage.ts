@@ -73,6 +73,11 @@ export class PassiveTreeStage {
       overlayLayer: this.overlayLayer,
       callbacks,
     });
+
+    // debug
+    // globalThis.__PIXI_APP__ = this.app;
+    // globalThis.__PIXI_STAGE__ = this.app.stage;
+    // globalThis.__PIXI_RENDERED__ = this.renderer;
   }
 
   public render(scene: TreeSceneRenderModel): void {

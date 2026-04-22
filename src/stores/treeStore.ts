@@ -1,6 +1,5 @@
 import { loadPassiveTree } from "@/data/loaders/loadPassiveTree";
 import { canAllocate } from "@/domain/logic/allocation";
-import { getStartNodeIdsForClass } from "@/domain/logic/selection";
 import type { ClassId } from "@/domain/models/passiveClass";
 import type { NodeId } from "@/domain/models/passiveNode";
 import type { PassiveTree } from "@/domain/models/passiveTree";
@@ -26,7 +25,7 @@ export const useTreeStore = defineStore("treeStore", {
     },
     startNodeIds: (state): Set<NodeId> => {
       if (!state.tree || state.selectedClassId === null) return new Set();
-      return getStartNodeIdsForClass(state.tree.nodesById, state.selectedClassId);
+      return state.tree.classes.get(state.selectedClassId)?.startNodeIds ?? new Set<NodeId>();
     },
   },
   actions: {

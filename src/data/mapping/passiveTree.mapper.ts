@@ -71,9 +71,8 @@ function mapClasses(tree: PassiveSkillTreeDto): Map<ClassId, PassiveClass> {
   const classesIn = tree.classes;
   const classesOut: Map<ClassId, PassiveClass> = new Map();
 
-  for (const classId in classesIn) {
+  for (const classId of classesIn.keys()) {
     const classIn = classesIn[classId]!;
-
     const classOut: PassiveClass = {
       id: classId,
       name: classIn.name,
@@ -86,12 +85,12 @@ function mapClasses(tree: PassiveSkillTreeDto): Map<ClassId, PassiveClass> {
   return classesOut;
 }
 
-function getClassStartNodeIds(classId: ClassId, tree: PassiveSkillTreeDto): NodeId[] {
-  const nodeIds: NodeId[] = [];
+function getClassStartNodeIds(classId: ClassId, tree: PassiveSkillTreeDto): Set<NodeId> {
+  const nodeIds = new Set<NodeId>();
   for (const [nodeId, node] of Object.entries(tree.nodes)) {
     const idx = (node as PassiveTreeNodeDto).classStartIndex;
-    if (idx && idx.toString() == classId) {
-      nodeIds.push(nodeId);
+    if (idx && idx == classId) {
+      nodeIds.add(nodeId);
     }
   }
 

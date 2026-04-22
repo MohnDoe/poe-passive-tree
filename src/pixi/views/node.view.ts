@@ -3,6 +3,7 @@ import type { NodeRenderModel } from "../types/render.models";
 import type { NodeViewCallbacks, NodeView } from "../types/render.views";
 
 function getVisualRadius(model: NodeRenderModel): number {
+  if (model.isStart) return 200;
   switch (model.kind) {
     case "keystone":
       return 50;

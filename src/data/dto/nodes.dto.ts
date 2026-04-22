@@ -5,7 +5,7 @@ export interface PassiveTreeNodeBaseDto {
   /** Position index within the orbit (0..skillsPerOrbit[o]). */
   orbitIndex?: number;
   out?: string[];
-  in?: string[]
+  in?: string[];
 }
 
 export interface PassiveTreeNodeDto extends PassiveTreeNodeBaseDto {
@@ -59,11 +59,9 @@ export interface PassiveTreeNodeDto extends PassiveTreeNodeBaseDto {
   [key: string]: unknown;
 }
 
-export interface PassiveTreeRootNodeDto extends PassiveTreeNodeBaseDto {
-  // nothing, just the base
-}
+export type PassiveTreeRootNodeDto = PassiveTreeNodeBaseDto;
 
-export type PassiveTreeNodeEntryDto = PassiveTreeNodeDto | PassiveTreeRootNodeDto
+export type PassiveTreeNodeEntryDto = PassiveTreeNodeDto | PassiveTreeRootNodeDto;
 
 export interface PassiveTreeExpansionJewelDto {
   /** Jewel size (0: small, 1: medium, etc. in GGG exports). */
@@ -76,10 +74,12 @@ export interface PassiveTreeExpansionJewelDto {
   parent: string;
 }
 
-export const ROOT_NODE_ID = 'root' as const;
+export const ROOT_NODE_ID = "root" as const;
 
-export function isPassiveNode(node: PassiveTreeNodeEntryDto | undefined): node is PassiveTreeNodeDto {
-  return !!node && typeof (node as PassiveTreeNodeDto).skill === 'number';
+export function isPassiveNode(
+  node: PassiveTreeNodeEntryDto | undefined,
+): node is PassiveTreeNodeDto {
+  return !!node && typeof (node as PassiveTreeNodeDto).skill === "number";
 }
 
 export function isRootNodeId(id: string): id is typeof ROOT_NODE_ID {
