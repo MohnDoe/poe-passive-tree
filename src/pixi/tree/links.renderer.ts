@@ -26,7 +26,9 @@ export function renderLinks(stage: PixiStageController, tree: PassiveTree, adj: 
       const endAngle = Math.atan2(endPoint.y - groupCenter.y, endPoint.x - groupCenter.x);
 
       // links.arcTo(startPoint.x, startPoint.y, endPoint.x, endPoint.y, radius)
-
+      links
+        .moveTo(nodeA.position.x, nodeA.position.y)
+        .lineTo(nodeB.position.x, nodeB.position.y)
 
     } else {
       links
@@ -38,7 +40,7 @@ export function renderLinks(stage: PixiStageController, tree: PassiveTree, adj: 
 
   links.stroke({
     color: 0x5f6775,
-    width: 2,
+    width: 10,
     alpha: 0.7
   })
 
