@@ -1,5 +1,8 @@
-<template>
-  <div>
+<script setup lang="ts">
+import { useTreeStore } from "@/stores/treeStore";
 
-  </div>
+const treeStore = useTreeStore();
+</script>
+<template>
+  <div></div>
 </template>

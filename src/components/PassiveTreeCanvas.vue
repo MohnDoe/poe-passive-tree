@@ -1,33 +1,46 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { createPixiStage, type PixiStageController } from "@/pixi/stage";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useTreeStore } from "@/stores/treeStore";
-import { renderTree } from "@/pixi/treeRenderer";
+import { PassiveTreeStage } from "@/pixi/PassiveTreeStage";
+import { createTreeSceneRenderModel } from "@/pixi/sceneModel.mapper";
 
 const hostRef = ref<HTMLDivElement | null>(null);
-let pixiStage: PixiStageController | null = null;
+const stage = new PassiveTreeStage();
 
 const treeStore = useTreeStore();
 
 onMounted(async () => {
   if (!hostRef.value) return;
-  pixiStage = await createPixiStage(hostRef.value);
+
+  await stage.mount(hostRef.value, {
+    onNodeClick: (nodeId) => {
+      console.log("Click node", nodeId);
+      treeStore.toggleNodeAllocation(nodeId);
+    },
+    onNodeHover: (nodeId) => {
+      console.log("Hover node", nodeId);
+      // uiStore.setHoveredNode(nodeId) idk
+    },
+  });
 
   await treeStore.loadTree();
-  // renderTree
 
-
-  renderTree(pixiStage, treeStore.tree!);
-})
-
+  stage.render(
+    createTreeSceneRenderModel({
+      allocatedNodeIds: treeStore.allocatedNodeIds,
+      selectedClassId: treeStore.selectedClassId,
+      tree: treeStore.tree!,
+      highlightedPathNodeIds: [],
+      hoveredNodeId: null,
+    }),
+  );
+  stage.fitToBounds(treeStore.tree!.bounds);
+});
 
 onBeforeUnmount(() => {
-  pixiStage?.destroy();
-  pixiStage = null;
-})
+  stage.destroy();
+});
 </script>
 <template>
-  <div ref="hostRef">
-
-  </div>
+  <div ref="hostRef"></div>
 </template>

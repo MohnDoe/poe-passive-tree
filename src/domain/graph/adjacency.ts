@@ -1,46 +1,46 @@
-import type { NormalizedNodes } from "@/data/mapping/nodes";
+import type { NormalizedNodes } from "@/data/mapping/nodes.mapper";
 import type { NodeId } from "../models/passiveNode";
-import type { PassiveTree, PassiveTreeAdjacency, PassiveTreeNodesById } from "../models/passiveTree";
+import type {
+  PassiveTree,
+  PassiveTreeAdjacency,
+  PassiveTreeNodesById,
+} from "../models/passiveTree";
 
 export function buildMainAdjacency(nodes: PassiveTreeNodesById): PassiveTreeAdjacency {
   //
-  const mainNodes = new Map(
-    [...nodes.entries()]
-      .filter(([_, node]) => node.region == 'main'))
+  const mainNodes = new Map([...nodes.entries()].filter(([_, node]) => node.region == "main"));
 
   return buildAdjacency(mainNodes);
 }
 
-export function buildAscendancyAdjacency(nodes: PassiveTree['nodesById']): PassiveTreeAdjacency {
+export function buildAscendancyAdjacency(nodes: PassiveTree["nodesById"]): PassiveTreeAdjacency {
   //
   const ascendancyNodes = new Map(
-    [...nodes.entries()]
-      .filter(([_, node]) => node.region == 'ascendancy'))
+    [...nodes.entries()].filter(([_, node]) => node.region == "ascendancy"),
+  );
 
   return buildAdjacency(ascendancyNodes);
 }
 
 export function buildFullAdjacency(nodes: NormalizedNodes): PassiveTreeAdjacency {
-  return buildAdjacency(nodes)
+  return buildAdjacency(nodes);
 }
 
 export function buildAdjacency(nodes: NormalizedNodes): PassiveTreeAdjacency {
-  const adj: Map<NodeId, NodeId[]> = new Map();
+  const adj: Map<NodeId, Set<NodeId>> = new Map();
 
   const connect = (a: NodeId, b: NodeId) => {
     let listA = adj.get(a);
     if (!listA) {
-      listA = [];
-      adj.set(a, listA)
+      listA = new Set();
+      adj.set(a, listA);
     }
 
-    if (!listA.includes(b)) {
-      listA.push(b);
-    }
-  }
+    listA.add(b);
+  };
   for (const [nodeId, node] of nodes) {
     if (!adj.has(nodeId)) {
-      adj.set(nodeId, []);
+      adj.set(nodeId, new Set());
     }
 
     const ins = node.in ?? [];

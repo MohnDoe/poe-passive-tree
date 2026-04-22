@@ -1,5 +1,5 @@
 import { buildFullAdjacency, buildMainAdjacency, buildAscendancyAdjacency } from "./adjacency";
-import { finalizedNodes, type NormalizedNodes } from "@/data/mapping/nodes";
+import { finalizedNodes, type NormalizedNodes } from "@/data/mapping/nodes.mapper";
 import { buildAscendancySubregionByNodeIds } from "./ascendancy";
 
 export function buildGraphIndexes(nodes: NormalizedNodes) {
@@ -14,7 +14,7 @@ export function buildGraphIndexes(nodes: NormalizedNodes) {
     adjacency: {
       full,
       main: buildMainAdjacency(nodesById),
-      ascendancy: buildAscendancyAdjacency(nodesById)
-    }
-  }
+      ascendancy: buildAscendancyAdjacency(nodesById),
+    },
+  };
 }

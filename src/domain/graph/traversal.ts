@@ -1,27 +1,29 @@
-import type { NormalizedNodes } from "@/data/mapping/nodes";
+import type { NormalizedNodes } from "@/data/mapping/nodes.mapper";
 import type { PassiveNodeNormalized, NodeId } from "../models/passiveNode";
 import type { PassiveTreeAdjacency } from "../models/passiveTree";
 
-
 function isAscendancyTraversalNode(node: PassiveNodeNormalized) {
-  if (node.type === 'jewel') return false;
-  return (node.isAscendancyStart ||
+  if (node.type === "jewel") return false;
+  return (
+    node.isAscendancyStart ||
     !!node.ascendancyName ||
     node.isMultipleChoice ||
     node.isMultipleChoiceOption ||
     node.isProxy
-  )
+  );
 }
 
-
-export function traverseAscendancyRegion(startNode: PassiveNodeNormalized, adj: PassiveTreeAdjacency, nodes: NormalizedNodes): Set<NodeId> {
+export function traverseAscendancyRegion(
+  startNode: PassiveNodeNormalized,
+  adj: PassiveTreeAdjacency,
+  nodes: NormalizedNodes,
+): Set<NodeId> {
   const visited = new Set<NodeId>();
 
   const DFSRecursive = (node: PassiveNodeNormalized) => {
     visited.add(node.id);
 
-    const neighbors = adj.get(node.id) || [];
-
+    const neighbors = getNeighborIds(node.id, adj);
 
     for (const neighbor of neighbors) {
       if (!visited.has(neighbor)) {
@@ -31,8 +33,12 @@ export function traverseAscendancyRegion(startNode: PassiveNodeNormalized, adj: 
         DFSRecursive(neighborNode);
       }
     }
-  }
+  };
 
   DFSRecursive(startNode);
   return visited;
+}
+
+export function getNeighborIds(nodeId: NodeId, adj: PassiveTreeAdjacency): Set<NodeId> {
+  return adj.get(nodeId) || new Set();
 }

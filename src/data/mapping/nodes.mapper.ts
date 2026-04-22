@@ -1,29 +1,19 @@
-import type { NodeId, AscendancySubregion, PassiveNode, PassiveNodeNormalized, PassiveNodePosition, PassiveNodeType } from "@/domain/models/passiveNode";
+import type {
+  NodeId,
+  AscendancySubregion,
+  PassiveNode,
+  PassiveNodeNormalized,
+  PassiveNodePosition,
+  PassiveNodeType,
+} from "@/domain/models/passiveNode";
 import { isPassiveNode, type PassiveTreeNodeDto } from "../dto/nodes.dto";
 import type { PassiveSkillTreeDto } from "../dto/passiveSkillTree.dto";
 
-export function finalizedNodes(nodes: NormalizedNodes, subregionByNodeId: Map<NodeId, AscendancySubregion>): Map<NodeId, PassiveNode> {
-  const nodesById: Map<NodeId, PassiveNode> = new Map();
-
-  for (const [nodeId, normalizedNode] of nodes) {
-    if (!normalizedNode) continue;
-    const subregion = subregionByNodeId.get(nodeId);
-    const node: PassiveNode = {
-      ...normalizedNode,
-      region: subregion ? 'ascendancy' : 'main',
-      subregion: subregion ?? undefined
-    };
-
-    nodesById.set(nodeId, node);
-  }
-
-  return nodesById;
-}
 export type NormalizedNodes = ReadonlyMap<NodeId, PassiveNodeNormalized>;
 
 export function normalizeAndMapNodes(tree: PassiveSkillTreeDto): NormalizedNodes {
   const nodesIn = tree.nodes;
-  let nodesOut: Map<NodeId, PassiveNodeNormalized> = new Map()
+  const nodesOut: Map<NodeId, PassiveNodeNormalized> = new Map();
   for (const nodeId in nodesIn) {
     const nodeIn = nodesIn[nodeId]!;
     if (!isPassiveNode(nodeIn)) {
@@ -45,11 +35,10 @@ export function normalizeAndMapNodes(tree: PassiveSkillTreeDto): NormalizedNodes
       isMultipleChoice: nodeIn.isMultipleChoice ?? false,
       isMultipleChoiceOption: nodeIn.isMultipleChoiceOption ?? false,
       isProxy: nodeIn.isProxy ?? false,
-      ascendancyName: nodeIn.ascendancyName ?? undefined
-    }
+      ascendancyName: nodeIn.ascendancyName ?? undefined,
+    };
 
-    nodesOut.set(nodeId, nodeOut)
-
+    nodesOut.set(nodeId, nodeOut);
   }
 
   return nodesOut;
@@ -57,25 +46,49 @@ export function normalizeAndMapNodes(tree: PassiveSkillTreeDto): NormalizedNodes
 
 function getPassiveNodeType(node: PassiveTreeNodeDto): PassiveNodeType {
   if (node.isJewelSocket) {
-    return 'jewel'
+    return "jewel";
   }
 
   if (node.isKeystone) {
-    return 'keystone';
+    return "keystone";
   }
 
   if (node.isNotable) {
-    return 'notable'
+    return "notable";
   }
 
   if (node.isMastery) {
-    return 'mastery'
+    return "mastery";
   }
 
-  return 'normal'
+  return "normal";
 }
 
-function getPassiveNodePosition(nodeId: PassiveNode['id'], tree: PassiveSkillTreeDto): PassiveNodePosition | undefined {
+export function finalizedNodes(
+  nodes: NormalizedNodes,
+  subregionByNodeId: Map<NodeId, AscendancySubregion>,
+): Map<NodeId, PassiveNode> {
+  const nodesById: Map<NodeId, PassiveNode> = new Map();
+
+  for (const [nodeId, normalizedNode] of nodes) {
+    if (!normalizedNode) continue;
+    const subregion = subregionByNodeId.get(nodeId);
+    const node: PassiveNode = {
+      ...normalizedNode,
+      region: subregion ? "ascendancy" : "main",
+      subregion: subregion ?? undefined,
+    };
+
+    nodesById.set(nodeId, node);
+  }
+
+  return nodesById;
+}
+
+function getPassiveNodePosition(
+  nodeId: PassiveNode["id"],
+  tree: PassiveSkillTreeDto,
+): PassiveNodePosition | undefined {
   const node = tree.nodes[nodeId];
   if (!node) return;
 
@@ -102,7 +115,5 @@ function getPassiveNodePosition(nodeId: PassiveNode['id'], tree: PassiveSkillTre
   const x = groupData.x + Math.sin(angle) * radius;
   const y = groupData.y - Math.cos(angle) * radius;
 
-  return { x, y }
+  return { x, y };
 }
-
-

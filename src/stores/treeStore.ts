@@ -1,14 +1,16 @@
 import { loadPassiveTree } from "@/data/loaders/loadPassiveTree";
+import { canAllocate } from "@/domain/logic/allocation";
+import { getStartNodeIdsForClass } from "@/domain/logic/selection";
 import type { ClassId } from "@/domain/models/passiveClass";
 import type { NodeId } from "@/domain/models/passiveNode";
 import type { PassiveTree } from "@/domain/models/passiveTree";
 import { defineStore } from "pinia";
 
 interface TreeStoreState {
-  tree: PassiveTree | null
-  selectedClassId: ClassId | null
-  allocatedNodeIds: Set<NodeId>
-  loading: boolean
+  tree: PassiveTree | null;
+  selectedClassId: ClassId | null;
+  allocatedNodeIds: Set<NodeId>;
+  loading: boolean;
 }
 
 export const useTreeStore = defineStore("treeStore", {
@@ -16,13 +18,50 @@ export const useTreeStore = defineStore("treeStore", {
     loading: false,
     tree: null,
     selectedClassId: null,
-    allocatedNodeIds: new Set()
+    allocatedNodeIds: new Set<NodeId>(),
   }),
+  getters: {
+    isAllocated(state): (nodeId: NodeId) => boolean {
+      return (nodeId) => state.allocatedNodeIds.has(nodeId);
+    },
+    startNodeIds: (state): Set<NodeId> => {
+      if (!state.tree || state.selectedClassId === null) return new Set();
+      return getStartNodeIdsForClass(state.tree.nodesById, state.selectedClassId);
+    },
+  },
   actions: {
     async loadTree() {
       this.loading = true;
-      const tree = await loadPassiveTree()
-      this.tree = tree;
-    }
-  }
-})
+      try {
+        this.tree = await loadPassiveTree();
+      } finally {
+        this.loading = false;
+      }
+    },
+    selectClass(classId: ClassId) {
+      this.selectedClassId = classId;
+    },
+    allocateNode(nodeId: NodeId) {
+      this.allocatedNodeIds.add(nodeId);
+    },
+    deallocateNode(_nodeId: NodeId) {
+      // tricky
+      // Should only allow leaf-like allocated nodes
+      // OR deallocated all the nodes after
+      // skip for now
+      // this.allocatedNodeIds.delete(nodeId);
+    },
+    resetAllocations() {
+      this.allocatedNodeIds.clear();
+    },
+    toggleNodeAllocation(nodeId: NodeId) {
+      if (!this.tree) return;
+      if (this.isAllocated(nodeId)) {
+        this.deallocateNode(nodeId);
+      } else {
+        if (canAllocate(nodeId, this.allocatedNodeIds, this.startNodeIds, this.tree.adjacency.full))
+          this.allocateNode(nodeId);
+      }
+    },
+  },
+});
