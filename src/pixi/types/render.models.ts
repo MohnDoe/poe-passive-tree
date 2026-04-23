@@ -1,3 +1,4 @@
+import type { ClassId } from "@/domain/models/passiveClass";
 import type { NodeId, PassiveNodeKind } from "@/domain/models/passiveNode";
 import type { Point } from "pixi.js";
 
@@ -6,8 +7,13 @@ export interface NodeRenderModel {
   x: number;
   y: number;
   kind: PassiveNodeKind;
+}
+
+export interface NodeStateModel {
+  isAllocated: boolean;
+  isHovered: boolean;
+  isInPath: boolean;
   isActiveClassStart?: boolean;
-  isAllocated?: boolean;
 }
 
 export interface GroupBackgroundRenderModel {
@@ -40,5 +46,13 @@ export interface TreeSceneRenderModel {
   backgrounds: GroupBackgroundRenderModel[];
   links: LinkRenderModel[];
   nodes: NodeRenderModel[];
-  highlightedPath: Point[];
+}
+
+export interface TreeVisualStateModel {
+  allocatedNodeIds: Set<NodeId>;
+  hoveredNodeId: NodeId | null;
+  highlightedPathNodeIds: NodeId[];
+  activeClassId: ClassId | null;
+  activeAscendancy: string | null;
+  activeStartNodeIds: Set<NodeId>;
 }

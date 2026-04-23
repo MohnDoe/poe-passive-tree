@@ -1,28 +1,36 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from "vue";
-import { useTreeStore } from "@/stores/treeStore";
+import { getStartNodeIds } from "@/domain/logic/classes";
+import type { NodeId } from "@/domain/models/passiveNode";
+import { treeService } from "@/domain/TreeService";
 import { PassiveTreeStage } from "@/pixi/PassiveTreeStage";
 import { createTreeSceneRenderModel } from "@/pixi/sceneModel.mapper";
+import type { TreeVisualStateModel } from "@/pixi/types/render.models";
+import { useBuildStore } from "@/stores/build.store";
 import { storeToRefs } from "pinia";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const hostRef = ref<HTMLDivElement | null>(null);
-const hasBeenFittedOnce = ref(false);
 const stage = new PassiveTreeStage();
+const buildStore = useBuildStore();
 
-const treeStore = useTreeStore();
+const { activeClassId, activeAscendancy, hoveredNodeId, allocatedNodeIds } =
+  storeToRefs(buildStore);
 
-const { tree, selectedClassId, allocatedNodeIds } = storeToRefs(treeStore);
+const visualState = computed<TreeVisualStateModel>(() => {
+  const tree = treeService.tree.value;
+  let startNodesId = new Set<NodeId>();
+  if (tree && activeClassId.value !== null) {
+    startNodesId = getStartNodeIds(tree, activeClassId.value);
+  }
 
-const sceneModal = computed(() => {
-  if (!tree.value) return null;
-
-  return createTreeSceneRenderModel({
-    tree: tree.value,
-    allocatedNodeIds: allocatedNodeIds.value,
-    selectedClassId: selectedClassId.value,
+  return {
+    allocatedNodeIds: new Set(allocatedNodeIds.value),
+    hoveredNodeId: hoveredNodeId.value,
     highlightedPathNodeIds: [],
-    hoveredNodeId: null,
-  });
+    activeClassId: activeClassId.value,
+    activeAscendancy: activeAscendancy.value,
+    activeStartNodeIds: startNodesId,
+  };
 });
 
 onMounted(async () => {
@@ -31,34 +39,41 @@ onMounted(async () => {
   await stage.mount(hostRef.value, {
     onNodeClick: (nodeId) => {
       console.log("Click node", nodeId);
-      treeStore.toggleNodeAllocation(nodeId);
+      buildStore.toggleNodeAllocation(nodeId);
     },
     onNodeHover: (nodeId) => {
-      if (!nodeId) return;
-      console.log("Hover node", nodeId);
-      console.log(tree.value?.nodesById.get(nodeId));
-      // uiStore.setHoveredNode(nodeId) idk
+      buildStore.setHoveredNode(nodeId);
     },
   });
 
-  await treeStore.loadTree();
+  // ONE-TIME BUILD: Static geometry
+  const stopWatchingTree = watch(
+    () => treeService.tree.value,
+    (tree) => {
+      if (tree) {
+        const staticScene = createTreeSceneRenderModel({ tree: tree });
 
-  watchEffect(() => {
-    const scene = sceneModal.value;
-    if (!scene) return;
+        stage.renderStaticScene(staticScene);
+        stage.fitToBounds(tree.bounds);
 
-    if (!hasBeenFittedOnce.value) {
-      stage.render(scene);
-      stage.fitToBounds(tree.value!.bounds);
-      hasBeenFittedOnce.value = true;
-    }
-  });
-});
+        // stage.updateVisualStates(visualState.value);
 
-watchEffect(() => {
-  const scene = sceneModal.value;
-  if (!scene) return;
-  stage.updateNodeStates(scene);
+        stopWatchingTree();
+      }
+    },
+    { immediate: true },
+  );
+
+  // Only update colors/textures when user state changes
+  watch(
+    visualState,
+    (newState) => {
+      if (treeService.tree.value) {
+        stage.updateVisualStates(newState);
+      }
+    },
+    { immediate: true },
+  );
 });
 
 onBeforeUnmount(() => {
@@ -66,5 +81,12 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <div ref="hostRef"></div>
+  <div ref="hostRef" class="the-tree"></div>
 </template>
+<style scoped>
+.the-tree {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+</style>

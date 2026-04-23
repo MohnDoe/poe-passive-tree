@@ -1,5 +1,5 @@
 import { Circle, Container, Graphics } from "pixi.js";
-import type { NodeRenderModel } from "../types/render.models";
+import type { NodeRenderModel, NodeStateModel } from "../types/render.models";
 import type { NodeViewCallbacks, NodeView } from "../types/render.views";
 
 function getVisualRadius(model: NodeRenderModel): number {
@@ -23,9 +23,9 @@ function getVisualRadius(model: NodeRenderModel): number {
   }
 }
 
-function getFillColor(model: NodeRenderModel): number {
-  if (model.isAllocated) return 0xf2c14e;
-  if (model.isActiveClassStart) return 0x6ecb63;
+function getFillColor(model: NodeRenderModel, state: NodeStateModel): number {
+  if (state.isAllocated) return 0xf2c14e;
+  if (state.isActiveClassStart) return 0x6ecb63;
 
   switch (model.kind) {
     case "ascendancyStart":
@@ -62,19 +62,22 @@ export function createNodeView(
 
   container.addChild(hitTarget, visible);
 
-  const redraw = (next: NodeRenderModel) => {
-    const radius = getVisualRadius(next);
-    const fill = getFillColor(next);
+  const draw = () => {
+    const radius = getVisualRadius(model);
+    hitTarget.circle(0, 0, radius * 1.1);
+    hitTarget.fill({ color: "white", alpha: 0.001 });
+    container.hitArea = new Circle(0, 0, radius * 1.1);
+  };
+
+  const updateState = (state: NodeStateModel) => {
+    const radius = getVisualRadius(model);
+    const fill = getFillColor(model, state);
 
     visible.clear();
     visible.circle(0, 0, radius);
     visible.fill(fill);
 
-    hitTarget.clear();
-    hitTarget.circle(0, 0, radius * 1.1);
-    hitTarget.fill({ color: "white", alpha: 0.001 });
-
-    container.hitArea = new Circle(0, 0, radius * 1.1);
+    // use sprite later
   };
 
   container.on("pointertap", () => {
@@ -92,13 +95,14 @@ export function createNodeView(
     container.destroy({ children: true });
   };
 
-  redraw(model);
+  draw();
+  updateState({ isAllocated: false, isHovered: false, isInPath: false });
 
   return {
     id: model.id,
     container,
     hitTarget,
-    redraw,
+    updateState,
     destroy,
   };
 }

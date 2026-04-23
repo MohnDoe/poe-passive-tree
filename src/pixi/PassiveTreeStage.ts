@@ -1,7 +1,7 @@
 import { Viewport } from "pixi-viewport";
 import { Application, Container } from "pixi.js";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
-import type { TreeSceneRenderModel } from "./types/render.models";
+import type { TreeSceneRenderModel, TreeVisualStateModel } from "./types/render.models";
 import type { TreeRendererCallbacks } from "./types/render.views";
 
 export interface PassiveTreeStageOptions {
@@ -85,9 +85,18 @@ export class PassiveTreeStage {
     this.renderer.render(scene);
   }
 
-  public updateNodeStates(scene: TreeSceneRenderModel): void {
+  public renderStaticScene(scene: TreeSceneRenderModel): void {
+    this.render(scene);
+  }
+
+  public updateVisualStates(state: TreeVisualStateModel): void {
+    this.updateNodeStates(state);
+    // TODO: update links and other stuff
+  }
+
+  public updateNodeStates(state: TreeVisualStateModel): void {
     if (!this.renderer) return;
-    this.renderer.updateNodeStates(scene.nodes);
+    this.renderer.updateNodeStates(state);
   }
 
   public fitToBounds(bounds: { minX: number; minY: number; maxX: number; maxY: number }): void {

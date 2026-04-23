@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { useTreeStore } from "@/stores/treeStore";
+import { treeService } from "@/domain/TreeService";
+import { useBuildStore } from "@/stores/build.store";
 import { storeToRefs } from "pinia";
 
-const treeStore = useTreeStore();
-const { selectedClassId } = storeToRefs(treeStore);
+const buildStore = useBuildStore();
+const { activeClassId } = storeToRefs(buildStore);
 </script>
 <template>
   <div>
     <button
-      v-for="[classId, pClass] of treeStore.tree?.classes"
+      v-for="[classId, pClass] of treeService.tree.value?.classes"
       :key="classId"
-      @click="treeStore.selectClass(classId)"
+      @click="buildStore.selectClass(classId)"
     >
       {{ pClass.id }} -
       {{ pClass.name }}
-      <span v-if="selectedClassId === classId">[active]</span>
+      <span v-if="activeClassId === classId">[active]</span>
     </button>
   </div>
 </template>

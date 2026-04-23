@@ -1,6 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import ClassSelector from "./components/ClassSelector.vue";
 import PassiveTreeCanvas from "./components/PassiveTreeCanvas.vue";
+import { useBuildStore } from "./stores/build.store";
+
+const buildStore = useBuildStore();
+
+onMounted(async () => {
+  await buildStore.initTree();
+});
 </script>
 
 <template>

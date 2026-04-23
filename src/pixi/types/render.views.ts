@@ -1,6 +1,6 @@
 import type { NodeId } from "@/domain/models/passiveNode";
 import type { Container, Graphics } from "pixi.js";
-import type { NodeRenderModel } from "./render.models";
+import type { NodeStateModel } from "./render.models";
 
 export interface TreeRendererCallbacks {
   onNodeClick?: (nodeId: NodeId) => void;
@@ -16,6 +16,6 @@ export interface NodeView {
   id: NodeId;
   container: Container;
   hitTarget: Graphics;
-  redraw: (model: NodeRenderModel) => void;
+  updateState: (state: NodeStateModel) => void;
   destroy: () => void;
 }

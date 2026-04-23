@@ -5,6 +5,7 @@ import type {
   LinkRenderModel,
   NodeRenderModel,
   TreeSceneRenderModel,
+  TreeVisualStateModel,
 } from "./types/render.models";
 import { createNodeView } from "./views/node.view";
 import { createLinkView } from "./views/link.view";
@@ -41,42 +42,18 @@ export class PassiveTreeRenderer {
     this.renderBackgrounds(scene.backgrounds);
     this.renderLinks(scene.links);
     this.renderNodes(scene.nodes);
-    this.renderOverlays(scene);
+    // this.renderOverlays(scene);
   }
 
-  public updateNodeStates(nodes: NodeRenderModel[]): void {
-    for (const node of nodes) {
-      const view = this.nodeViews.get(node.id);
-
-      if (!view) continue;
-
-      view.redraw(node);
+  public updateNodeStates(state: TreeVisualStateModel): void {
+    for (const [nodeId, view] of this.nodeViews) {
+      view.updateState({
+        isAllocated: state.allocatedNodeIds.has(nodeId),
+        isHovered: state.hoveredNodeId === nodeId,
+        isInPath: state.highlightedPathNodeIds.includes(nodeId),
+        isActiveClassStart: state.activeStartNodeIds.has(nodeId),
+      });
     }
-  }
-
-  public destroy(): void {
-    for (const view of this.nodeViews.values()) {
-      view.destroy();
-    }
-
-    this.nodeViews.clear();
-
-    for (const graphics of this.linkViews.values()) {
-      graphics.destroy();
-    }
-
-    this.linkViews.clear();
-
-    for (const graphics of this.backgroundViews.values()) {
-      graphics.destroy();
-    }
-
-    this.backgroundViews.clear();
-
-    this.backgroundLayer.removeChildren();
-    this.linkLayer.removeChildren();
-    this.nodeLayer.removeChildren();
-    this.overlayLayer.removeChildren();
   }
 
   private renderBackgrounds(backgrounds: GroupBackgroundRenderModel[]): void {
@@ -130,24 +107,24 @@ export class PassiveTreeRenderer {
     }
   }
 
-  private renderOverlays(scene: TreeSceneRenderModel): void {
-    this.overlayLayer.removeChildren();
-
-    if (!scene.highlightedPath.length) return;
-
-    const graphics = new Graphics();
-
-    graphics.moveTo(scene.highlightedPath[0]!.x, scene.highlightedPath[0]!.y);
-
-    for (let i = 1; i < scene.highlightedPath.length; i += 1) {
-      const point = scene.highlightedPath[i]!;
-      graphics.lineTo(point.x, point.y);
-    }
-
-    graphics.stroke({ color: 0xffd166, width: 6, alpha: 0.85 });
-
-    this.overlayLayer.addChild(graphics);
-  }
+  // private renderOverlays(scene: TreeSceneRenderModel): void {
+  //   this.overlayLayer.removeChildren();
+  //
+  //   if (!scene.highlightedPath.length) return;
+  //
+  //   const graphics = new Graphics();
+  //
+  //   graphics.moveTo(scene.highlightedPath[0]!.x, scene.highlightedPath[0]!.y);
+  //
+  //   for (let i = 1; i < scene.highlightedPath.length; i += 1) {
+  //     const point = scene.highlightedPath[i]!;
+  //     graphics.lineTo(point.x, point.y);
+  //   }
+  //
+  //   graphics.stroke({ color: 0xffd166, width: 6, alpha: 0.85 });
+  //
+  //   this.overlayLayer.addChild(graphics);
+  // }
 
   private createBackgroundView(background: GroupBackgroundRenderModel): Graphics {
     const graphics = new Graphics();
@@ -156,5 +133,30 @@ export class PassiveTreeRenderer {
     graphics.fill({ color: background.color, alpha: background.alpha });
 
     return graphics;
+  }
+
+  public destroy(): void {
+    for (const view of this.nodeViews.values()) {
+      view.destroy();
+    }
+
+    this.nodeViews.clear();
+
+    for (const graphics of this.linkViews.values()) {
+      graphics.destroy();
+    }
+
+    this.linkViews.clear();
+
+    for (const graphics of this.backgroundViews.values()) {
+      graphics.destroy();
+    }
+
+    this.backgroundViews.clear();
+
+    this.backgroundLayer.removeChildren();
+    this.linkLayer.removeChildren();
+    this.nodeLayer.removeChildren();
+    this.overlayLayer.removeChildren();
   }
 }
