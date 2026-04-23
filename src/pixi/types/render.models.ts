@@ -33,6 +33,7 @@ export type LinkRenderModel =
       radius: number;
       startAngle: number;
       endAngle: number;
+      anticlockwise: boolean;
     };
 
 export interface TreeSceneRenderModel {

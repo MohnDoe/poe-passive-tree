@@ -8,13 +8,20 @@ export function createLinkView(link: LinkRenderModel): Graphics {
     graphics.moveTo(link.from.x, link.from.y);
     graphics.lineTo(link.to.x, link.to.y);
   } else {
-    graphics.arc(link.center.x, link.center.y, link.radius, link.startAngle, link.endAngle);
+    graphics.arc(
+      link.center.x,
+      link.center.y,
+      link.radius,
+      link.startAngle,
+      link.endAngle,
+      link.anticlockwise,
+    );
   }
 
   graphics.stroke({
     color: 0x2d2b21,
-    width: 10,
-    alpha: 0.75,
+    width: 15,
+    alpha: 1,
   });
 
   return graphics;

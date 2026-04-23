@@ -1,7 +1,6 @@
-const TAU = Math.PI * 2;
-
-export function normalizeSignedAngle(angle: number) {
-  angle = (angle + Math.PI) % TAU;
-  if (angle < 0) angle += TAU;
-  return angle - Math.PI;
+export function normalizeSignedAngle(angle: number): number {
+  let a = angle % (2 * Math.PI);
+  if (a <= -Math.PI) a += 2 * Math.PI;
+  if (a > Math.PI) a -= 2 * Math.PI;
+  return a;
 }

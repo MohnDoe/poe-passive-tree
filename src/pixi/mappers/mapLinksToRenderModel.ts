@@ -40,6 +40,7 @@ export function mapLinks(tree: PassiveTree): LinkRenderModel[] {
         endAngle,
         startAngle,
         key,
+        anticlockwise: shortestDelta < 0,
       });
     } else {
       links.push({
