@@ -24,6 +24,7 @@ export interface PassiveNodeNormalized {
   isProxy: boolean;
   ascendancyName?: string;
   classStartIndex?: ClassId;
+  isClassStart?: boolean;
 }
 
 export interface PassiveNode extends PassiveNodeNormalized {

@@ -20,6 +20,8 @@ export function normalizeAndMapNodes(tree: PassiveSkillTreeDto): NormalizedNodes
       continue;
     }
 
+    const isClassStart = nodeIn.classStartIndex !== undefined;
+
     const nodeOut: PassiveNodeNormalized = {
       id: nodeId,
       name: nodeIn.name,
@@ -36,7 +38,8 @@ export function normalizeAndMapNodes(tree: PassiveSkillTreeDto): NormalizedNodes
       isMultipleChoiceOption: nodeIn.isMultipleChoiceOption ?? false,
       isProxy: nodeIn.isProxy ?? false,
       ascendancyName: nodeIn.ascendancyName ?? undefined,
-      classStartIndex: nodeIn.classStartIndex ?? undefined,
+      classStartIndex: isClassStart ? nodeIn.classStartIndex : undefined,
+      isClassStart,
     };
 
     nodesOut.set(nodeId, nodeOut);

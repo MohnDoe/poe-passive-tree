@@ -8,8 +8,6 @@ export function mapNodes(
   allocatedNodeIds: CreateTreeSceneInput["allocatedNodeIds"],
 ): NodeRenderModel[] {
   const nodes: NodeRenderModel[] = [];
-  const selectedClass = selectedClassId ? (tree.classes.get(selectedClassId) ?? null) : null;
-  const classStartNodeIds = selectedClass ? selectedClass.startNodeIds : new Set();
 
   for (const [nodeId, node] of tree.nodesById) {
     const nodeRenderModel: NodeRenderModel = {
@@ -18,7 +16,8 @@ export function mapNodes(
       x: node.position?.x || 0,
       y: node.position?.y || 0,
       isAllocated: allocatedNodeIds.has(nodeId),
-      isStart: classStartNodeIds.has(nodeId),
+      isActiveClassStart: node.isClassStart && selectedClassId == node.classStartIndex,
+      isClassStartNode: node.isClassStart,
     };
 
     nodes.push(nodeRenderModel);

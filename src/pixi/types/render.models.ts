@@ -6,8 +6,9 @@ export interface NodeRenderModel {
   x: number;
   y: number;
   kind: PassiveNodeType;
-  isStart?: boolean;
+  isActiveClassStart?: boolean;
   isAllocated?: boolean;
+  isClassStartNode?: boolean;
 }
 
 export interface GroupBackgroundRenderModel {

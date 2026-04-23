@@ -27,8 +27,6 @@ export function buildAscendancySubregionByNodeIds(
   const subregionByNodeId = new Map<NodeId, AscendancySubregion>();
   const seedIds = collectAscendancySeedNodeIds(nodes);
 
-  console.log("Ascendancy seeds", seedIds);
-
   for (const seedId of seedIds) {
     const seedNode = nodes.get(seedId);
     if (!seedNode) continue;
