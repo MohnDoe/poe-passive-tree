@@ -4,7 +4,7 @@ import type {
   PassiveNode,
   PassiveNodeNormalized,
   PassiveNodePosition,
-  PassiveNodeType,
+  PassiveNodeKind,
 } from "@/domain/models/passiveNode";
 import { isPassiveNode, type PassiveTreeNodeDto } from "../dto/nodes.dto";
 import type { PassiveSkillTreeDto } from "../dto/passiveSkillTree.dto";
@@ -30,16 +30,13 @@ export function normalizeAndMapNodes(tree: PassiveSkillTreeDto): NormalizedNodes
       orbit: nodeIn.orbit ?? 0,
       orbitIndex: nodeIn.orbit ?? 0,
       stats: nodeIn.stats,
-      type: getPassiveNodeType(nodeIn),
+      kind: getPassiveNodeKind(nodeIn),
       groupId: nodeIn.group?.toString() ?? undefined,
       position: getPassiveNodePosition(nodeId, tree),
-      isAscendancyStart: nodeIn.isAscendancyStart ?? false,
       isMultipleChoice: nodeIn.isMultipleChoice ?? false,
       isMultipleChoiceOption: nodeIn.isMultipleChoiceOption ?? false,
-      isProxy: nodeIn.isProxy ?? false,
       ascendancyName: nodeIn.ascendancyName ?? undefined,
       classStartIndex: isClassStart ? nodeIn.classStartIndex : undefined,
-      isClassStart,
     };
 
     nodesOut.set(nodeId, nodeOut);
@@ -48,23 +45,14 @@ export function normalizeAndMapNodes(tree: PassiveSkillTreeDto): NormalizedNodes
   return nodesOut;
 }
 
-function getPassiveNodeType(node: PassiveTreeNodeDto): PassiveNodeType {
-  if (node.isJewelSocket) {
-    return "jewel";
-  }
-
-  if (node.isKeystone) {
-    return "keystone";
-  }
-
-  if (node.isNotable) {
-    return "notable";
-  }
-
-  if (node.isMastery) {
-    return "mastery";
-  }
-
+function getPassiveNodeKind(raw: PassiveTreeNodeDto): PassiveNodeKind {
+  if (raw.isProxy) return "proxy";
+  if (raw.isMastery) return "mastery";
+  if (raw.isJewelSocket) return "jewel";
+  if (raw.isAscendancyStart) return "ascendancyStart";
+  if (raw.classStartIndex !== undefined) return "classStart";
+  if (raw.isKeystone) return "keystone";
+  if (raw.isNotable) return "notable";
   return "normal";
 }
 

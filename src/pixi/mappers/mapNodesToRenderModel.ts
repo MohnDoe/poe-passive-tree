@@ -12,12 +12,11 @@ export function mapNodes(
   for (const [nodeId, node] of tree.nodesById) {
     const nodeRenderModel: NodeRenderModel = {
       id: node.id,
-      kind: node.type,
+      kind: node.kind,
       x: node.position?.x || 0,
       y: node.position?.y || 0,
       isAllocated: allocatedNodeIds.has(nodeId),
-      isActiveClassStart: node.isClassStart && selectedClassId == node.classStartIndex,
-      isClassStartNode: node.isClassStart,
+      isActiveClassStart: node.kind === "classStart" && selectedClassId == node.classStartIndex,
     };
 
     nodes.push(nodeRenderModel);

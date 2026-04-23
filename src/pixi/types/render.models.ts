@@ -1,14 +1,13 @@
-import type { NodeId, PassiveNodeType } from "@/domain/models/passiveNode";
+import type { NodeId, PassiveNodeKind } from "@/domain/models/passiveNode";
 import type { Point } from "pixi.js";
 
 export interface NodeRenderModel {
   id: NodeId;
   x: number;
   y: number;
-  kind: PassiveNodeType;
+  kind: PassiveNodeKind;
   isActiveClassStart?: boolean;
   isAllocated?: boolean;
-  isClassStartNode?: boolean;
 }
 
 export interface GroupBackgroundRenderModel {

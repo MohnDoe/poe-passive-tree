@@ -3,13 +3,13 @@ import type { PassiveNodeNormalized, NodeId } from "../models/passiveNode";
 import type { PassiveTreeAdjacency } from "../models/passiveTree";
 
 function isAscendancyTraversalNode(node: PassiveNodeNormalized) {
-  if (node.type === "jewel") return false;
+  if (node.kind === "jewel") return false;
   return (
-    node.isAscendancyStart ||
+    node.kind === "ascendancyStart" ||
     !!node.ascendancyName ||
     node.isMultipleChoice ||
     node.isMultipleChoiceOption ||
-    node.isProxy
+    node.kind == "proxy"
   );
 }
 

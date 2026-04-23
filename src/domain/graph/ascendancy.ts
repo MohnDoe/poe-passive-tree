@@ -12,7 +12,7 @@ export function collectAscendancySeedNodeIds(nodes: NormalizedNodes): Set<NodeId
   const ids = new Set<NodeId>();
 
   for (const [nodeId, node] of nodes) {
-    if (node.isAscendancyStart) {
+    if (node.kind === "ascendancyStart") {
       ids.add(nodeId);
     }
   }

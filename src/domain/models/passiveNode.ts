@@ -5,7 +5,15 @@ export type NodeId = string;
 
 export type AscendancySubregion = string;
 export type PassiveNodeRegion = "main" | "ascendancy";
-export type PassiveNodeType = "normal" | "notable" | "keystone" | "jewel" | "mastery";
+export type PassiveNodeKind =
+  | "normal"
+  | "notable"
+  | "keystone"
+  | "jewel"
+  | "mastery"
+  | "proxy"
+  | "classStart"
+  | "ascendancyStart";
 
 export interface PassiveNodeNormalized {
   id: NodeId;
@@ -13,18 +21,15 @@ export interface PassiveNodeNormalized {
   stats: string[];
   groupId?: GroupId;
   position?: PassiveNodePosition;
-  type: PassiveNodeType;
+  kind: PassiveNodeKind;
   orbit: number;
   orbitIndex: number;
   out: NodeId[];
   in: NodeId[];
-  isAscendancyStart: boolean;
   isMultipleChoice: boolean;
   isMultipleChoiceOption: boolean;
-  isProxy: boolean;
   ascendancyName?: string;
   classStartIndex?: ClassId;
-  isClassStart?: boolean;
 }
 
 export interface PassiveNode extends PassiveNodeNormalized {

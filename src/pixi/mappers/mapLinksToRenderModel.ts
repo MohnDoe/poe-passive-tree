@@ -7,7 +7,7 @@ import { normalizeSignedAngle } from "@/utils/math.utils";
 
 export function mapLinks(tree: PassiveTree): LinkRenderModel[] {
   const nodes = tree.nodesById;
-  const adj = tree.adjacency.main;
+  const adj = tree.adjacency.full; // TODO: change this probably
   const links: LinkRenderModel[] = [];
 
   for (const [aId, bId] of uniqueEdgesFromAdjacency(adj)) {
@@ -21,6 +21,7 @@ export function mapLinks(tree: PassiveTree): LinkRenderModel[] {
     const startPoint = nodeA.position;
     const endPoint = nodeB.position;
     if (shouldBeAnArc(nodeA, nodeB)) {
+      // FIX: shortest path is not working
       const groupId = nodeA.groupId!;
 
       const groupCenter = tree.groups.get(groupId)!;

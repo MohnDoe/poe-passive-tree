@@ -3,8 +3,13 @@ import type { NodeRenderModel } from "../types/render.models";
 import type { NodeViewCallbacks, NodeView } from "../types/render.views";
 
 function getVisualRadius(model: NodeRenderModel): number {
-  if (model.isClassStartNode) return 200;
   switch (model.kind) {
+    case "ascendancyStart":
+      return 20;
+    case "proxy":
+      return 25;
+    case "classStart":
+      return 200;
     case "keystone":
       return 85;
     case "notable":
@@ -23,6 +28,8 @@ function getFillColor(model: NodeRenderModel): number {
   if (model.isActiveClassStart) return 0x6ecb63;
 
   switch (model.kind) {
+    case "ascendancyStart":
+      return 0xff0000;
     case "keystone":
       return 0xd96bff;
     case "notable":
@@ -31,7 +38,10 @@ function getFillColor(model: NodeRenderModel): number {
       return 0xff7f50;
     case "mastery":
       return 0x909f9f;
+    case "proxy":
+      return 0x0000ff;
     case "normal":
+    case "classStart":
     default:
       return 0xcfcfcf;
   }
