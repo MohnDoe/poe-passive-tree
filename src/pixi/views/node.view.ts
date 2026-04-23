@@ -6,16 +6,15 @@ function getVisualRadius(model: NodeRenderModel): number {
   if (model.isClassStartNode) return 200;
   switch (model.kind) {
     case "keystone":
-      return 70;
+      return 85;
     case "notable":
-      return 30;
     case "jewel":
-      return 40;
+      return 55;
     case "mastery":
-      return 50;
+      return 70;
     case "normal":
     default:
-      return 20;
+      return 35;
   }
 }
 
@@ -30,6 +29,8 @@ function getFillColor(model: NodeRenderModel): number {
       return 0x5da9e9;
     case "jewel":
       return 0xff7f50;
+    case "mastery":
+      return 0x909f9f;
     case "normal":
     default:
       return 0xcfcfcf;

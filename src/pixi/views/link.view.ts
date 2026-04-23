@@ -12,8 +12,8 @@ export function createLinkView(link: LinkRenderModel): Graphics {
   }
 
   graphics.stroke({
-    color: 0x6c757d,
-    width: 2,
+    color: 0x2d2b21,
+    width: 10,
     alpha: 0.75,
   });
 

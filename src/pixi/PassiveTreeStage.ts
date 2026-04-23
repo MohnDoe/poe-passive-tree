@@ -46,7 +46,7 @@ export class PassiveTreeStage {
 
     await app.init({
       resizeTo: host,
-      backgroundColor: options.backgroundColor ?? 0x0b0d12,
+      backgroundColor: options.backgroundColor ?? 0x080c11,
       antialias: options.antialias ?? true,
       autoDensity: true,
     });
