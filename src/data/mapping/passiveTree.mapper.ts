@@ -1,5 +1,5 @@
 import type { PassiveSkillTreeDto } from "@/data/dto/passiveSkillTree.dto";
-import { buildGraphIndexes } from "@/domain/graph/indexes";
+import { buildBaseGraph } from "@/domain/graph/builder";
 import type { ClassId, PassiveClass } from "@/domain/models/passiveClass";
 import type { GroupId, PassiveGroup } from "@/domain/models/passiveGroup";
 import type { NodeId, PassiveRootNode } from "@/domain/models/passiveNode";
@@ -10,13 +10,14 @@ import { normalizeAndMapNodes } from "./nodes.mapper";
 export function mapPassiveTreeDto(rawTree: PassiveSkillTreeDto): PassiveTree {
   const normalizedNodesById = normalizeAndMapNodes(rawTree);
 
-  const graphIndexes = buildGraphIndexes(normalizedNodesById);
+  const baseTree = buildBaseGraph(normalizedNodesById);
 
   return {
-    adjacency: graphIndexes.adjacency,
+    adjacency: baseTree.adjacency,
+    edges: baseTree.edges,
+    nodesById: baseTree.nodesById,
     classes: mapClasses(rawTree),
     groups: mapGroups(rawTree.groups),
-    nodesById: graphIndexes.nodesById,
     root: mapRootNode(rawTree.nodes),
     bounds: mapBounds(rawTree),
   };

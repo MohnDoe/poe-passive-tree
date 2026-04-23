@@ -1,16 +1,17 @@
 import type { PassiveTree } from "@/domain/models/passiveTree";
 import type { LinkRenderModel } from "../types/render.models";
-import { uniqueEdgesFromAdjacency } from "@/domain/graph/ascendancy";
 import type { PassiveNode } from "@/domain/models/passiveNode";
 import { Point } from "pixi.js";
 import { normalizeSignedAngle } from "@/utils/math.utils";
+import { getRenderableEdges } from "@/domain/graph/edges";
 
 export function mapLinks(tree: PassiveTree): LinkRenderModel[] {
   const nodes = tree.nodesById;
-  const adj = tree.adjacency.full; // TODO: change this probably
   const links: LinkRenderModel[] = [];
 
-  for (const [aId, bId] of uniqueEdgesFromAdjacency(adj)) {
+  for (const edge of getRenderableEdges(tree.edges)) {
+    const aId = edge.source;
+    const bId = edge.target;
     const nodeA = nodes.get(aId);
     const nodeB = nodes.get(bId);
 

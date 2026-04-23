@@ -34,7 +34,9 @@ onMounted(async () => {
       treeStore.toggleNodeAllocation(nodeId);
     },
     onNodeHover: (nodeId) => {
+      if (!nodeId) return;
       console.log("Hover node", nodeId);
+      console.log(tree.value?.nodesById.get(nodeId));
       // uiStore.setHoveredNode(nodeId) idk
     },
   });

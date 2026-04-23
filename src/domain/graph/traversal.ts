@@ -1,6 +1,7 @@
 import type { NormalizedNodes } from "@/data/mapping/nodes.mapper";
 import type { PassiveNodeNormalized, NodeId } from "../models/passiveNode";
 import type { PassiveTreeAdjacency } from "../models/passiveTree";
+import type { GraphEdge } from "./edges";
 
 function isAscendancyTraversalNode(node: PassiveNodeNormalized) {
   if (node.kind === "jewel") return false;
@@ -41,4 +42,41 @@ export function traverseAscendancyRegion(
 
 export function getNeighborIds(nodeId: NodeId, adj: PassiveTreeAdjacency): Set<NodeId> {
   return adj.get(nodeId) || new Set();
+}
+
+export function buildTraversalAdjacency(
+  nodes: NormalizedNodes,
+  edges: GraphEdge[],
+  activeAscendancy?: string,
+): PassiveTreeAdjacency {
+  const adj = new Map();
+
+  const connect = (a: NodeId, b: NodeId) => {
+    if (!adj.has(a)) adj.set(a, new Set());
+    if (!adj.has(b)) adj.set(b, new Set());
+    adj.get(a)!.add(b);
+    adj.get(b)!.add(a);
+  };
+
+  for (const edge of edges) {
+    const sourceNode = nodes.get(edge.source);
+    const targetNode = nodes.get(edge.target);
+
+    if (!sourceNode || !targetNode) continue;
+
+    // RULE: Cannot path through proxy nodes
+    if (edge.isProxyTransition) continue;
+
+    // RULE: Masteries are endpoints. We can allocate them, but we cannot path *through* them.
+    // Usually, pathfinding ignores them, and allocating a mastery is just a check if the parent notable is allocated.
+    if (edge.isMasteryLink) continue;
+
+    // RULE: Ascendancy gating
+    if (sourceNode.ascendancyName && sourceNode.ascendancyName !== activeAscendancy) continue;
+    if (targetNode.ascendancyName && targetNode.ascendancyName !== activeAscendancy) continue;
+
+    connect(edge.source, edge.target);
+  }
+
+  return adj;
 }

@@ -59,7 +59,7 @@ export const useTreeStore = defineStore("treeStore", {
       if (this.isAllocated(nodeId)) {
         this.deallocateNode(nodeId);
       } else {
-        if (canAllocate(nodeId, this.allocatedNodeIds, this.startNodeIds, this.tree.adjacency.full))
+        if (canAllocate(nodeId, this.allocatedNodeIds, this.startNodeIds, this.tree.adjacency))
           this.allocateNode(nodeId);
       }
     },

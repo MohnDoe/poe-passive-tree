@@ -1,3 +1,4 @@
+import type { GraphEdge } from "../graph/edges";
 import type { ClassId, PassiveClass } from "./passiveClass";
 import type { GroupId, PassiveGroup } from "./passiveGroup";
 import type { NodeId, PassiveNode, PassiveRootNode } from "./passiveNode";
@@ -17,11 +18,8 @@ export interface PassiveTree {
   nodesById: PassiveTreeNodesById;
   groups: ReadonlyMap<GroupId, PassiveGroup>;
   classes: ReadonlyMap<ClassId, PassiveClass>;
-  adjacency: {
-    full: PassiveTreeAdjacency;
-    main: PassiveTreeAdjacency;
-    ascendancy: PassiveTreeAdjacency;
-  };
+  adjacency: PassiveTreeAdjacency;
+  edges: GraphEdge[];
   root: PassiveRootNode;
   bounds: PassiveTreeBounds;
 }
