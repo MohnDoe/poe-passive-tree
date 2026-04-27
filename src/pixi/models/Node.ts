@@ -1,5 +1,5 @@
 import type { NodeId, PassiveNodeKind } from "@/domain/passiveGraph/PassiveNode";
-import type { Container, Graphics } from "pixi.js";
+import type { Container } from "pixi.js";
 
 export interface NodeRenderModel {
   id: NodeId;
@@ -30,7 +30,6 @@ export interface NodeViewCallbacks {
 export interface NodeView {
   id: NodeId;
   container: Container;
-  hitTarget: Graphics;
   updateState: (state: NodeStateModel) => void;
   destroy: () => void;
 }

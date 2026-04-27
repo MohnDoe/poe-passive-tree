@@ -1,4 +1,4 @@
-import { Circle, Container, Graphics } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import type {
   NodeRenderModel,
   NodeStateModel,
@@ -7,28 +7,12 @@ import type {
   NodeVisualStyle,
 } from "../models/Node";
 import { resolveNodeStyle } from "../theme/nodeStyle.resolver";
-import { passiveTreeTheme } from "../theme/passiveTree.theme";
-
-function sameState(prev: NodeStateModel, next: NodeStateModel): boolean {
-  return (
-    prev.isInPreviewPath === next.isInPreviewPath &&
-    prev.isActiveClassStart === next.isActiveClassStart &&
-    prev.isAllocated === next.isAllocated &&
-    prev.isHovered === next.isHovered
-  );
-}
 
 const defaultState: NodeStateModel = {
   isAllocated: false,
   isHovered: false,
   isInPreviewPath: false,
-};
-
-const defaultStyle: NodeVisualStyle = {
-  scale: 1,
-  alpha: 1,
-  fill: passiveTreeTheme.nodes.colors.normal,
-  radius: passiveTreeTheme.nodes.radiusByKind.normal,
+  isActiveClassStart: false,
 };
 
 export function createNodeView(
@@ -42,12 +26,11 @@ export function createNodeView(
   });
 
   const visible = new Graphics();
-  const hitTarget = new Graphics();
 
-  container.addChild(hitTarget, visible);
+  container.addChild(visible);
 
-  const currentState = defaultState;
-  const currentStyle = defaultStyle;
+  let currentState = { ...defaultState };
+  let currentStyle = resolveNodeStyle(model, currentState);
 
   const draw = (style: NodeVisualStyle) => {
     // use sprite later
@@ -57,21 +40,20 @@ export function createNodeView(
     visible.circle(0, 0, radius);
     visible.fill(fill);
 
-    hitTarget.circle(0, 0, radius * 1.1);
-    hitTarget.fill({ color: "white", alpha: 0.001 });
-    container.hitArea = new Circle(0, 0, radius * 1.1);
-
-    container.scale = scale;
+    container.scale.set(scale);
     container.alpha = alpha;
   };
 
-  const updateState = (state: NodeStateModel) => {
-    if (sameState(currentState, state)) return;
+  const updateState = (nextState: NodeStateModel) => {
+    if (sameState(currentState, nextState)) return;
 
-    const nextStyle = resolveNodeStyle(model, state);
-    // TODO: maybe check if style is really new ? But that's annoying to do
+    const nextStyle = resolveNodeStyle(model, nextState);
 
-    draw(nextStyle);
+    if (!sameStyle(currentStyle, nextStyle)) {
+      draw(nextStyle);
+      currentStyle = nextStyle;
+    }
+    currentState = { ...nextState };
   };
 
   container.on("pointertap", () => {
@@ -94,8 +76,25 @@ export function createNodeView(
   return {
     id: model.id,
     container,
-    hitTarget,
     updateState,
     destroy,
   };
+}
+
+function sameState(prev: NodeStateModel, next: NodeStateModel): boolean {
+  return (
+    prev.isInPreviewPath === next.isInPreviewPath &&
+    prev.isActiveClassStart === next.isActiveClassStart &&
+    prev.isAllocated === next.isAllocated &&
+    prev.isHovered === next.isHovered
+  );
+}
+
+function sameStyle(prev: NodeVisualStyle, next: NodeVisualStyle): boolean {
+  return (
+    prev.alpha === next.alpha &&
+    prev.fill === next.fill &&
+    prev.radius === next.radius &&
+    prev.scale === next.radius
+  );
 }
