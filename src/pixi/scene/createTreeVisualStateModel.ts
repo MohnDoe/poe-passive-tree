@@ -52,7 +52,8 @@ export function createTreeVisualState({
   };
 }
 
-function makeEdgeKeysFromPath(path: NodeId[]): Set<EdgeKey> {
+//TODO: move this
+export function makeEdgeKeysFromPath(path: NodeId[]): Set<EdgeKey> {
   const edgeKeys = new Set<EdgeKey>();
   for (let i = 1; i < path.length; i += 1) {
     edgeKeys.add(makeEdgeKey(path[i - 1]!, path[i]!));

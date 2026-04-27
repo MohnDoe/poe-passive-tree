@@ -4,6 +4,8 @@ import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 
+//TODO: delete this
+
 export function canAllocate(
   graph: PassiveGraph,
   targetNodeId: NodeId,
