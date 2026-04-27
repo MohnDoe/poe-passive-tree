@@ -8,6 +8,8 @@ import type {
   TreeVisualStateModel,
   GroupBackgroundRenderModel,
   TreeRendererCallbacks,
+  HoverVisualDelta,
+  HoverPreviewStateModel,
 } from "../models/Render";
 import { createEdgeView } from "../views/edge.view";
 import { createNodeView } from "../views/node.view";
@@ -44,26 +46,6 @@ export class PassiveTreeRenderer {
     this.renderEdges(scene.edges);
     this.renderNodes(scene.nodes);
     // this.renderOverlays(scene);
-  }
-
-  public updateNodeStates(state: TreeVisualStateModel): void {
-    for (const [nodeId, view] of this.nodeViews) {
-      view.updateState({
-        isAllocated: state.allocated.nodeIds.has(nodeId),
-        isHovered: state.hoveredNodeId === nodeId,
-        isActiveClassStart: state.activeStartNodeIds.has(nodeId),
-        isInPreviewPath: state.preview.nodeIds.has(nodeId),
-      });
-    }
-  }
-
-  public updateEdgeStates(state: TreeVisualStateModel): void {
-    for (const [edgeKey, view] of this.edgeViews) {
-      view.updateState({
-        active: state.allocated.edgeKeys.has(edgeKey),
-        highlighted: state.preview.nodeIds.has(edgeKey),
-      });
-    }
   }
 
   private renderBackgrounds(backgrounds: GroupBackgroundRenderModel[]): void {
@@ -169,5 +151,80 @@ export class PassiveTreeRenderer {
     this.edgeLayer.removeChildren();
     this.nodeLayer.removeChildren();
     this.overlayLayer.removeChildren();
+  }
+
+  public updateNodeStates(state: TreeVisualStateModel): void {
+    for (const [nodeId, view] of this.nodeViews) {
+      view.updateState({
+        isAllocated: state.allocated.nodeIds.has(nodeId),
+        // isHovered: state.hoveredNodeId === nodeId,
+        isHovered: false,
+        isActiveClassStart: state.activeStartNodeIds.has(nodeId),
+        // isInPreviewPath: state.preview.nodeIds.has(nodeId),
+        isInPreviewPath: false,
+      });
+    }
+  }
+
+  public updateEdgeStates(state: TreeVisualStateModel): void {
+    for (const [edgeKey, view] of this.edgeViews) {
+      view.updateState({
+        active: state.allocated.edgeKeys.has(edgeKey),
+        // highlighted: state.preview.nodeIds.has(edgeKey),
+        highlighted: false,
+      });
+    }
+  }
+
+  public updateHoverState({
+    delta,
+    treeState,
+    hoverPreviewState,
+  }: {
+    delta: HoverVisualDelta;
+    treeState: TreeVisualStateModel;
+    hoverPreviewState: HoverPreviewStateModel;
+  }): void {
+    const changedNodeIds = new Set<NodeId>();
+
+    if (delta.previous.hoveredNodeId) changedNodeIds.add(delta.previous.hoveredNodeId);
+    if (delta.hoveredNodeId) changedNodeIds.add(delta.hoveredNodeId);
+
+    for (const nodeId of delta.previous.preview.nodeIds) {
+      changedNodeIds.add(nodeId);
+    }
+
+    for (const nodeId of delta.preview.nodeIds) {
+      changedNodeIds.add(nodeId);
+    }
+
+    for (const nodeId of changedNodeIds) {
+      const view = this.nodeViews.get(nodeId);
+      if (!view) continue;
+
+      //TODO: DRY
+
+      view.updateState({
+        isAllocated: treeState.allocated.nodeIds.has(nodeId),
+        isHovered: hoverPreviewState.hoveredNodeId === nodeId,
+        isActiveClassStart: treeState.activeStartNodeIds.has(nodeId),
+        isInPreviewPath: delta.preview.nodeIds.has(nodeId),
+      });
+    }
+
+    const changedEdgeKeys = new Set<EdgeKey>();
+
+    for (const key of delta.previous.preview.edgeKeys) changedEdgeKeys.add(key);
+    for (const key of delta.preview.edgeKeys) changedEdgeKeys.add(key);
+
+    for (const edgeKey of changedEdgeKeys) {
+      const view = this.edgeViews.get(edgeKey);
+      if (!view) continue;
+
+      view.updateState({
+        active: treeState.allocated.edgeKeys.has(edgeKey),
+        highlighted: delta.preview.edgeKeys.has(edgeKey),
+      });
+    }
   }
 }

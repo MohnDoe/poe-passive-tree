@@ -6,12 +6,12 @@ import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 
 export interface CreateTreeVisualStateParams {
   snapshot: AllocationSnapshot | null;
-  hoveredNodeId: NodeId | null;
+  // hoveredNodeId: NodeId | null;
 }
 
 export function createTreeVisualState({
   snapshot,
-  hoveredNodeId,
+  // hoveredNodeId,
 }: CreateTreeVisualStateParams): TreeVisualStateModel {
   const allocatedNodeIds = new Set<NodeId>();
   let allocatedPathEdgeKeys = new Set<EdgeKey>();
@@ -22,8 +22,8 @@ export function createTreeVisualState({
 
   // const connectedNodeIds = new Set<NodeId>();
 
-  const previewNodeIds = new Set<NodeId>();
-  let previewEdgeKeys = new Set<EdgeKey>();
+  // const previewNodeIds = new Set<NodeId>();
+  // let previewEdgeKeys = new Set<EdgeKey>();
 
   let activeStartNodeIds = new Set<NodeId>();
 
@@ -38,16 +38,16 @@ export function createTreeVisualState({
       // if (state.connectedToStart) connectedNodeIds.add(nodeId);
     }
 
-    if (hoveredNodeId) {
-      const hoveredState = snapshot.nodeStateById.get(hoveredNodeId);
-      const path = hoveredState?.path ?? [];
-
-      for (const nodeId of path) {
-        previewNodeIds.add(nodeId);
-      }
-
-      previewEdgeKeys = makeEdgeKeysFromPath(path);
-    }
+    // if (hoveredNodeId) {
+    //   const hoveredState = snapshot.nodeStateById.get(hoveredNodeId);
+    //   const path = hoveredState?.path ?? [];
+    //
+    //   for (const nodeId of path) {
+    //     previewNodeIds.add(nodeId);
+    //   }
+    //
+    //   previewEdgeKeys = makeEdgeKeysFromPath(path);
+    // }
   }
 
   return {
@@ -56,12 +56,12 @@ export function createTreeVisualState({
       nodeIds: allocatedNodeIds,
       edgeKeys: allocatedPathEdgeKeys,
     },
-    preview: {
-      edgeKeys: previewEdgeKeys,
-      nodeIds: previewNodeIds,
-    },
+    // preview: {
+    //   edgeKeys: previewEdgeKeys,
+    //   nodeIds: previewNodeIds,
+    // },
     allocatableNodeIds,
-    hoveredNodeId,
+    // hoveredNodeId,
   };
 }
 

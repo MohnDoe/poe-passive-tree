@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { TreeVisualStateModel } from "@/pixi/models/Render";
+import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
+import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { HoverVisualDelta, TreeVisualStateModel } from "@/pixi/models/Render";
+import { createHoverPreviewStateModel } from "@/pixi/scene/createHoverPreview";
 import { createTreeSceneModel } from "@/pixi/scene/createTreeSceneModel";
 import { createTreeVisualState } from "@/pixi/scene/createTreeVisualStateModel";
 import { PassiveTreeStage } from "@/pixi/stage/PassiveTreeStage";
@@ -15,12 +18,16 @@ const allocationStore = useAllocationStore();
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = new PassiveTreeStage();
 
+const previousHoveredNodeId = ref<NodeId | null>(null);
+let previousPreviewNodeIds = new Set<NodeId>();
+let previousPreviewEdgeKeys = new Set<EdgeKey>();
+
 const visualState = computed<TreeVisualStateModel | null>(() => {
   if (!runtimeStore.graph) return null;
 
   return createTreeVisualState({
     snapshot: allocationStore.snapshot,
-    hoveredNodeId: uiStore.hoveredNodeId,
+    // hoveredNodeId: uiStore.hoveredNodeId,
   });
 });
 
@@ -51,6 +58,43 @@ onMounted(async () => {
       if (newState) stage.updateVisualStates(newState);
     },
     { immediate: true },
+  );
+
+  watch(
+    () => uiStore.hoveredNodeId,
+    (hoveredNodeId) => {
+      if (!visualState.value) return;
+
+      const hoverPreviewState = createHoverPreviewStateModel({
+        snapshot: allocationStore.snapshot,
+        hoveredNodeId,
+      });
+
+      const delta: HoverVisualDelta = {
+        hoveredNodeId,
+        preview: {
+          nodeIds: hoverPreviewState.nodeIds,
+          edgeKeys: hoverPreviewState.edgeKeys,
+        },
+        previous: {
+          hoveredNodeId: previousHoveredNodeId.value,
+          preview: {
+            edgeKeys: previousPreviewEdgeKeys,
+            nodeIds: previousPreviewNodeIds,
+          },
+        },
+      };
+
+      stage.updateHoverState({
+        delta,
+        treeState: visualState.value,
+        hoverPreviewState,
+      });
+
+      previousHoveredNodeId.value = hoveredNodeId;
+      previousPreviewNodeIds = new Set(hoverPreviewState.nodeIds);
+      previousPreviewEdgeKeys = new Set(hoverPreviewState.edgeKeys);
+    },
   );
 });
 

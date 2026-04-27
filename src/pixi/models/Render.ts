@@ -29,11 +29,32 @@ export interface TreeVisualStateModel {
   // reachableNodeIds: ReadonlySet<NodeId>;
   allocatableNodeIds: ReadonlySet<NodeId>;
 
-  hoveredNodeId: NodeId | null;
+  // hoveredNodeId: NodeId | null;
 
+  // preview: {
+  //   nodeIds: ReadonlySet<NodeId>;
+  //   edgeKeys: ReadonlySet<EdgeKey>;
+  // };
+}
+
+export interface HoverPreviewStateModel {
+  hoveredNodeId: NodeId | null;
+  nodeIds: ReadonlySet<NodeId>;
+  edgeKeys: ReadonlySet<EdgeKey>;
+}
+
+export interface HoverVisualDelta {
+  hoveredNodeId: NodeId | null;
+  previous: {
+    preview: {
+      edgeKeys: ReadonlySet<EdgeKey>;
+      nodeIds: ReadonlySet<NodeId>;
+    };
+    hoveredNodeId: NodeId | null;
+  };
   preview: {
-    nodeIds: ReadonlySet<NodeId>;
     edgeKeys: ReadonlySet<EdgeKey>;
+    nodeIds: ReadonlySet<NodeId>;
   };
 }
 
