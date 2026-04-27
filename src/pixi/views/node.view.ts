@@ -13,6 +13,7 @@ const defaultState: NodeStateModel = {
   isHovered: false,
   isInPreviewPath: false,
   isActiveClassStart: false,
+  isInRefundPath: false,
 };
 
 export function createNodeView(
@@ -86,7 +87,8 @@ function sameState(prev: NodeStateModel, next: NodeStateModel): boolean {
     prev.isInPreviewPath === next.isInPreviewPath &&
     prev.isActiveClassStart === next.isActiveClassStart &&
     prev.isAllocated === next.isAllocated &&
-    prev.isHovered === next.isHovered
+    prev.isHovered === next.isHovered &&
+    prev.isInRefundPath === next.isInRefundPath
   );
 }
 

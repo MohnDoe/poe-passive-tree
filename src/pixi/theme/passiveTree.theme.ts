@@ -23,6 +23,7 @@ export const passiveTreeTheme = {
       activeClassStart: 0x6ecb63,
       previewPath: 0xfffb6f,
       hovered: 0xffffff,
+      refund: 0xff1100,
     },
   },
   edges: {
@@ -30,6 +31,7 @@ export const passiveTreeTheme = {
       normal: 0x2d2b21,
       highlighted: 0xfffb6f,
       active: 0xf2c14e,
+      refund: 0xff1100,
     },
     stroke: 15,
     alpha: 1,

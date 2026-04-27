@@ -162,6 +162,7 @@ export class PassiveTreeRenderer {
         isActiveClassStart: state.activeStartNodeIds.has(nodeId),
         // isInPreviewPath: state.preview.nodeIds.has(nodeId),
         isInPreviewPath: false,
+        isInRefundPath: false,
       });
     }
   }
@@ -172,6 +173,7 @@ export class PassiveTreeRenderer {
         active: state.allocated.edgeKeys.has(edgeKey),
         // highlighted: state.preview.nodeIds.has(edgeKey),
         highlighted: false,
+        refund: false,
       });
     }
   }
@@ -185,18 +187,15 @@ export class PassiveTreeRenderer {
     treeState: TreeVisualStateModel;
     hoverPreviewState: HoverPreviewStateModel;
   }): void {
-    const changedNodeIds = new Set<NodeId>();
+    const changedNodeIds = new Set<NodeId>([
+      ...delta.previous.highlight.nodeIds,
+      ...delta.highlight.nodeIds,
+      ...delta.previous.refund.nodeIds,
+      ...delta.refund.nodeIds,
+    ]);
 
     if (delta.previous.hoveredNodeId) changedNodeIds.add(delta.previous.hoveredNodeId);
     if (delta.hoveredNodeId) changedNodeIds.add(delta.hoveredNodeId);
-
-    for (const nodeId of delta.previous.preview.nodeIds) {
-      changedNodeIds.add(nodeId);
-    }
-
-    for (const nodeId of delta.preview.nodeIds) {
-      changedNodeIds.add(nodeId);
-    }
 
     for (const nodeId of changedNodeIds) {
       const view = this.nodeViews.get(nodeId);
@@ -208,22 +207,27 @@ export class PassiveTreeRenderer {
         isAllocated: treeState.allocated.nodeIds.has(nodeId),
         isHovered: hoverPreviewState.hoveredNodeId === nodeId,
         isActiveClassStart: treeState.activeStartNodeIds.has(nodeId),
-        isInPreviewPath: delta.preview.nodeIds.has(nodeId),
+        isInPreviewPath: delta.highlight.nodeIds.has(nodeId),
+        isInRefundPath: delta.refund.nodeIds.has(nodeId),
       });
     }
 
-    const changedEdgeKeys = new Set<EdgeKey>();
+    const changedEdgeKeys = new Set<EdgeKey>([
+      ...delta.previous.highlight.edgeKeys,
+      ...delta.highlight.edgeKeys,
+      ...delta.previous.refund.edgeKeys,
+      ...delta.refund.edgeKeys,
+    ]);
 
-    for (const key of delta.previous.preview.edgeKeys) changedEdgeKeys.add(key);
-    for (const key of delta.preview.edgeKeys) changedEdgeKeys.add(key);
-
+    // TODO: DRY
     for (const edgeKey of changedEdgeKeys) {
       const view = this.edgeViews.get(edgeKey);
       if (!view) continue;
 
       view.updateState({
         active: treeState.allocated.edgeKeys.has(edgeKey),
-        highlighted: delta.preview.edgeKeys.has(edgeKey),
+        highlighted: hoverPreviewState.highlight.edgeKeys.has(edgeKey),
+        refund: hoverPreviewState.refund.edgeKeys.has(edgeKey),
       });
     }
   }

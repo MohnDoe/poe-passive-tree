@@ -12,6 +12,10 @@ export function resolveEdgeStyle(state: EdgeRenderState): EdgeVisualStyle {
     color = passiveTreeTheme.edges.colors.active;
   }
 
+  if (state.refund) {
+    color = passiveTreeTheme.edges.colors.refund;
+  }
+
   return {
     stroke: {
       width: passiveTreeTheme.edges.stroke,

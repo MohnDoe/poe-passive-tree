@@ -12,6 +12,7 @@ export interface NodeStateModel {
   isAllocated: boolean;
   isHovered: boolean;
   isInPreviewPath: boolean;
+  isInRefundPath: boolean;
   isActiveClassStart?: boolean;
 }
 

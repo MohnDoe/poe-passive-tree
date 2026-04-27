@@ -21,6 +21,7 @@ export type EdgeRenderModel =
 export interface EdgeRenderState {
   active: boolean;
   highlighted: boolean;
+  refund: boolean;
 
   // TODO: refundable, alternative (for when 2 preview path are equal)
 }

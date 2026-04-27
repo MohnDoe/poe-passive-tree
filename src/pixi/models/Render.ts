@@ -39,23 +39,18 @@ export interface TreeVisualStateModel {
 
 export interface HoverPreviewStateModel {
   hoveredNodeId: NodeId | null;
-  nodeIds: ReadonlySet<NodeId>;
-  edgeKeys: ReadonlySet<EdgeKey>;
+  highlight: {
+    nodeIds: ReadonlySet<NodeId>;
+    edgeKeys: ReadonlySet<EdgeKey>;
+  };
+  refund: {
+    nodeIds: ReadonlySet<NodeId>;
+    edgeKeys: ReadonlySet<EdgeKey>;
+  };
 }
 
-export interface HoverVisualDelta {
-  hoveredNodeId: NodeId | null;
-  previous: {
-    preview: {
-      edgeKeys: ReadonlySet<EdgeKey>;
-      nodeIds: ReadonlySet<NodeId>;
-    };
-    hoveredNodeId: NodeId | null;
-  };
-  preview: {
-    edgeKeys: ReadonlySet<EdgeKey>;
-    nodeIds: ReadonlySet<NodeId>;
-  };
+export interface HoverVisualDelta extends HoverPreviewStateModel {
+  previous: HoverPreviewStateModel;
 }
 
 export interface TreeRendererCallbacks {

@@ -1,14 +1,14 @@
 import type { BuildState } from "@/domain/build/BuildState";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import { setsEqual } from "@/utils/utils";
 import type {
   AllocationNodeState,
   AllocationResult,
   AllocationSnapshot,
 } from "../../../domain/build/allocation/Allocation";
+import { computeRefundClosure } from "./analysis/refund";
 import { buildAllocationSnapshot } from "./buildAllocationSnapshot";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { setsEqual } from "@/utils/utils";
-import { computeRefundClosure } from "./analysis/computeRefundClosure";
 
 interface AllocationSnapshotInputs {
   graph: PassiveGraph;

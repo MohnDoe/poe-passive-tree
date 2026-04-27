@@ -54,6 +54,8 @@ function shouldBeAnArc(a: PassiveNode, b: PassiveNode) {
   return a.groupId === b.groupId && a.orbit === b.orbit;
 }
 
-export function makeEdgeKey(a: NodeId, b: NodeId) {
+export function makeEdgeKey(aId: NodeId, bId: NodeId) {
+  const a = parseInt(aId);
+  const b = parseInt(bId);
   return a < b ? `${a}-${b}` : `${b}-${a}`;
 }

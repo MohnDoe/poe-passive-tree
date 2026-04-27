@@ -7,7 +7,9 @@ export function resolveNodeStyle(model: NodeRenderModel, state: NodeStateModel):
 
   let fill = nodesTheme.colors.normal;
 
-  if (state.isAllocated) {
+  if (state.isInRefundPath) {
+    fill = nodesTheme.colors.refund;
+  } else if (state.isAllocated) {
     fill = nodesTheme.colors.allocated;
   } else if (state.isActiveClassStart) {
     fill = nodesTheme.colors.activeClassStart;

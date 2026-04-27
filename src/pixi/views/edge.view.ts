@@ -5,6 +5,7 @@ import { resolveEdgeStyle } from "../theme/edgeStyle.resolver";
 const defaultState: EdgeRenderState = {
   highlighted: false,
   active: false,
+  refund: false,
 };
 
 export function createEdgeView(edge: EdgeRenderModel): EdgeView {
@@ -59,7 +60,11 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
 }
 
 function sameState(prev: EdgeRenderState, next: EdgeRenderState): boolean {
-  return prev.active === next.active && prev.highlighted === next.highlighted;
+  return (
+    prev.active === next.active &&
+    prev.highlighted === next.highlighted &&
+    prev.refund === next.refund
+  );
 }
 
 function sameStyle(prev: EdgeVisualStyle, next: EdgeVisualStyle): boolean {
