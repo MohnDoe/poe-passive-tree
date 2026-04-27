@@ -8,6 +8,7 @@ import type {
 import { buildAllocationSnapshot } from "./buildAllocationSnapshot";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { setsEqual } from "@/utils/utils";
+import { computeRefundClosure } from "./analysis/computeRefundClosure";
 
 interface AllocationSnapshotInputs {
   graph: PassiveGraph;
@@ -99,6 +100,25 @@ export class AllocationService {
 
     for (const pathNodeId of path) {
       nextAllocatedNodeIds.add(pathNodeId);
+    }
+
+    return {
+      changed: !setsEqual(nextAllocatedNodeIds, this.buildState.allocatedNodeIds),
+      nextAllocatedNodeIds,
+    };
+  }
+
+  planRefund(nodeId: NodeId): AllocationResult {
+    if (!this.snapshot || !this.buildState) {
+      return { changed: false, nextAllocatedNodeIds: new Set() };
+    }
+
+    const refundedNodeIds = computeRefundClosure(nodeId, this.snapshot.nodeStateById);
+
+    const nextAllocatedNodeIds = new Set(this.buildState.allocatedNodeIds);
+
+    for (const refundedNodeId of refundedNodeIds) {
+      nextAllocatedNodeIds.delete(refundedNodeId);
     }
 
     return {
