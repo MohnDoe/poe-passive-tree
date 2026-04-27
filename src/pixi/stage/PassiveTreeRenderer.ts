@@ -52,7 +52,7 @@ export class PassiveTreeRenderer {
         isAllocated: state.allocatedNodeIds.has(nodeId),
         isHovered: state.hoveredNodeId === nodeId,
         isActiveClassStart: state.activeStartNodeIds.has(nodeId),
-        isInPreviewPath: state.previewPathNodeIds.has(nodeId),
+        isInPreviewPath: state.previw.nodeIds.has(nodeId),
       });
     }
   }

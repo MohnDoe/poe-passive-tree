@@ -15,8 +15,8 @@ export function createTreeVisualState({
   const allocatedNodeIds = new Set<NodeId>();
   const allocatableNodeIds = new Set<NodeId>();
   const connectedNodeIds = new Set<NodeId>();
-  const previewPathNodeIds = new Set<NodeId>();
-  const highlightedEdgeIds = new Set<string>();
+  const previewNodeIds = new Set<NodeId>();
+  const previewEdgeKeys = new Set<string>();
   let activeStartNodeIds = new Set<NodeId>();
 
   if (snapshot) {
@@ -32,11 +32,11 @@ export function createTreeVisualState({
       const path = hoveredState?.path ?? [];
 
       for (const nodeId of path) {
-        previewPathNodeIds.add(nodeId);
+        previewNodeIds.add(nodeId);
       }
 
       for (let i = 1; i < path.length; i += 1) {
-        highlightedEdgeIds.add(makeEdgeKey(path[i - 1]!, path[i]!));
+        previewEdgeKeys.add(makeEdgeKey(path[i - 1]!, path[i]!));
       }
     }
   }
@@ -44,7 +44,10 @@ export function createTreeVisualState({
   return {
     activeStartNodeIds,
     allocatedNodeIds,
-    previewPathNodeIds,
+    previw: {
+      edgeKeys: previewEdgeKeys,
+      nodeIds: previewNodeIds,
+    },
     // allocatableNodeIds,
     hoveredNodeId,
   };
