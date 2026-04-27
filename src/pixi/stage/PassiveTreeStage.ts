@@ -94,12 +94,18 @@ export class PassiveTreeStage {
 
   public updateVisualStates(state: TreeVisualStateModel): void {
     this.updateNodeStates(state);
-    // TODO: update edges and other stuff
+    this.updateEdgeStates(state);
+    // TODO: update other stuff
   }
 
   public updateNodeStates(state: TreeVisualStateModel): void {
     if (!this.renderer) return;
     this.renderer.updateNodeStates(state);
+  }
+
+  public updateEdgeStates(state: TreeVisualStateModel): void {
+    if (!this.renderer) return;
+    this.renderer.updateEdgeStates(state);
   }
 
   public fitToBounds(bounds: { minX: number; minY: number; maxX: number; maxY: number }): void {

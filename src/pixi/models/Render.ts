@@ -21,17 +21,20 @@ export interface TreeSceneRenderModel {
 export interface TreeVisualStateModel {
   activeStartNodeIds: ReadonlySet<NodeId>;
 
-  allocatedNodeIds: ReadonlySet<NodeId>;
-  // reachableNodeIds: ReadonlySet<NodeId>;
-  // allocatableNodeIds: ReadonlySet<NodeId>;
-
-  previw: {
+  allocated: {
     nodeIds: ReadonlySet<NodeId>;
     edgeKeys: ReadonlySet<EdgeKey>;
   };
-  // activeEdgeKeys: ReadonlySet<EdgeKey>;
-  // highlightedEdgeKeys: ReadonlySet<EdgeKey>;
+
+  // reachableNodeIds: ReadonlySet<NodeId>;
+  allocatableNodeIds: ReadonlySet<NodeId>;
+
   hoveredNodeId: NodeId | null;
+
+  preview: {
+    nodeIds: ReadonlySet<NodeId>;
+    edgeKeys: ReadonlySet<EdgeKey>;
+  };
 }
 
 export interface TreeRendererCallbacks {

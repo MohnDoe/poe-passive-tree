@@ -9,8 +9,8 @@ import type {
   GroupBackgroundRenderModel,
   TreeRendererCallbacks,
 } from "../models/Render";
-import { createEdgeView } from "../views/createEdgeView";
-import { createNodeView } from "../views/createNodeView";
+import { createEdgeView } from "../views/edge.view";
+import { createNodeView } from "../views/node.view";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -49,10 +49,19 @@ export class PassiveTreeRenderer {
   public updateNodeStates(state: TreeVisualStateModel): void {
     for (const [nodeId, view] of this.nodeViews) {
       view.updateState({
-        isAllocated: state.allocatedNodeIds.has(nodeId),
+        isAllocated: state.allocated.nodeIds.has(nodeId),
         isHovered: state.hoveredNodeId === nodeId,
         isActiveClassStart: state.activeStartNodeIds.has(nodeId),
-        isInPreviewPath: state.previw.nodeIds.has(nodeId),
+        isInPreviewPath: state.preview.nodeIds.has(nodeId),
+      });
+    }
+  }
+
+  public updateEdgeStates(state: TreeVisualStateModel): void {
+    for (const [edgeKey, view] of this.edgeViews) {
+      view.updateState({
+        active: state.allocated.edgeKeys.has(edgeKey),
+        highlighted: state.preview.nodeIds.has(edgeKey),
       });
     }
   }

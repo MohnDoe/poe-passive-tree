@@ -28,11 +28,6 @@ export interface AllocationSnapshot {
   rootNodeIds: Set<NodeId>;
 
   allocatedNodeIds: ReadonlySet<NodeId>;
-  connectedNodeIds: ReadonlySet<NodeId>;
-  allocatableNodeIds: ReadonlySet<NodeId>;
-  reachableNodeIds: ReadonlySet<NodeId>;
 
   nodeStateById: Map<NodeId, AllocationNodeState>;
-
-  // previewByNodeId: Map<NodeId, PreviewState>;
 }

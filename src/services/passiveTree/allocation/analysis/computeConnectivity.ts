@@ -6,19 +6,14 @@ export interface ComputeConnectivityParams {
   graph: PassiveGraph;
   rootNodeIds: ReadonlySet<NodeId>;
   allocatedNodeIds: ReadonlySet<NodeId>;
-  nodeStateById: Map<NodeId, AllocationNodeState>;
 }
 
 export function computeConnectivity({
   graph,
-  nodeStateById,
   rootNodeIds,
   allocatedNodeIds,
 }: ComputeConnectivityParams): Set<NodeId> {
   const connectedNodeIds = new Set<NodeId>();
-
-  if (!graph) return connectedNodeIds;
-
   const queue: NodeId[] = [...rootNodeIds];
 
   while (queue.length > 0) {
@@ -31,13 +26,12 @@ export function computeConnectivity({
     if (!allocatedNodeIds.has(nodeId) && !rootNodeIds.has(nodeId)) continue;
 
     connectedNodeIds.add(nodeId);
-    nodeStateById.get(nodeId)!.connectedToStart = true;
 
     for (const neighborId of graph.adjacency.get(nodeId) ?? []) {
       const neighbor = graph.nodesById.get(neighborId);
       if (!neighbor) continue;
       if (!allocatedNodeIds.has(neighborId)) continue;
-      if (node.kind === "mastery") continue;
+      if (neighbor.kind === "mastery") continue;
       if (neighbor.kind === "classStart" || neighbor.kind === "ascendancyStart") continue;
 
       queue.push(neighborId);
@@ -45,4 +39,13 @@ export function computeConnectivity({
   }
 
   return connectedNodeIds;
+}
+
+export function applyConnectivityToNodeState(
+  nodeStateById: Map<NodeId, AllocationNodeState>,
+  connectedNodeIds: ReadonlySet<NodeId>,
+): void {
+  for (const [nodeId, state] of nodeStateById) {
+    state.connectedToStart = connectedNodeIds.has(nodeId);
+  }
 }

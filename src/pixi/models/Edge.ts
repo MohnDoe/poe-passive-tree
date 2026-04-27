@@ -19,12 +19,15 @@ export type EdgeRenderModel =
     };
 
 export interface EdgeRenderState {
-  isActive: boolean;
-  //is preview blabla bla
+  active: boolean;
+  highlighted: boolean;
+
+  // TODO: refundable, alternative (for when 2 preview path are equal)
 }
 
 export interface EdgeView {
   key: GraphEdge["key"];
   graphics: Graphics;
   destroy: () => void;
+  updateState: (state: EdgeRenderState) => void;
 }

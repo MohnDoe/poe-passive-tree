@@ -11,9 +11,15 @@ export interface NodeRenderModel {
 export interface NodeStateModel {
   isAllocated: boolean;
   isHovered: boolean;
-  // isInPath: boolean;
   isInPreviewPath: boolean;
   isActiveClassStart?: boolean;
+}
+
+export interface NodeVisualStyle {
+  radius: number;
+  fill: number;
+  alpha: number;
+  scale: number;
 }
 
 export interface NodeViewCallbacks {

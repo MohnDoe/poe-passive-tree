@@ -1,5 +1,9 @@
 import { Graphics } from "pixi.js";
-import type { EdgeRenderModel, EdgeView } from "../models/Edge";
+import type { EdgeRenderModel, EdgeRenderState, EdgeView } from "../models/Edge";
+
+function sameState(prev: EdgeRenderState, next: EdgeRenderState): boolean {
+  return prev.active === next.active && prev.highlighted === next.highlighted;
+}
 
 export function createEdgeView(edge: EdgeRenderModel): EdgeView {
   const graphics = new Graphics();
@@ -25,14 +29,26 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
     });
   };
 
+  const currentState: EdgeRenderState = {
+    active: false,
+    highlighted: false,
+  };
+
+  const updateState = (state: EdgeRenderState) => {
+    if (sameState(currentState, state)) return;
+  };
+
   const destroy = () => {
     graphics.destroy();
   };
+
   draw();
+  updateState(currentState);
 
   return {
     key: edge.key,
     graphics,
     destroy,
+    updateState,
   };
 }
