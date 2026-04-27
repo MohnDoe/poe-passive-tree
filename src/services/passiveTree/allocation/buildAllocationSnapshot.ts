@@ -53,15 +53,6 @@ export function buildAllocationSnapshot({
 
   applyConnectivityToNodeState(nodeStateById, connectedNodeIds);
 
-  const allocatableNodeIds = new Set<NodeId>();
-
-  for (const [nodeId, state] of nodeStateById) {
-    if (!state.allocated && state.path !== null) {
-      state.allocatable = true;
-      allocatableNodeIds.add(nodeId);
-    }
-  }
-
   return {
     activeClassId: buildState.activeClassId,
     rootNodeIds: new Set(rootNodeIds),

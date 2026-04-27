@@ -24,7 +24,7 @@ export function buildEdges(nodes: MappedPassiveTree["nodesById"]): GraphEdge[] {
       source: sourceId,
       target: targetId,
       isAscendancyTransition: isAscendancyTransition(sourceNode, targetNode),
-      isMasteryLink: sourceNode.kind === "mastery" || targetNode.kind === "mastery",
+      isMasteryLink: isMasteryLink(sourceNode, targetNode),
       isProxyTransition: isProxyTransition(sourceNode, targetNode),
     });
   };
@@ -35,6 +35,13 @@ export function buildEdges(nodes: MappedPassiveTree["nodesById"]): GraphEdge[] {
   }
 
   return edges;
+}
+
+function isMasteryLink(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
+  return (
+    // sourceNode.kind === "mastery" ||
+    targetNode.kind === "mastery"
+  );
 }
 
 function isAscendancyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {

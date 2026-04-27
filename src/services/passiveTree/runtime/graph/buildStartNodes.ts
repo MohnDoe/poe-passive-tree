@@ -50,9 +50,10 @@ function getStartNodeIdsByClassId(
       const classId = node.classStartIndex;
 
       // only neighbors in the main tree are start node
-      const neighbors = [...getNeighborIds(nodeId, adjacency)].filter(
-        (neighborId) => regionByNodeId.get(neighborId) == "main",
-      );
+      // const neighbors = [...getNeighborIds(nodeId, adjacency)].filter(
+      //   (neighborId) => regionByNodeId.get(neighborId) == "main",
+      // );
+      const neighbors = [nodeId];
 
       if (!out.has(classId)) out.set(classId, new Set(neighbors));
     }
