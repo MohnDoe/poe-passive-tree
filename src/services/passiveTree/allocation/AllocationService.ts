@@ -1,8 +1,13 @@
 import type { BuildState } from "@/domain/build/BuildState";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { AllocationSnapshot } from "../../../domain/build/allocation/Allocation";
+import type {
+  AllocationNodeState,
+  AllocationResult,
+  AllocationSnapshot,
+} from "../../../domain/build/allocation/Allocation";
 import { buildAllocationSnapshot } from "./buildAllocationSnapshot";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import { setsEqual } from "@/utils/utils";
 
 interface AllocationSnapshotInputs {
   graph: PassiveGraph;
@@ -36,7 +41,11 @@ export class AllocationService {
 
   canAllocate(nodeId: NodeId): boolean {
     const snapshot = this.requireSnapshot();
-    return snapshot.allocatedNodeIds.has(nodeId);
+    return snapshot.allocatableNodeIds.has(nodeId);
+  }
+
+  getNodeState(nodeId: NodeId): AllocationNodeState | null {
+    return this.snapshot?.nodeStateById.get(nodeId) ?? null;
   }
 
   private tryRebuild() {
@@ -68,9 +77,33 @@ export class AllocationService {
     });
 
     console.log("[AllocationService] New snapshot");
-    console.log(snapshot);
 
     this.snapshot = snapshot;
     return snapshot;
+  }
+
+  planAllocation(nodeId: NodeId): AllocationResult {
+    if (!this.snapshot || !this.buildState) {
+      return { changed: false, nextAllocatedNodeIds: new Set() };
+    }
+
+    const nextAllocatedNodeIds = new Set<NodeId>(this.buildState.allocatedNodeIds);
+    if (!this.canAllocate(nodeId)) {
+      return {
+        changed: false,
+        nextAllocatedNodeIds,
+      };
+    }
+
+    const path = this.getNodeState(nodeId)?.path ?? [];
+
+    for (const pathNodeId of path) {
+      nextAllocatedNodeIds.add(pathNodeId);
+    }
+
+    return {
+      changed: !setsEqual(nextAllocatedNodeIds, this.buildState.allocatedNodeIds),
+      nextAllocatedNodeIds,
+    };
   }
 }

@@ -32,22 +32,14 @@ export function createTreeVisualState({
     for (const [nodeId, state] of snapshot.nodeStateById) {
       if (state.allocated) {
         allocatedNodeIds.add(nodeId);
-        allocatedPathEdgeKeys = makeEdgeKeysFromPath(state.path ?? []);
+        allocatedPathEdgeKeys = new Set([
+          ...allocatedPathEdgeKeys,
+          ...makeEdgeKeysFromPath(state.path ?? []),
+        ]);
       }
       if (state.allocatable) allocatableNodeIds.add(nodeId);
       // if (state.connectedToStart) connectedNodeIds.add(nodeId);
     }
-
-    // if (hoveredNodeId) {
-    //   const hoveredState = snapshot.nodeStateById.get(hoveredNodeId);
-    //   const path = hoveredState?.path ?? [];
-    //
-    //   for (const nodeId of path) {
-    //     previewNodeIds.add(nodeId);
-    //   }
-    //
-    //   previewEdgeKeys = makeEdgeKeysFromPath(path);
-    // }
   }
 
   return {
@@ -56,12 +48,7 @@ export function createTreeVisualState({
       nodeIds: allocatedNodeIds,
       edgeKeys: allocatedPathEdgeKeys,
     },
-    // preview: {
-    //   edgeKeys: previewEdgeKeys,
-    //   nodeIds: previewNodeIds,
-    // },
     allocatableNodeIds,
-    // hoveredNodeId,
   };
 }
 

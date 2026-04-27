@@ -14,7 +14,7 @@ export interface AllocationNodeState {
 
 export interface AllocationResult {
   changed: boolean;
-  // nextAllocatedNodeIds: ReadonlySet<NodeId>;
+  nextAllocatedNodeIds: ReadonlySet<NodeId>;
   // activeStartNodeIds: ReadonlySet<NodeId>;
   // reachableNodeIds: ReadonlySet<NodeId>;
   // allocatableNodeIds: ReadonlySet<NodeId>;
@@ -28,6 +28,7 @@ export interface AllocationSnapshot {
   rootNodeIds: Set<NodeId>;
 
   allocatedNodeIds: ReadonlySet<NodeId>;
+  allocatableNodeIds: ReadonlySet<NodeId>;
 
   nodeStateById: Map<NodeId, AllocationNodeState>;
 }

@@ -6,7 +6,9 @@ export function resolveEdgeStyle(state: EdgeRenderState): EdgeVisualStyle {
 
   if (state.highlighted) {
     color = passiveTreeTheme.edges.colors.highlighted;
-  } else if (state.active) {
+  }
+
+  if (state.active) {
     color = passiveTreeTheme.edges.colors.active;
   }
 

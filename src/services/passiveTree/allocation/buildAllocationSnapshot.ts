@@ -45,6 +45,14 @@ export function buildAllocationSnapshot({
     dependencies,
   });
 
+  const allocatableNodeIds: Set<NodeId> = new Set(
+    [...nodeStateById]
+      .filter(([_, nodeState]) => nodeState.allocatable)
+      .map(([nodeId]) => {
+        return nodeId;
+      }),
+  );
+
   const connectedNodeIds = computeConnectivity({
     allocatedNodeIds,
     graph,
@@ -58,7 +66,7 @@ export function buildAllocationSnapshot({
     rootNodeIds: new Set(rootNodeIds),
     allocatedNodeIds,
     nodeStateById,
-    // allocatableNodeIds,
+    allocatableNodeIds,
     // connectedNodeIds,
   };
 }

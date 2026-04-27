@@ -42,6 +42,7 @@ onMounted(async () => {
       allocationStore.toggleNode(nodeId);
     },
     onNodeHover: (nodeId) => {
+      console.log(allocationStore.snapshot?.nodeStateById.get(nodeId));
       uiStore.setHoveredNodeId(nodeId);
     },
   });
