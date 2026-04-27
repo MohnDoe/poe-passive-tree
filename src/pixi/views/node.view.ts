@@ -7,6 +7,7 @@ import type {
   NodeVisualStyle,
 } from "../models/Node";
 import { resolveNodeStyle } from "../theme/nodeStyle.resolver";
+import { makeShallowEqual } from "@/utils/utils";
 
 const defaultState: NodeStateModel = {
   isAllocated: false,
@@ -82,21 +83,17 @@ export function createNodeView(
   };
 }
 
-function sameState(prev: NodeStateModel, next: NodeStateModel): boolean {
-  return (
-    prev.isInPreviewPath === next.isInPreviewPath &&
-    prev.isActiveClassStart === next.isActiveClassStart &&
-    prev.isAllocated === next.isAllocated &&
-    prev.isHovered === next.isHovered &&
-    prev.isInRefundPath === next.isInRefundPath
-  );
-}
+const sameState = makeShallowEqual<NodeStateModel>({
+  isInRefundPath: true,
+  isAllocated: true,
+  isHovered: true,
+  isInPreviewPath: true,
+  isActiveClassStart: true,
+});
 
-function sameStyle(prev: NodeVisualStyle, next: NodeVisualStyle): boolean {
-  return (
-    prev.alpha === next.alpha &&
-    prev.fill === next.fill &&
-    prev.radius === next.radius &&
-    prev.scale === next.radius
-  );
-}
+const sameStyle = makeShallowEqual<NodeVisualStyle>({
+  alpha: true,
+  fill: true,
+  radius: true,
+  scale: true,
+});

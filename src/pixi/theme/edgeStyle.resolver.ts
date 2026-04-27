@@ -17,10 +17,8 @@ export function resolveEdgeStyle(state: EdgeRenderState): EdgeVisualStyle {
   }
 
   return {
-    stroke: {
-      width: passiveTreeTheme.edges.stroke,
-      alpha: passiveTreeTheme.edges.alpha,
-      color,
-    },
+    strokeWidth: passiveTreeTheme.edges.stroke,
+    strokeAlpha: passiveTreeTheme.edges.alpha,
+    strokeColor: color,
   };
 }

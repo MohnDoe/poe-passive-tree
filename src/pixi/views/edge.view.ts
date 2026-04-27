@@ -1,6 +1,7 @@
 import { Graphics } from "pixi.js";
 import type { EdgeRenderModel, EdgeRenderState, EdgeView, EdgeVisualStyle } from "../models/Edge";
 import { resolveEdgeStyle } from "../theme/edgeStyle.resolver";
+import { makeShallowEqual } from "@/utils/utils";
 
 const defaultState: EdgeRenderState = {
   highlighted: false,
@@ -26,7 +27,11 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
       );
     }
 
-    graphics.stroke(style.stroke);
+    graphics.stroke({
+      width: style.strokeWidth,
+      alpha: style.strokeAlpha,
+      color: style.strokeColor,
+    });
   };
 
   let currentState = { ...defaultState };
@@ -59,18 +64,14 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
   };
 }
 
-function sameState(prev: EdgeRenderState, next: EdgeRenderState): boolean {
-  return (
-    prev.active === next.active &&
-    prev.highlighted === next.highlighted &&
-    prev.refund === next.refund
-  );
-}
+const sameState = makeShallowEqual<EdgeRenderState>({
+  refund: true,
+  active: true,
+  highlighted: true,
+});
 
-function sameStyle(prev: EdgeVisualStyle, next: EdgeVisualStyle): boolean {
-  return (
-    prev.stroke.alpha === next.stroke.alpha &&
-    prev.stroke.color === next.stroke.color &&
-    prev.stroke.width === next.stroke.width
-  );
-}
+const sameStyle = makeShallowEqual<EdgeVisualStyle>({
+  strokeAlpha: true,
+  strokeColor: true,
+  strokeWidth: true,
+});

@@ -27,11 +27,9 @@ export interface EdgeRenderState {
 }
 
 export interface EdgeVisualStyle {
-  stroke: {
-    width: number;
-    color: number;
-    alpha: number;
-  };
+  strokeWidth: number;
+  strokeColor: number;
+  strokeAlpha: number;
 }
 
 export interface EdgeView {
