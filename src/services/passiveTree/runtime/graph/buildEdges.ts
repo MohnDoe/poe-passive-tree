@@ -38,10 +38,7 @@ export function buildEdges(nodes: MappedPassiveTree["nodesById"]): GraphEdge[] {
 }
 
 function isMasteryLink(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
-  return (
-    // sourceNode.kind === "mastery" ||
-    targetNode.kind === "mastery"
-  );
+  return sourceNode.kind === "mastery" || targetNode.kind === "mastery";
 }
 
 function isAscendancyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
