@@ -1,19 +1,12 @@
-import type { PassiveTree } from "@/domain/models/passiveTree";
-import type { NodeRenderModel } from "../types/render.models";
+import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { NodeRenderModel } from "../models/Node";
+import { mapNodeToRenderModel } from "./mapNodeToRenderModel";
 
-export function mapNodes(tree: PassiveTree): NodeRenderModel[] {
+export function mapNodesToRenderModel(graph: PassiveGraph): NodeRenderModel[] {
   const nodes: NodeRenderModel[] = [];
 
-  for (const [nodeId, node] of tree.nodesById) {
-    const nodeRenderModel: NodeRenderModel = {
-      id: nodeId,
-      kind: node.kind,
-      x: node.position?.x || 0,
-      y: node.position?.y || 0,
-      // isAllocated: allocatedNodeIds?.has(nodeId),
-      // isActiveClassStart: node.kind === "classStart" && selectedClassId == node.classStartIndex,
-    };
-
+  for (const [, node] of graph.nodesById) {
+    const nodeRenderModel = mapNodeToRenderModel(node);
     nodes.push(nodeRenderModel);
   }
 

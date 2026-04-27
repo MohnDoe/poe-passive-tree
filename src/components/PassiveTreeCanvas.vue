@@ -1,76 +1,54 @@
 <script setup lang="ts">
-import { getStartNodeIds } from "@/domain/logic/classes";
-import type { NodeId } from "@/domain/models/passiveNode";
-import { treeService } from "@/domain/TreeService";
-import { PassiveTreeStage } from "@/pixi/PassiveTreeStage";
-import { createTreeSceneRenderModel } from "@/pixi/sceneModel.mapper";
-import type { TreeVisualStateModel } from "@/pixi/types/render.models";
-import { useBuildStore } from "@/stores/build.store";
-import { storeToRefs } from "pinia";
+import type { TreeVisualStateModel } from "@/pixi/models/Render";
+import { createTreeSceneModel } from "@/pixi/scene/createTreeSceneModel";
+import { createTreeVisualState } from "@/pixi/scene/createTreeVisualStateModel";
+import { PassiveTreeStage } from "@/pixi/stage/PassiveTreeStage";
+import { useAllocationStore } from "@/stores/allocation.store";
+import { useRuntimeStore } from "@/stores/runtime.store";
+import { useUiStore } from "@/stores/ui.store";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+const uiStore = useUiStore();
+const runtimeStore = useRuntimeStore();
+const allocationStore = useAllocationStore();
 
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = new PassiveTreeStage();
-const buildStore = useBuildStore();
 
-const { activeClassId, activeAscendancy, hoveredNodeId, allocatedNodeIds } =
-  storeToRefs(buildStore);
+const visualState = computed<TreeVisualStateModel | null>(() => {
+  if (!runtimeStore.graph) return null;
 
-const visualState = computed<TreeVisualStateModel>(() => {
-  const tree = treeService.tree.value;
-  let startNodesId = new Set<NodeId>();
-  if (tree && activeClassId.value !== null) {
-    startNodesId = getStartNodeIds(tree, activeClassId.value);
-  }
-
-  return {
-    allocatedNodeIds: new Set(allocatedNodeIds.value),
-    hoveredNodeId: hoveredNodeId.value,
-    highlightedPathNodeIds: [],
-    activeClassId: activeClassId.value,
-    activeAscendancy: activeAscendancy.value,
-    activeStartNodeIds: startNodesId,
-  };
+  return createTreeVisualState({
+    snapshot: allocationStore.snapshot,
+    hoveredNodeId: uiStore.hoveredNodeId,
+  });
 });
 
 onMounted(async () => {
-  if (!hostRef.value) return;
+  await runtimeStore.load();
+  allocationStore.initialize();
+  if (!hostRef.value || !runtimeStore.graph) return;
 
   await stage.mount(hostRef.value, {
     onNodeClick: (nodeId) => {
       console.log("Click node", nodeId);
-      buildStore.toggleNodeAllocation(nodeId);
+      allocationStore.toggleNode(nodeId);
     },
     onNodeHover: (nodeId) => {
-      buildStore.setHoveredNode(nodeId);
+      uiStore.setHoveredNodeId(nodeId);
     },
   });
 
-  // ONE-TIME BUILD: Static geometry
-  const stopWatchingTree = watch(
-    () => treeService.tree.value,
-    (tree) => {
-      if (tree) {
-        const staticScene = createTreeSceneRenderModel({ tree: tree });
+  const staticScene = createTreeSceneModel({ graph: runtimeStore.graph });
 
-        stage.renderStaticScene(staticScene);
-        stage.fitToBounds(tree.bounds);
-
-        // stage.updateVisualStates(visualState.value);
-
-        stopWatchingTree();
-      }
-    },
-    { immediate: true },
-  );
+  stage.renderStaticScene(staticScene);
+  stage.fitToBounds(runtimeStore.graph.bounds);
 
   // Only update colors/textures when user state changes
   watch(
     visualState,
     (newState) => {
-      if (treeService.tree.value) {
-        stage.updateVisualStates(newState);
-      }
+      if (newState) stage.updateVisualStates(newState);
     },
     { immediate: true },
   );
