@@ -28,6 +28,10 @@ export const passiveTreeTheme = {
   edges: {
     colors: {
       normal: 0x2d2b21,
+      highlighted: 0xfffb6f,
+      active: 0xf2c14e,
     },
+    stroke: 15,
+    alpha: 1,
   },
 };

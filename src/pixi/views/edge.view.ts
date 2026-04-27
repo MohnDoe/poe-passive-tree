@@ -1,13 +1,16 @@
 import { Graphics } from "pixi.js";
-import type { EdgeRenderModel, EdgeRenderState, EdgeView } from "../models/Edge";
+import type { EdgeRenderModel, EdgeRenderState, EdgeView, EdgeVisualStyle } from "../models/Edge";
+import { resolveEdgeStyle } from "../theme/edgeStyle.resolver";
 
-function sameState(prev: EdgeRenderState, next: EdgeRenderState): boolean {
-  return prev.active === next.active && prev.highlighted === next.highlighted;
-}
+const defaultState: EdgeRenderState = {
+  highlighted: false,
+  active: false,
+};
 
 export function createEdgeView(edge: EdgeRenderModel): EdgeView {
   const graphics = new Graphics();
-  const draw = () => {
+  const draw = (style: EdgeVisualStyle) => {
+    graphics.clear();
     if (edge.kind === "line") {
       graphics.moveTo(edge.from.x, edge.from.y);
       graphics.lineTo(edge.to.x, edge.to.y);
@@ -22,28 +25,30 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
       );
     }
 
-    graphics.stroke({
-      color: 0x2d2b21,
-      width: 15,
-      alpha: 1,
-    });
+    graphics.stroke(style.stroke);
   };
 
-  const currentState: EdgeRenderState = {
-    active: false,
-    highlighted: false,
-  };
+  let currentState = { ...defaultState };
+  let currentStyle = resolveEdgeStyle(currentState);
 
-  const updateState = (state: EdgeRenderState) => {
-    if (sameState(currentState, state)) return;
+  const updateState = (nextState: EdgeRenderState) => {
+    if (sameState(currentState, nextState)) return;
+
+    const nextStyle = resolveEdgeStyle(nextState);
+
+    if (!sameStyle(currentStyle, nextStyle)) {
+      draw(nextStyle);
+      currentStyle = nextStyle;
+    }
+
+    currentState = { ...nextState };
   };
 
   const destroy = () => {
     graphics.destroy();
   };
 
-  draw();
-  updateState(currentState);
+  draw(currentStyle);
 
   return {
     key: edge.key,
@@ -51,4 +56,16 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
     destroy,
     updateState,
   };
+}
+
+function sameState(prev: EdgeRenderState, next: EdgeRenderState): boolean {
+  return prev.active === next.active && prev.highlighted === next.highlighted;
+}
+
+function sameStyle(prev: EdgeVisualStyle, next: EdgeVisualStyle): boolean {
+  return (
+    prev.stroke.alpha === next.stroke.alpha &&
+    prev.stroke.color === next.stroke.color &&
+    prev.stroke.width === next.stroke.width
+  );
 }

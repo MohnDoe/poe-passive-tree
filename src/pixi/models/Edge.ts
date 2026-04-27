@@ -25,6 +25,14 @@ export interface EdgeRenderState {
   // TODO: refundable, alternative (for when 2 preview path are equal)
 }
 
+export interface EdgeVisualStyle {
+  stroke: {
+    width: number;
+    color: number;
+    alpha: number;
+  };
+}
+
 export interface EdgeView {
   key: GraphEdge["key"];
   graphics: Graphics;
