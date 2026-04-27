@@ -29,13 +29,17 @@ export const useBuildStore = defineStore("build", {
       this.allocatedNodeIds.clear();
     },
     setClass(classId: ClassId) {
-      // TODO: test changes
+      if (this.activeClassId === classId) return;
+
       this.resetBuild();
       this.activeClassId = classId;
       this.setAscendancy(null);
     },
     setAscendancy(ascendancyId: AscendancyId | null): void {
-      // TODO: test if changes
+      if (this.activeAscendancy === ascendancyId) return;
+      // TODO: check if new Ascendancy is related to current selected class
+      // or maybe just change the class either way with this.setClass()
+
       // this.resetBuild();
       this.activeAscendancy = ascendancyId;
     },
