@@ -4,7 +4,7 @@ import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { PassiveNode } from "@/domain/passiveGraph/PassiveNode";
 import { Point } from "pixi.js";
 import type { GraphEdge } from "@/domain/passiveGraph/GraphEdge";
-import { makeEdgeKey } from "@/services/passiveTree/runtime/graph/buildEdges";
+import { makeEdgeKey } from "@/domain/passiveGraph/edgeKeys";
 
 export function mapEdgeToRenderModel(
   graph: PassiveGraph,
