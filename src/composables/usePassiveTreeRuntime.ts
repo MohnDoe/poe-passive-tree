@@ -6,7 +6,13 @@ export function usePassiveTreeRuntime() {
   const { graph, status, error } = storeToRefs(runtimeStore);
 
   async function ensureLoaded() {
-    if (graph.value || status.value === "ready") return;
+    if (
+      graph.value ||
+      status.value === "ready" ||
+      status.value === "error" ||
+      status.value === "loading"
+    )
+      return;
     await runtimeStore.load();
   }
 
