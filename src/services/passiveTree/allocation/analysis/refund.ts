@@ -1,4 +1,4 @@
-import type { AllocationSnapshot } from "@/domain/build/allocation/Allocation";
+import type { AllocationSnapshot } from "@/domain/build/models/allocation/Allocation";
 import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";

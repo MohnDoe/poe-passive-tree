@@ -7,7 +7,7 @@ const buildStore = useBuildStore();
 const runtimeStore = useRuntimeStore();
 
 const { graph } = storeToRefs(runtimeStore);
-const { activeClassId } = storeToRefs(buildStore);
+const { build } = storeToRefs(buildStore);
 </script>
 <template>
   <div>
@@ -18,7 +18,7 @@ const { activeClassId } = storeToRefs(buildStore);
     >
       {{ pClass.id }} -
       {{ pClass.name }}
-      <span v-if="activeClassId === classId">[active]</span>
+      <span v-if="build.activeClassId === classId">[active]</span>
     </button>
   </div>
 </template>

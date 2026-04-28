@@ -1,6 +1,6 @@
-import type { AllocationNodeState } from "@/domain/build/allocation/Allocation";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import type { ComputeDependenciesResult } from "./computeDependencies";
+import type { AllocationNodeState } from "@/domain/build/models/allocation/Allocation";
 
 export interface MergeDependenciesIntoNodeStateParams {
   nodeStateById: Map<NodeId, AllocationNodeState>;

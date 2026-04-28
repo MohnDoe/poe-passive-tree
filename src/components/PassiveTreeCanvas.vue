@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import {
-  type HoverPreviewStateModel,
-  type HoverVisualDelta,
-  type TreeVisualStateModel,
-} from "@/pixi/models/Render";
-import { createHoverPreviewStateModel } from "@/pixi/scene/createHoverPreview";
+import { useHoverPreview } from "@/composables/useHoverPreview";
+import { usePassiveTreeVisualState } from "@/composables/usePassiveTreeVisualState";
+import { type HoverPreviewStateModel, type HoverVisualDelta } from "@/pixi/models/Render";
 import { createTreeSceneModel } from "@/pixi/scene/createTreeSceneModel";
-import { createTreeVisualState } from "@/pixi/scene/createTreeVisualStateModel";
 import { PassiveTreeStage } from "@/pixi/stage/PassiveTreeStage";
-import { useAllocationStore } from "@/stores/allocation.store";
+import { useBuildStore } from "@/stores/build.store";
 import { useRuntimeStore } from "@/stores/runtime.store";
 import { useUiStore } from "@/stores/ui.store";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 
 const uiStore = useUiStore();
 const runtimeStore = useRuntimeStore();
-const allocationStore = useAllocationStore();
+const buildStore = useBuildStore();
+
+const { graph } = storeToRefs(runtimeStore);
+const { treeVisualState } = usePassiveTreeVisualState();
+const { hoverPreview: hoverPreviewState } = useHoverPreview();
 
 const hostRef = ref<HTMLDivElement | null>(null);
-const stage = new PassiveTreeStage();
+const stage = shallowRef<PassiveTreeStage | null>(null);
 
 const previousHoveredState = ref<HoverPreviewStateModel>({
   hoveredNodeId: null,
@@ -32,76 +33,72 @@ const previousHoveredState = ref<HoverPreviewStateModel>({
   },
 });
 
-const visualState = computed<TreeVisualStateModel | null>(() => {
-  if (!runtimeStore.graph) return null;
-
-  return createTreeVisualState({
-    snapshot: allocationStore.snapshot,
-    // hoveredNodeId: uiStore.hoveredNodeId,
-  });
-});
-
 onMounted(async () => {
-  await runtimeStore.load();
-  allocationStore.initialize();
-  if (!hostRef.value || !runtimeStore.graph) return;
+  if (!hostRef.value || !graph.value) return;
 
-  await stage.mount(hostRef.value, {
+  const nextStage = new PassiveTreeStage();
+
+  stage.value = nextStage;
+
+  await nextStage.mount(hostRef.value, {
     onNodeClick: (nodeId) => {
       console.log("Click node", nodeId);
-      allocationStore.toggleNode(nodeId);
+      buildStore.toggleNode(nodeId);
     },
     onNodeHover: (nodeId) => {
-      if (nodeId !== null) console.log(allocationStore.snapshot?.nodeStateById.get(nodeId));
       uiStore.setHoveredNodeId(nodeId);
     },
   });
 
-  const staticScene = createTreeSceneModel({ graph: runtimeStore.graph });
+  nextStage.renderStaticScene(createTreeSceneModel({ graph: graph.value }));
 
-  stage.renderStaticScene(staticScene);
-  stage.fitToBounds(runtimeStore.graph.bounds);
-
-  // Only update colors/textures when user state changes
-  watch(
-    visualState,
-    (newState) => {
-      if (newState) stage.updateVisualStates(newState);
-    },
-    { immediate: true },
-  );
-
-  watch(
-    () => uiStore.hoveredNodeId,
-    (hoveredNodeId) => {
-      if (!visualState.value) return;
-
-      const hoverPreviewState = createHoverPreviewStateModel({
-        snapshot: allocationStore.snapshot,
-        hoveredNodeId,
-      });
-
-      const delta: HoverVisualDelta = {
-        ...hoverPreviewState,
-        previous: previousHoveredState.value,
-      };
-
-      stage.updateHoverState({
-        delta,
-        treeState: visualState.value,
-        hoverPreviewState,
-      });
-
-      previousHoveredState.value = {
-        ...hoverPreviewState,
-        hoveredNodeId,
-      };
-    },
-  );
+  nextStage.fitToBounds(graph.value.bounds);
 });
 
+watch(graph, (nextGraph) => {
+  if (!nextGraph || !stage.value) return;
+
+  stage.value.renderStaticScene(createTreeSceneModel({ graph: nextGraph }));
+  stage.value.fitToBounds(nextGraph.bounds);
+});
+
+watch(
+  treeVisualState,
+  (nextTreeVisualState) => {
+    if (!nextTreeVisualState || !stage.value) return;
+
+    stage.value.updateVisualStates(nextTreeVisualState);
+  },
+  { immediate: true },
+);
+
+watch(
+  hoverPreviewState,
+  (nextHoverPreviewState) => {
+    if (!treeVisualState.value || !stage.value) return;
+
+    const delta: HoverVisualDelta = {
+      ...nextHoverPreviewState,
+      previous: previousHoveredState.value,
+    };
+
+    stage.value.updateHoverState({
+      delta,
+      treeState: treeVisualState.value,
+      hoverPreviewState: nextHoverPreviewState,
+    });
+
+    previousHoveredState.value = {
+      ...nextHoverPreviewState,
+      hoveredNodeId: nextHoverPreviewState.hoveredNodeId,
+    };
+  },
+  { immediate: true },
+);
+
 onBeforeUnmount(() => {
-  stage.destroy();
+  stage.value?.destroy();
+  stage.value = null;
 });
 </script>
 <template>

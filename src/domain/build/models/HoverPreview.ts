@@ -1,5 +1,5 @@
-import type { EdgeKey } from "../passiveGraph/GraphEdge";
-import type { NodeId } from "../passiveGraph/PassiveNode";
+import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
+import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 
 export interface HoverPreview {
   targetNodeId: NodeId;

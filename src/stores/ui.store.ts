@@ -1,4 +1,4 @@
-import type { UiState } from "@/domain/build/UiState";
+import type { UiState } from "@/domain/build/models/UiState";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { defineStore } from "pinia";
 

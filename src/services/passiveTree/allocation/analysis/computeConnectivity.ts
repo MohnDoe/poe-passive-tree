@@ -1,4 +1,4 @@
-import type { AllocationNodeState } from "@/domain/build/allocation/Allocation";
+import type { AllocationNodeState } from "@/domain/build/models/allocation/Allocation";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 

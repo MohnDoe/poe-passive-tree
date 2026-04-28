@@ -1,6 +1,6 @@
-import type { AllocationNodeState } from "@/domain/build/allocation/Allocation";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { materializePath, type WeightedPathsResult } from "../pathfinding/computeWeightedPaths";
+import type { AllocationNodeState } from "@/domain/build/models/allocation/Allocation";
 
 export interface MergeWeightedPathsIntoNodeStateParams {
   nodeStateById: Map<NodeId, AllocationNodeState>;

@@ -1,14 +1,17 @@
-import type { AllocationNodeState, AllocationSnapshot } from "@/domain/build/allocation/Allocation";
-import type { BuildState } from "@/domain/build/BuildState";
+import type {
+  AllocationNodeState,
+  AllocationSnapshot,
+} from "@/domain/build/models/allocation/Allocation";
+import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
+import { getClassStartNodeIds } from "../queries/getClassStartNodeIds";
+import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
 import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
 import { applyConnectivityToNodeState, computeConnectivity } from "./analysis/computeConnectivity";
-import { getClassStartNodeIds } from "../queries/getClassStartNodeIds";
 import { computeDependencies } from "./analysis/computeDependencies";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
-import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
+import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
 
 export interface BuildAllocationSnapshotParams {
   graph: PassiveGraph;
