@@ -23,6 +23,9 @@ export function applyWeightedPathsToNodeState({
 
     nodeState.pathCost = pathCost;
     nodeState.path = materializePath(nodeId, weightedPaths.predecessorByNodeId);
-    nodeState.reachable = true;
+
+    if (nodeState.path.length > 0) {
+      nodeState.reachable = true;
+    }
   }
 }

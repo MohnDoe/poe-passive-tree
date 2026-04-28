@@ -47,6 +47,7 @@ export function resolveNodeStyle(model: NodeRenderModel, state: NodeStateModel):
     radius,
     fill,
     alpha: 1,
+    //TODO: this should only be true if it's reachable/allocatable
     scale: state.isHovered ? 1.06 : 1,
   };
 }
