@@ -8,6 +8,7 @@ import { applyConnectivityToNodeState, computeConnectivity } from "./analysis/co
 import { getClassStartNodeIds } from "../queries/getClassStartNodeIds";
 import { computeDependencies } from "./analysis/computeDependencies";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
+import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
 
 export interface BuildAllocationSnapshotParams {
   graph: PassiveGraph;
@@ -33,6 +34,11 @@ export function buildAllocationSnapshot({
   mergeWeightedPathsIntoNodeState({
     nodeStateById,
     weightedPaths,
+  });
+
+  applyAllocationFlagsToNodeState({
+    graph,
+    nodeStateById,
   });
 
   const dependencies = computeDependencies({
@@ -82,6 +88,7 @@ function createDefaultNodeState(
       id: nodeId,
       connectedToStart: false,
       allocatable: false,
+      reachable: false,
       allocated: allocatedNodeIds.has(nodeId),
       path: null,
       pathCost: null,

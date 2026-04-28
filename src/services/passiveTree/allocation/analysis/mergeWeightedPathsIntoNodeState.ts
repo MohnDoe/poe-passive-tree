@@ -17,5 +17,6 @@ export function mergeWeightedPathsIntoNodeState({
 
     nodeState.pathCost = cost;
     nodeState.path = weightedPaths.pathByNodeId.get(nodeId) ?? null;
+    nodeState.reachable = nodeState.path !== null && cost !== null;
   }
 }

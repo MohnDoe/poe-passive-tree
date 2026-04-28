@@ -14,9 +14,5 @@ export function mergeDependenciesIntoNodeState({
   for (const [nodeId, nodeState] of nodeStateById) {
     nodeState.dependsOn = dependencies.dependsOnByNodeId.get(nodeId) ?? new Set<NodeId>();
     nodeState.requiredBy = dependencies.requiredByNodeId.get(nodeId) ?? new Set<NodeId>();
-
-    if (!nodeState.allocated && nodeState.allocated !== null) {
-      nodeState.allocatable = true;
-    }
   }
 }
