@@ -2,8 +2,8 @@ import type { AllocationSnapshot } from "@/domain/build/allocation/Allocation";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import type { HoverPreviewStateModel } from "../models/Render";
-import { makeEdgeKeysFromPath } from "./createTreeVisualStateModel";
 import { analyzeRefundTarget } from "@/services/passiveTree/allocation/analysis/refund";
+import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
 
 export interface createHoverPreviewStateModelParams {
   snapshot: AllocationSnapshot | null;

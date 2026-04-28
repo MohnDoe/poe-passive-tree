@@ -2,7 +2,7 @@ import type { AllocationSnapshot } from "@/domain/build/allocation/Allocation";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import type { TreeVisualStateModel } from "../models/Render";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
-import { makeEdgeKey } from "@/services/passiveTree/runtime/graph/buildEdges";
+import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
 
 export interface CreateTreeVisualStateParams {
   snapshot: AllocationSnapshot | null;
@@ -50,14 +50,4 @@ export function createTreeVisualState({
     },
     allocatableNodeIds,
   };
-}
-
-//TODO: move this
-export function makeEdgeKeysFromPath(path: NodeId[]): Set<EdgeKey> {
-  const edgeKeys = new Set<EdgeKey>();
-  for (let i = 1; i < path.length; i += 1) {
-    edgeKeys.add(makeEdgeKey(path[i - 1]!, path[i]!));
-  }
-
-  return edgeKeys;
 }

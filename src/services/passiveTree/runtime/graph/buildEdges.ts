@@ -1,4 +1,5 @@
 import type { MappedPassiveTree } from "@/data/mapping/MappedPassiveTree";
+import { makeEdgeKey } from "@/domain/passiveGraph/edgeKeys";
 import type { GraphEdge } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
 
@@ -49,10 +50,4 @@ function isAscendancyTransition(sourceNode: PassiveNode, targetNode: PassiveNode
 function isProxyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
   //FIX: this is wrong
   return sourceNode.kind === "proxy" || targetNode.kind === "proxy";
-}
-
-export function makeEdgeKey(sourceId: NodeId, targetId: NodeId) {
-  const min = Math.min(parseInt(sourceId), parseInt(targetId));
-  const max = Math.max(parseInt(sourceId), parseInt(targetId));
-  return `${min}-${max}`;
 }

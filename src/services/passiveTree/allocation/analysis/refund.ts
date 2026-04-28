@@ -1,7 +1,7 @@
 import type { AllocationSnapshot } from "@/domain/build/allocation/Allocation";
+import { makeEdgeKey } from "@/domain/passiveGraph/edgeKeys";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { makeEdgeKey } from "../../runtime/graph/buildEdges";
 
 // Returns all the nodes that would be refunded in order to refund the input node
 function computeRefundClosure(
@@ -30,7 +30,7 @@ function computeRefundClosure(
   return out;
 }
 
-function computeRefundPath(
+function computeRefundEdgeKeys(
   refundedNodeIds: Set<NodeId>,
   nodeStateById: AllocationSnapshot["nodeStateById"],
 ): Set<EdgeKey> {
@@ -75,7 +75,7 @@ export function analyzeRefundTarget(
   }
 
   const refundedNodeIds = computeRefundClosure(nodeId, nodeStateById);
-  const refundedEdgeKeys = computeRefundPath(refundedNodeIds, nodeStateById);
+  const refundedEdgeKeys = computeRefundEdgeKeys(refundedNodeIds, nodeStateById);
 
   return {
     canRefund: refundedNodeIds.size > 0,
