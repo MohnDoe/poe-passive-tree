@@ -34,7 +34,7 @@ export function createTreeVisualState({
         allocatedNodeIds.add(nodeId);
         allocatedPathEdgeKeys = new Set([
           ...allocatedPathEdgeKeys,
-          ...makeEdgeKeysFromPath({ path: state.path ?? [], allowedNodeIds: allocatedNodeIds }),
+          ...makeEdgeKeysFromPath({ path: state.path ?? [] }),
         ]);
       }
       if (state.allocatable) allocatableNodeIds.add(nodeId);

@@ -24,7 +24,10 @@ export function makeEdgeKeysFromPath({
     const bId = path[i]!;
 
     if (!aId || !bId) continue;
-    if (allowedNodeIds?.has(aId) || allowedNodeIds?.has(bId)) continue;
+
+    if (allowedNodeIds !== undefined) {
+      if (!allowedNodeIds.has(aId) && !allowedNodeIds.has(bId)) continue;
+    }
 
     edgeKeys.add(makeEdgeKey(aId, bId));
   }
