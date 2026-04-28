@@ -1,13 +1,13 @@
 import type { BuildState } from "@/domain/build/models/BuildState";
 import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { BuildCommandResult } from "@/domain/build/commands/types";
+import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
 
+import { createBuildCommandContext } from "@/domain/build/commands/createBuildCommandContext";
 import { planToggleAllocation } from "@/domain/build/commands/planToggleAllocation";
 import { setAscendancy } from "@/domain/build/commands/setAscendancy";
 import { setClass } from "@/domain/build/commands/setClass";
-import type { BuildCommandResult } from "@/domain/build/commands/types";
-import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
-import { buildAllocationSnapshot } from "@/services/passiveTree/allocation/buildAllocationSnapshot";
 import { defineStore } from "pinia";
 import { useRuntimeStore } from "./runtime.store";
 
@@ -43,12 +43,7 @@ export const useBuildStore = defineStore("build", {
     build: createEmptyBuild(),
   }),
 
-  getters: {
-    // totalPointsSpent: (state) => state.allocatedNodeIds.size,
-    // isAllocated(state): (nodeId: NodeId) => boolean {
-    //   return (nodeId) => state.allocatedNodeIds.has(nodeId);
-    // },
-  },
+  getters: {},
   actions: {
     resetBuild() {
       this.build = createEmptyBuild();
@@ -68,16 +63,13 @@ export const useBuildStore = defineStore("build", {
 
       return result;
     },
-    // allocate(nodeId: NodeId): BuildCommandContext {},
-    // refund(nodeId: NodeId): BuildCommandContext {},
     toggleNode(nodeId: NodeId): BuildCommandResult {
       const runtimeStore = useRuntimeStore();
       const graph = runtimeStore.graph;
 
       if (!graph) return { ok: false, reason: "NO_ACTIVE_CLASS" };
 
-      const snapshot = buildAllocationSnapshot({ graph, buildState: this.build });
-      const result = planToggleAllocation({ graph, build: this.build, snapshot }, nodeId);
+      const result = planToggleAllocation(createBuildCommandContext(graph, this.build), nodeId);
 
       if (result.ok) this.build = result.build;
 
