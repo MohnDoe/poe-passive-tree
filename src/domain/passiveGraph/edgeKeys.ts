@@ -1,16 +1,32 @@
 import type { EdgeKey } from "./GraphEdge";
 import type { NodeId } from "./PassiveNode";
 
-export function makeEdgeKey(sourceId: NodeId, targetId: NodeId) {
-  const min = Math.min(parseInt(sourceId), parseInt(targetId));
-  const max = Math.max(parseInt(sourceId), parseInt(targetId));
-  return `${min}-${max}`;
+export function makeEdgeKey(aId: NodeId, bId: NodeId) {
+  const a = Number(aId);
+  const b = Number(bId);
+
+  return a <= b ? `${aId}-${bId}` : `${bId}-${aId}`;
 }
 
-export function makeEdgeKeysFromPath(path: NodeId[]): Set<EdgeKey> {
+export interface MakeEdgeKeysFromPathParams {
+  path: ReadonlyArray<NodeId>;
+  allowedNodeIds?: ReadonlySet<NodeId>;
+}
+
+export function makeEdgeKeysFromPath({
+  path,
+  allowedNodeIds,
+}: MakeEdgeKeysFromPathParams): Set<EdgeKey> {
   const edgeKeys = new Set<EdgeKey>();
+
   for (let i = 1; i < path.length; i += 1) {
-    edgeKeys.add(makeEdgeKey(path[i - 1]!, path[i]!));
+    const aId = path[i - 1]!;
+    const bId = path[i]!;
+
+    if (!aId || !bId) continue;
+    if (allowedNodeIds?.has(aId) || allowedNodeIds?.has(bId)) continue;
+
+    edgeKeys.add(makeEdgeKey(aId, bId));
   }
 
   return edgeKeys;

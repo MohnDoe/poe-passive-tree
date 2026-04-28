@@ -40,7 +40,7 @@ export function createHoverPreviewStateModel({
     hoveredNodeId,
     highlight: {
       nodeIds: new Set(highlightedPath),
-      edgeKeys: makeEdgeKeysFromPath(highlightedPath),
+      edgeKeys: makeEdgeKeysFromPath({ path: highlightedPath }),
     },
     refund: {
       nodeIds: refundAnalysis.refundedNodeIds,

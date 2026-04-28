@@ -1,5 +1,5 @@
 import type { AllocationSnapshot } from "@/domain/build/allocation/Allocation";
-import { makeEdgeKey } from "@/domain/passiveGraph/edgeKeys";
+import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 
@@ -40,14 +40,11 @@ function computeRefundEdgeKeys(
     const nodeState = nodeStateById.get(refundedNodeId);
     if (!nodeState?.path) continue;
 
-    for (let i = 0; i < nodeState.path.length - 1; i++) {
-      const aId = nodeState.path[i];
-      const bId = nodeState.path[i + 1];
-
-      if (!aId || !refundedNodeIds.has(aId)) continue;
-      if (!bId || !refundedNodeIds.has(bId)) continue;
-
-      edgeKeys.add(makeEdgeKey(aId, bId));
+    for (const edgeKey of makeEdgeKeysFromPath({
+      path: nodeState.path,
+      allowedNodeIds: refundedNodeIds,
+    })) {
+      edgeKeys.add(edgeKey);
     }
   }
 
