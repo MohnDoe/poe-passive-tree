@@ -1,8 +1,8 @@
 import type { AllocationSnapshot } from "@/domain/build/allocation/Allocation";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { makeEdgeKey } from "../mappers/mapEdgeToRenderModel";
 import type { TreeVisualStateModel } from "../models/Render";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
+import { makeEdgeKey } from "@/services/passiveTree/runtime/graph/buildEdges";
 
 export interface CreateTreeVisualStateParams {
   snapshot: AllocationSnapshot | null;

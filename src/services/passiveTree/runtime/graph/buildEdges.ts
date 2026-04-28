@@ -9,9 +9,7 @@ export function buildEdges(nodes: MappedPassiveTree["nodesById"]): GraphEdge[] {
   const addEdge = (sourceId: NodeId, targetId: NodeId) => {
     if (!nodes.has(sourceId) || !nodes.has(targetId)) return;
 
-    const min = Math.min(parseInt(sourceId), parseInt(targetId));
-    const max = Math.max(parseInt(sourceId), parseInt(targetId));
-    const edgeKey = `${min}-${max}`;
+    const edgeKey = makeEdgeKey(sourceId, targetId);
 
     if (seenEdges.has(edgeKey)) return;
     seenEdges.add(edgeKey);
@@ -51,4 +49,10 @@ function isAscendancyTransition(sourceNode: PassiveNode, targetNode: PassiveNode
 function isProxyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
   //FIX: this is wrong
   return sourceNode.kind === "proxy" || targetNode.kind === "proxy";
+}
+
+export function makeEdgeKey(sourceId: NodeId, targetId: NodeId) {
+  const min = Math.min(parseInt(sourceId), parseInt(targetId));
+  const max = Math.max(parseInt(sourceId), parseInt(targetId));
+  return `${min}-${max}`;
 }

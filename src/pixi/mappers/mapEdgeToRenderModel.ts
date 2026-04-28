@@ -1,9 +1,10 @@
 import type { EdgeRenderModel } from "../models/Edge";
 import { normalizeSignedAngle } from "@/utils/math.utils";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
+import type { PassiveNode } from "@/domain/passiveGraph/PassiveNode";
 import { Point } from "pixi.js";
 import type { GraphEdge } from "@/domain/passiveGraph/GraphEdge";
+import { makeEdgeKey } from "@/services/passiveTree/runtime/graph/buildEdges";
 
 export function mapEdgeToRenderModel(
   graph: PassiveGraph,
@@ -52,10 +53,4 @@ export function mapEdgeToRenderModel(
 
 function shouldBeAnArc(a: PassiveNode, b: PassiveNode) {
   return a.groupId === b.groupId && a.orbit === b.orbit;
-}
-
-export function makeEdgeKey(aId: NodeId, bId: NodeId) {
-  const a = parseInt(aId);
-  const b = parseInt(bId);
-  return a < b ? `${a}-${b}` : `${b}-${a}`;
 }

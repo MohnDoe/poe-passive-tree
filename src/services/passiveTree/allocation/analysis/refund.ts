@@ -1,7 +1,7 @@
 import type { AllocationSnapshot } from "@/domain/build/allocation/Allocation";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { makeEdgeKey } from "@/pixi/mappers/mapEdgeToRenderModel";
+import { makeEdgeKey } from "../../runtime/graph/buildEdges";
 
 // Returns all the nodes that would be refunded in order to refund the input node
 export function computeRefundClosure(
