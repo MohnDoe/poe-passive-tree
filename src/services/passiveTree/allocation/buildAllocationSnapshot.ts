@@ -3,7 +3,7 @@ import type { BuildState } from "@/domain/build/BuildState";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
-import { mergeWeightedPathsIntoNodeState } from "./analysis/mergeWeightedPathsIntoNodeState";
+import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
 import { applyConnectivityToNodeState, computeConnectivity } from "./analysis/computeConnectivity";
 import { getClassStartNodeIds } from "../queries/getClassStartNodeIds";
 import { computeDependencies } from "./analysis/computeDependencies";
@@ -31,7 +31,7 @@ export function buildAllocationSnapshot({
     allocatedNodeIds,
   });
 
-  mergeWeightedPathsIntoNodeState({
+  applyWeightedPathsToNodeState({
     nodeStateById,
     weightedPaths,
   });

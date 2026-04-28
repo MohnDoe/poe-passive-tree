@@ -1,7 +1,7 @@
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { buildPathsFromRoot } from "./computePathsFromRoot";
-import type { WeightedPathsResult } from "./types/WeightedPathsResult";
+import { Deque } from "../../runtime/graph/Deque";
+import { canTraverse } from "../rules/traversal";
 
 export interface ComputeWeightedPathsParams {
   graph: PassiveGraph;
@@ -9,27 +9,83 @@ export interface ComputeWeightedPathsParams {
   allocatedNodeIds: ReadonlySet<NodeId>;
 }
 
+export interface WeightedPathsResult {
+  // cheapest cost from active root
+  distanceByNodeId: Map<NodeId, number>;
+  // used to rebuild shortest path
+  predecessorByNodeId: Map<NodeId, NodeId | null>;
+}
+
 export function computeWeightedPaths({
   rootNodeIds,
   allocatedNodeIds,
   graph,
 }: ComputeWeightedPathsParams): WeightedPathsResult {
-  const distanceByNodeId = new Map<NodeId, number>();
-  const pathByNodeId = new Map<NodeId, NodeId[]>();
+  const distanceByNodeId: WeightedPathsResult["distanceByNodeId"] = new Map();
+  const predecessorByNodeId: WeightedPathsResult["predecessorByNodeId"] = new Map();
+
+  const deque = new Deque<NodeId>();
 
   for (const rootId of rootNodeIds) {
-    const perRoot = buildPathsFromRoot({ rootId, allocatedNodeIds, graph });
-    for (const [nodeId, cost] of perRoot.distanceByNodeId) {
-      const previous = distanceByNodeId.get(nodeId);
-      if (previous !== undefined && previous <= cost) continue;
+    distanceByNodeId.set(rootId, 0);
+    predecessorByNodeId.set(rootId, null);
+    deque.pushBack(rootId);
+  }
 
-      distanceByNodeId.set(nodeId, cost);
-      pathByNodeId.set(nodeId, perRoot.pathByNodeId.get(nodeId) ?? []);
+  while (!deque.isEmpty()) {
+    const currentId = deque.popFront();
+    if (!currentId) continue;
+
+    const currentNode = graph.nodesById.get(currentId);
+    if (!currentNode) continue;
+
+    const currentDistance = distanceByNodeId.get(currentId);
+    if (currentDistance === undefined) continue;
+
+    for (const neighborId of graph.adjacency.get(currentId) ?? []) {
+      const neighborNode = graph.nodesById.get(neighborId);
+      if (!neighborNode) continue;
+
+      if (!canTraverse(currentNode, neighborNode, currentDistance)) continue;
+
+      // allocated nodes are free
+      const stepCost = allocatedNodeIds.has(neighborId) ? 0 : 1;
+      const nextDistance = currentDistance + stepCost;
+      const previousDistance = distanceByNodeId.get(neighborId);
+
+      if (previousDistance !== undefined && previousDistance <= nextDistance) {
+        continue;
+      }
+
+      distanceByNodeId.set(neighborId, nextDistance);
+      predecessorByNodeId.set(neighborId, currentId);
+
+      if (stepCost === 0) {
+        deque.pushFront(neighborId);
+      } else {
+        deque.pushBack(neighborId);
+      }
     }
   }
 
   return {
     distanceByNodeId,
-    pathByNodeId,
+    predecessorByNodeId,
   };
+}
+
+export function materializePath(
+  targetNodeId: NodeId,
+  predecessorByNodeId: ReadonlyMap<NodeId, NodeId | null>,
+): NodeId[] {
+  const reversedPath: NodeId[] = [];
+  let currentNodeId: NodeId | null | undefined = targetNodeId;
+
+  while (currentNodeId !== undefined && currentNodeId !== null) {
+    reversedPath.push(currentNodeId);
+    currentNodeId = predecessorByNodeId.get(currentNodeId) ?? null;
+  }
+
+  reversedPath.reverse();
+  return reversedPath;
 }
