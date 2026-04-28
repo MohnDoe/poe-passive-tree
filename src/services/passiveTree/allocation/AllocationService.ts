@@ -6,9 +6,9 @@ import type {
   AllocationNodeState,
   AllocationResult,
   AllocationSnapshot,
-} from "../../../domain/build/allocation/Allocation";
-import { computeRefundClosure } from "./analysis/refund";
+} from "@/domain/build/allocation/Allocation";
 import { buildAllocationSnapshot } from "./buildAllocationSnapshot";
+import { analyzeRefundTarget } from "./analysis/refund";
 
 interface AllocationSnapshotInputs {
   graph: PassiveGraph;
@@ -113,11 +113,18 @@ export class AllocationService {
       return { changed: false, nextAllocatedNodeIds: new Set() };
     }
 
-    const refundedNodeIds = computeRefundClosure(nodeId, this.snapshot.nodeStateById);
+    const analysis = analyzeRefundTarget(nodeId, this.snapshot.nodeStateById);
+
+    if (!analysis.canRefund) {
+      return {
+        changed: false,
+        nextAllocatedNodeIds: new Set(this.buildState.allocatedNodeIds),
+      };
+    }
 
     const nextAllocatedNodeIds = new Set(this.buildState.allocatedNodeIds);
 
-    for (const refundedNodeId of refundedNodeIds) {
+    for (const refundedNodeId of analysis.refundedNodeIds) {
       nextAllocatedNodeIds.delete(refundedNodeId);
     }
 

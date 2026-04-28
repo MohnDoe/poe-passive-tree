@@ -26,43 +26,35 @@ export const useAllocationStore = defineStore("allocation", {
   getters: {
     hasSnapshot: (state): boolean => state.snapshot !== null,
 
-    allocatableNodeIds: (state): Set<NodeId> => {
-      const result = new Set<NodeId>();
-      if (!state.snapshot) return result;
+    // TODO: evaluate if beneficial to have here
 
-      for (const [nodeId, nodeState] of state.snapshot.nodeStateById) {
-        if (nodeState.allocatable) {
-          result.add(nodeId);
-        }
-      }
-
-      return result;
-    },
-
-    allocatedNodeIds: (state): Set<NodeId> => {
-      if (!state.snapshot) return new Set<NodeId>();
-      return new Set(state.snapshot.allocatedNodeIds);
-    },
+    // allocatableNodeIds: (state): Set<NodeId> => {
+    //   const result = new Set<NodeId>();
+    //   if (!state.snapshot) return result;
+    //
+    //   for (const [nodeId, nodeState] of state.snapshot.nodeStateById) {
+    //     if (nodeState.allocatable) {
+    //       result.add(nodeId);
+    //     }
+    //   }
+    //
+    //   return result;
+    // },
+    //
+    // allocatedNodeIds: (state): Set<NodeId> => {
+    //   if (!state.snapshot) return new Set<NodeId>();
+    //   return new Set(state.snapshot.allocatedNodeIds);
+    // },
+    // canAllocate:
+    //   (state) =>
+    //   (nodeId: NodeId): boolean => {
+    //     return state.snapshot?.nodeStateById.get(nodeId)?.allocatable ?? false;
+    //   },
+    //   canRefund()
 
     getNodeState: (state) => (nodeId: NodeId) => {
       return state.snapshot?.nodeStateById.get(nodeId) ?? null;
     },
-
-    canAllocate:
-      (state) =>
-      (nodeId: NodeId): boolean => {
-        return state.snapshot?.nodeStateById.get(nodeId)?.allocatable ?? false;
-      },
-
-    canRefund:
-      (state) =>
-      (nodeId: NodeId): boolean => {
-        const nodeState = state.snapshot?.nodeStateById.get(nodeId);
-        if (!nodeState) return false;
-        if (!nodeState.allocated) return false;
-
-        return nodeState.requiredBy.size === 0;
-      },
   },
 
   actions: {

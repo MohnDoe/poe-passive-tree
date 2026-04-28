@@ -4,7 +4,7 @@ import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { makeEdgeKey } from "../../runtime/graph/buildEdges";
 
 // Returns all the nodes that would be refunded in order to refund the input node
-export function computeRefundClosure(
+function computeRefundClosure(
   nodeId: NodeId,
   nodeStateById: AllocationSnapshot["nodeStateById"],
 ): Set<NodeId> {
@@ -30,7 +30,7 @@ export function computeRefundClosure(
   return out;
 }
 
-export function computeRefundPath(
+function computeRefundPath(
   refundedNodeIds: Set<NodeId>,
   nodeStateById: AllocationSnapshot["nodeStateById"],
 ): Set<EdgeKey> {
@@ -52,4 +52,34 @@ export function computeRefundPath(
   }
 
   return edgeKeys;
+}
+
+export interface RefundAnalysis {
+  canRefund: boolean;
+  refundedNodeIds: ReadonlySet<NodeId>;
+  refundedEdgeKeys: ReadonlySet<EdgeKey>;
+}
+
+export function analyzeRefundTarget(
+  nodeId: NodeId,
+  nodeStateById: AllocationSnapshot["nodeStateById"],
+): RefundAnalysis {
+  const nodeState = nodeStateById.get(nodeId);
+
+  if (!nodeState?.allocated) {
+    return {
+      canRefund: false,
+      refundedNodeIds: new Set(),
+      refundedEdgeKeys: new Set(),
+    };
+  }
+
+  const refundedNodeIds = computeRefundClosure(nodeId, nodeStateById);
+  const refundedEdgeKeys = computeRefundPath(refundedNodeIds, nodeStateById);
+
+  return {
+    canRefund: refundedNodeIds.size > 0,
+    refundedNodeIds,
+    refundedEdgeKeys,
+  };
 }

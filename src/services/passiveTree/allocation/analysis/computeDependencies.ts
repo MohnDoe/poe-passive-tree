@@ -27,10 +27,11 @@ export function computeDependencies({
     const nodeState = nodeStateById.get(nodeId);
     if (!nodeState) continue;
 
-    const path = nodeState.path ?? [nodeId];
+    const path = nodeState.path ?? [];
     const dependsOn = dependsOnByNodeId.get(nodeId)!;
 
     for (const dependencyNodeId of path) {
+      if (dependencyNodeId === nodeId) continue;
       dependsOn.add(dependencyNodeId);
     }
   }

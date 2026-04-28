@@ -3,10 +3,7 @@ import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import type { HoverPreviewStateModel } from "../models/Render";
 import { makeEdgeKeysFromPath } from "./createTreeVisualStateModel";
-import {
-  computeRefundClosure,
-  computeRefundPath,
-} from "@/services/passiveTree/allocation/analysis/refund";
+import { analyzeRefundTarget } from "@/services/passiveTree/allocation/analysis/refund";
 
 export interface createHoverPreviewStateModelParams {
   snapshot: AllocationSnapshot | null;
@@ -33,10 +30,11 @@ export function createHoverPreviewStateModel({
   }
 
   const hoveredNodeState = snapshot.nodeStateById.get(hoveredNodeId);
-  const highlightedPath = hoveredNodeState?.path ?? [];
+  if (!hoveredNodeState) return previewState;
 
-  const refundedNodeIds = computeRefundClosure(hoveredNodeId, snapshot.nodeStateById);
-  const refundedEdgeKeys = computeRefundPath(refundedNodeIds, snapshot.nodeStateById);
+  const highlightedPath = hoveredNodeState.path ?? [];
+
+  const refundAnalysis = analyzeRefundTarget(hoveredNodeId, snapshot.nodeStateById);
 
   return {
     hoveredNodeId,
@@ -45,8 +43,8 @@ export function createHoverPreviewStateModel({
       edgeKeys: makeEdgeKeysFromPath(highlightedPath),
     },
     refund: {
-      nodeIds: refundedNodeIds,
-      edgeKeys: refundedEdgeKeys,
+      nodeIds: refundAnalysis.refundedNodeIds,
+      edgeKeys: refundAnalysis.refundedEdgeKeys,
     },
   };
 }
