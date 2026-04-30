@@ -57,9 +57,7 @@ export const useBuildStore = defineStore("build", {
       if (!graph) return { ok: false, reason: "NO_ACTIVE_CLASS" };
       const result = setAscendancy(this.build, graph, ascendancyId);
 
-      if (result.ok) {
-        // do something
-      }
+      if (result.ok) this.build = result.build;
 
       return result;
     },
