@@ -6,4 +6,6 @@ export interface BuildState {
   allocatedNodeIds: Set<NodeId>;
   activeClassId: ClassId | null;
   activeAscendancy: AscendancyId | null;
+  passivePointsBudget: number;
+  ascendancyPointsBudget: number;
 }

@@ -20,14 +20,15 @@ export function createEmptyBuild(): BuildState {
     allocatedNodeIds: new Set(),
     activeClassId: null,
     activeAscendancy: null,
+    passivePointsBudget: 123, // TODO: better
+    ascendancyPointsBudget: 8,
   };
 }
 
 export function cloneBuild(build: BuildState): BuildState {
   return {
+    ...build,
     allocatedNodeIds: new Set(build.allocatedNodeIds),
-    activeClassId: build.activeClassId,
-    activeAscendancy: build.activeAscendancy,
   };
 }
 

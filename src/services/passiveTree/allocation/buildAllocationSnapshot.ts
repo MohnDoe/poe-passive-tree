@@ -43,6 +43,7 @@ export function buildAllocationSnapshot({
 
   applyAllocationFlagsToNodeState({
     graph,
+    build: buildState,
     nodeStateById,
   });
 

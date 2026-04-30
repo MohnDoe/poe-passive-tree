@@ -1,5 +1,5 @@
 import { buildAllocationSnapshot } from "@/services/passiveTree/allocation/buildAllocationSnapshot";
-import { useBuildStore } from "@/stores/build.store";
+import { cloneBuild, useBuildStore } from "@/stores/build.store";
 import { useRuntimeStore } from "@/stores/runtime.store";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
@@ -16,11 +16,7 @@ export function useAllocationSnapshot() {
 
     return buildAllocationSnapshot({
       graph: graph.value,
-      buildState: {
-        allocatedNodeIds: new Set(build.value.allocatedNodeIds),
-        activeClassId: build.value.activeClassId,
-        activeAscendancy: build.value.activeAscendancy,
-      },
+      buildState: cloneBuild(build.value),
     });
   });
 
