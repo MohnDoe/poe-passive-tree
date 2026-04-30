@@ -1,6 +1,6 @@
 import type { AllocationNodeState } from "@/domain/build/models/allocation/Allocation";
 import type { BuildState } from "@/domain/build/models/BuildState";
-import { getPointBudgets } from "@/domain/build/selectors/getPointBudgets";
+import { getPointBudgetSummary } from "@/domain/build/selectors/getPointBudgetSummary";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
 
@@ -15,7 +15,7 @@ export function applyAllocationFlagsToNodeState({
   nodeStateById,
   build,
 }: ApplyAllocationFlagsToNodeStateParams) {
-  const pointBudgets = getPointBudgets(graph, build);
+  const pointBudgetSummary = getPointBudgetSummary(graph, build);
 
   for (const [nodeId, nodeState] of nodeStateById) {
     const node = graph.nodesById.get(nodeId);
@@ -31,8 +31,8 @@ export function applyAllocationFlagsToNodeState({
 
     const hasBudget =
       region === "ascendancy"
-        ? pointBudgets.remaining.ascendancy >= cost
-        : pointBudgets.remaining.passive >= cost;
+        ? pointBudgetSummary.remaining.ascendancy >= cost
+        : pointBudgetSummary.remaining.passive >= cost;
 
     nodeState.allocatable =
       !nodeState.allocated &&
