@@ -27,7 +27,7 @@ const selectedAscendancyId = computed({
 <template>
   <div>
     <select v-model="selectedClassId">
-      <option disabled :selected="selectedClassId === null">Choose a class</option>
+      <option disabled :value="null">Choose a class</option>
       <option v-for="[classId, pClass] of graph?.classesById" :key="classId" :value="classId">
         {{ pClass.name }}
       </option>

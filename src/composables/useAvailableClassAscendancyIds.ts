@@ -12,9 +12,9 @@ export function useAvailableClassAscendancyIds() {
   const { graph } = storeToRefs(runtimeStore);
 
   const availableClassAscendancyIds = computed((): ReadonlySet<AscendancyId> => {
-    if (!graph.value || !build.value.activeClassId) return new Set();
+    if (!graph.value || build.value.activeClassId === null) return new Set();
 
-    return graph.value.ascendancyIdsByClassId.get(build.value.activeClassId) ?? new Set();
+    return graph.value.ascendancyIdsByClassId.get(build.value.activeClassId!) ?? new Set();
   });
 
   return {
