@@ -1,3 +1,4 @@
+import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 
@@ -27,6 +28,8 @@ export interface AllocationSnapshot {
 
   allocatedNodeIds: ReadonlySet<NodeId>;
   allocatableNodeIds: ReadonlySet<NodeId>;
+
+  activeEdgeKeys: ReadonlySet<EdgeKey>;
 
   nodeStateById: Map<NodeId, AllocationNodeState>;
 }

@@ -12,6 +12,7 @@ import { computeDependencies } from "./analysis/computeDependencies";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
 import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
 import { getActiveRootNodeIds } from "../../../domain/passiveGraph/queries/getActiveRootNodeIds";
+import { computeEdgeKeysFromNodeIds } from "@/domain/passiveGraph/queries/computeEdgeKeysFromNodeIds";
 
 export interface BuildAllocationSnapshotParams {
   graph: PassiveGraph;
@@ -73,13 +74,15 @@ export function buildAllocationSnapshot({
 
   applyConnectivityToNodeState(nodeStateById, connectedNodeIds);
 
+  const activeEdgeKeys = computeEdgeKeysFromNodeIds(graph, allocatedNodeIds);
+
   return {
     activeClassId: buildState.activeClassId,
     rootNodeIds: new Set(rootNodeIds),
     allocatedNodeIds,
     nodeStateById,
     allocatableNodeIds,
-    // connectedNodeIds,
+    activeEdgeKeys,
   };
 }
 
