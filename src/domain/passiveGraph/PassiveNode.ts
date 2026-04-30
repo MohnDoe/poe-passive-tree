@@ -1,6 +1,7 @@
 import type { ClassId } from "./PassiveClass";
 import type { GroupId } from "./PassiveGroup";
 
+//TODO: change to number
 export type NodeId = string;
 
 export type AscendancySubregion = string;
