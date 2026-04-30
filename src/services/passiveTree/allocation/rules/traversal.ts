@@ -42,12 +42,22 @@ export function getNeighborIds(nodeId: NodeId, adj: PassiveTreeAdjacency): Set<N
   return adj.get(nodeId) || new Set();
 }
 
-export function canTraverse(from: PassiveNode, to: PassiveNode, currentDistance: number): boolean {
+export function canTraverse(graph: PassiveGraph, from: PassiveNode, to: PassiveNode): boolean {
   if (from.kind === "mastery") return false;
   if (to.kind === "classStart" || to.kind === "ascendancyStart") return false;
 
-  const sameAscendancy = from.ascendancyName === to.ascendancyName;
-  const mayLeaveAscendancyAtRoot = currentDistance === 0 && !to.ascendancyName;
+  const fromRegion = graph.regionByNodeId.get(from.id);
+  const toRegion = graph.regionByNodeId.get(to.id);
 
-  return sameAscendancy || mayLeaveAscendancyAtRoot;
+  if (!fromRegion || !toRegion) return false;
+  if (fromRegion !== toRegion) return false;
+
+  if (fromRegion === "ascendancy") {
+    const fromSubregion = graph.subregionByNodeId.get(from.id);
+    const toSubregion = graph.subregionByNodeId.get(to.id);
+
+    return fromSubregion !== null && fromSubregion === toSubregion;
+  }
+
+  return true;
 }

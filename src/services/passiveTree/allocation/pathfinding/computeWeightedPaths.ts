@@ -46,7 +46,7 @@ export function computeWeightedPaths({
       const neighborNode = graph.nodesById.get(neighborId);
       if (!neighborNode) continue;
 
-      if (!canTraverse(currentNode, neighborNode, currentDistance)) continue;
+      if (!canTraverse(graph, currentNode, neighborNode)) continue;
 
       // allocated nodes are free
       const stepCost = allocatedNodeIds.has(neighborId) ? 0 : 1;
