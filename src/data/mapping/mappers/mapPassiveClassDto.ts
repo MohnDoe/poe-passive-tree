@@ -5,5 +5,6 @@ export function mapPassiveClassDto(classId: number, raw: PassiveTreeClassDto): P
   return {
     id: classId,
     name: raw.name,
+    ascendancyIds: raw.ascendancies.map((a) => a.id),
   };
 }
