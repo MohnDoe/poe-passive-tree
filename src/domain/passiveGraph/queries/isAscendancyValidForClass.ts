@@ -7,5 +7,5 @@ export function isAscendancyValidForClass(
   classId: ClassId,
   ascendancyId: AscendancyId,
 ): boolean {
-  return graph.classByStartNodeId.get(ascendancyId) === classId;
+  return graph.ascendancyIdsByClassId.get(classId)?.has(ascendancyId) ?? false;
 }
