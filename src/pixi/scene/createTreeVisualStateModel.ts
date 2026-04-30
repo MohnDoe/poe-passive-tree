@@ -6,12 +6,10 @@ import type { AllocationSnapshot } from "@/domain/build/models/allocation/Alloca
 
 export interface CreateTreeVisualStateParams {
   snapshot: AllocationSnapshot | null;
-  // hoveredNodeId: NodeId | null;
 }
 
 export function createTreeVisualState({
   snapshot,
-  // hoveredNodeId,
 }: CreateTreeVisualStateParams): TreeVisualStateModel {
   const allocatedNodeIds = new Set<NodeId>();
   let allocatedPathEdgeKeys = new Set<EdgeKey>();

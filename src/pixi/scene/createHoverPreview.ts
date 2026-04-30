@@ -32,6 +32,10 @@ export function createHoverPreviewStateModel({
   const hoveredNodeState = snapshot.nodeStateById.get(hoveredNodeId);
   if (!hoveredNodeState) return previewState;
 
+  if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) {
+    return previewState;
+  }
+
   const highlightedPath = hoveredNodeState.path ?? [];
 
   const refundAnalysis = analyzeRefundTarget(hoveredNodeId, snapshot.nodeStateById);
