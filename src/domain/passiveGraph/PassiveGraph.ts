@@ -1,4 +1,5 @@
 import type { GraphEdge } from "./GraphEdge";
+import type { AscendancyId } from "./PassiveAscendancy";
 import type { ClassId } from "./PassiveClass";
 import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "./PassiveNode";
 import type { PassiveTreeData } from "./PassiveTreeData";
@@ -13,8 +14,9 @@ export interface PassiveGraph extends PassiveTreeData {
   regionByNodeId: ReadonlyMap<NodeId, PassiveNodeRegion>;
   subregionByNodeId: ReadonlyMap<NodeId, PassiveNodeSubregion>;
 
-  startNodeIdsByClassId: ReadonlyMap<ClassId, ReadonlySet<NodeId>>;
   allStartNodeIds: ReadonlySet<NodeId>;
+
+  startNodeIdsByClassId: ReadonlyMap<ClassId, ReadonlySet<NodeId>>;
   classByStartNodeId: ReadonlyMap<NodeId, ClassId>;
 
   // nodeIdsByGroupId: ReadonlyMap<GroupId, ReadonlySet<NodeId>>;
@@ -23,6 +25,7 @@ export interface PassiveGraph extends PassiveTreeData {
   // jewelSocketNodeIds: ReadonlySet<NodeId>;
 
   ascendancyStartNodeIds: ReadonlySet<NodeId>;
+  ascendancyIdsByClassId: ReadonlyMap<ClassId, ReadonlySet<AscendancyId>>;
 
   edges: readonly GraphEdge[];
   // edgeIdsByNodeId: ReadonlyMap<NodeId, string>;

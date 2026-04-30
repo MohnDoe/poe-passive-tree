@@ -1,22 +1,22 @@
 import type { MappedPassiveTree } from "@/data/mapping/MappedPassiveTree";
+import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
 import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
-import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/passiveGraph/PassiveGraph";
+import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { getNeighborIds } from "../../allocation/rules/traversal";
-import type { RegionIndexes } from "./buildRegions";
 
 interface StartNodeIndexes {
   startNodeIdsByClassId: PassiveGraph["startNodeIdsByClassId"];
   allStartNodeIds: PassiveGraph["allStartNodeIds"];
   classByStartNodeId: PassiveGraph["classByStartNodeId"];
+  ascendancyIdsByClassId: PassiveGraph["ascendancyIdsByClassId"];
 }
 
 export function buildStartNodeIndexes(
   input: MappedPassiveTree,
-  adjacency: PassiveTreeAdjacency,
-  regionByNodeId: RegionIndexes["regionByNodeId"],
+  // adjacency: PassiveTreeAdjacency,
+  // regionByNodeId: RegionIndexes["regionByNodeId"],
 ): StartNodeIndexes {
-  const startNodeIdsByClassId = getStartNodeIdsByClassId(input, adjacency, regionByNodeId);
+  const startNodeIdsByClassId = getStartNodeIdsByClassId(input);
 
   // flatten the Map<ClassId, Set<NodeId>> into a Set<NodeId>
   const allStartNodeIds = new Set<NodeId>(
@@ -31,17 +31,24 @@ export function buildStartNodeIndexes(
     }
   }
 
+  const ascendancyIdsByClassId = new Map<ClassId, Set<AscendancyId>>();
+
+  for (const [classId, pClass] of input.classesById) {
+    ascendancyIdsByClassId.set(classId, new Set<AscendancyId>(pClass.ascendancyIds));
+  }
+
   return {
     allStartNodeIds,
     startNodeIdsByClassId,
     classByStartNodeId,
+    ascendancyIdsByClassId,
   };
 }
 
 function getStartNodeIdsByClassId(
   input: MappedPassiveTree,
-  adjacency: PassiveTreeAdjacency,
-  regionByNodeId: RegionIndexes["regionByNodeId"],
+  // adjacency: PassiveTreeAdjacency,
+  // regionByNodeId: RegionIndexes["regionByNodeId"],
 ): Map<ClassId, Set<NodeId>> {
   const out = new Map<ClassId, Set<NodeId>>();
 

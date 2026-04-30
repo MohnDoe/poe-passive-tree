@@ -17,11 +17,8 @@ export function buildGraph(input: MappedPassiveTree): PassiveGraph {
     adjacency,
   );
 
-  const { allStartNodeIds, classByStartNodeId, startNodeIdsByClassId } = buildStartNodeIndexes(
-    input,
-    adjacency,
-    regionByNodeId,
-  );
+  const { allStartNodeIds, classByStartNodeId, startNodeIdsByClassId, ascendancyIdsByClassId } =
+    buildStartNodeIndexes(input);
 
   return {
     classesById: input.classesById,
@@ -34,6 +31,8 @@ export function buildGraph(input: MappedPassiveTree): PassiveGraph {
     allStartNodeIds,
     classByStartNodeId,
     startNodeIdsByClassId,
+
+    ascendancyIdsByClassId,
 
     regionByNodeId,
     subregionByNodeId,
