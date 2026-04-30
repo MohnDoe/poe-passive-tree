@@ -21,18 +21,19 @@ export function createNodeView(
   model: NodeRenderModel,
   callbacks: NodeViewCallbacks = {},
 ): NodeView {
+  let currentState = { ...defaultState };
+  let currentStyle = resolveNodeStyle(model, currentState);
+
   const container = new Container({
     position: { x: model.x, y: model.y },
     eventMode: "static",
+    // TODO: change this when not reachable/allocatable
     cursor: "pointer",
   });
 
   const visible = new Graphics();
 
   container.addChild(visible);
-
-  let currentState = { ...defaultState };
-  let currentStyle = resolveNodeStyle(model, currentState);
 
   const draw = (style: NodeVisualStyle) => {
     // use sprite later

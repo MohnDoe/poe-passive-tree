@@ -37,8 +37,7 @@ export function applyAllocationFlagsToNodeState({
     nodeState.allocatable =
       !nodeState.allocated &&
       nodeState.reachable &&
-      costsSomething &&
-      hasBudget &&
+      ((costsSomething && hasBudget) || true) && //TODO: fix issue : hover shows what can't be done, so for now : let allocation even out of budget
       !isForbiddenAllocationTarget(node);
   }
 }
