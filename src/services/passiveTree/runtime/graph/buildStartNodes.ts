@@ -69,14 +69,33 @@ function getStartNodeIdsByClassId(
   return out;
 }
 
-export function buildAscendancyStartNodeIds(input: MappedPassiveTree): Set<NodeId> {
-  const ids = new Set<NodeId>();
+export interface AscendancyStartNodeIndexes {
+  ascendancyStartNodeIds: PassiveGraph["ascendancyStartNodeIds"];
+  ascendancyStartNodeIdsByAscendancyId: PassiveGraph["ascendancyStartNodeIdsByAscendancyId"];
+}
+
+export function buildAscendancyStartNodeIds(input: MappedPassiveTree): AscendancyStartNodeIndexes {
+  const ascendancyStartNodeIds = new Set<NodeId>();
+  const ascendancyStartNodeIdsByAscendancyId = new Map<AscendancyId, Set<NodeId>>();
 
   for (const [nodeId, node] of input.nodesById) {
     if (node.kind === "ascendancyStart") {
-      ids.add(nodeId);
+      ascendancyStartNodeIds.add(nodeId);
+
+      if (node.ascendancyName) {
+        if (!ascendancyStartNodeIdsByAscendancyId.get(node.ascendancyName))
+          ascendancyStartNodeIdsByAscendancyId.set(node.ascendancyName, new Set());
+
+        ascendancyStartNodeIdsByAscendancyId.set(
+          node.ascendancyName,
+          new Set([...ascendancyStartNodeIdsByAscendancyId.get(node.ascendancyName)!, nodeId]),
+        );
+      }
     }
   }
 
-  return ids;
+  return {
+    ascendancyStartNodeIds,
+    ascendancyStartNodeIdsByAscendancyId,
+  };
 }

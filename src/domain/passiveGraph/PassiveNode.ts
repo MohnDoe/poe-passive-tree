@@ -1,3 +1,4 @@
+import type { AscendancyId } from "./PassiveAscendancy";
 import type { ClassId } from "./PassiveClass";
 import type { GroupId } from "./PassiveGroup";
 
@@ -36,7 +37,7 @@ export interface PassiveNode extends PassiveRootNode {
   kind: PassiveNodeKind;
   isMultipleChoice: boolean;
   isMultipleChoiceOption: boolean;
-  ascendancyName?: string;
+  ascendancyName?: AscendancyId;
   classStartIndex?: ClassId;
 }
 

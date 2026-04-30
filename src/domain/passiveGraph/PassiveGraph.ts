@@ -25,6 +25,7 @@ export interface PassiveGraph extends PassiveTreeData {
   // jewelSocketNodeIds: ReadonlySet<NodeId>;
 
   ascendancyStartNodeIds: ReadonlySet<NodeId>;
+  ascendancyStartNodeIdsByAscendancyId: ReadonlyMap<AscendancyId, ReadonlySet<NodeId>>;
   ascendancyIdsByClassId: ReadonlyMap<ClassId, ReadonlySet<AscendancyId>>;
 
   edges: readonly GraphEdge[];
