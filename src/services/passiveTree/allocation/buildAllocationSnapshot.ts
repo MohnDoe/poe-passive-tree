@@ -11,7 +11,7 @@ import { applyConnectivityToNodeState, computeConnectivity } from "./analysis/co
 import { computeDependencies } from "./analysis/computeDependencies";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
 import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
-import { getActiveRootNodeIds } from "../queries/getActiveRootNodeIds";
+import { getActiveRootNodeIds } from "../../../domain/passiveGraph/queries/getActiveRootNodeIds";
 
 export interface BuildAllocationSnapshotParams {
   graph: PassiveGraph;
@@ -24,7 +24,9 @@ export function buildAllocationSnapshot({
 }: BuildAllocationSnapshotParams): AllocationSnapshot {
   const allocatedNodeIds = new Set(buildState.allocatedNodeIds);
 
-  const rootNodeIds = new Set(getActiveRootNodeIds(graph, buildState));
+  const rootNodeIds = new Set(
+    getActiveRootNodeIds(graph, buildState.activeClassId, buildState.activeAscendancy),
+  );
 
   const nodeStateById = createDefaultNodeState(graph.nodesById, allocatedNodeIds);
 
