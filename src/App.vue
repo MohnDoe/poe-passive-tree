@@ -3,6 +3,7 @@ import { onMounted } from "vue";
 import ClassSelector from "./components/ClassSelector.vue";
 import PassiveTreeCanvas from "./components/PassiveTreeCanvas.vue";
 import { usePassiveTreeRuntime } from "./composables/usePassiveTreeRuntime";
+import StatsPanel from "./components/StatsPanel.vue";
 
 const { status, error, ensureLoaded } = usePassiveTreeRuntime();
 
@@ -16,6 +17,7 @@ onMounted(() => {
     <header>
       <h1>PoE Passive Tree (WIP)</h1>
       <ClassSelector />
+      <StatsPanel />
     </header>
     <main>
       <p v-if="status === 'loading'">Loading ...</p>
