@@ -1,5 +1,5 @@
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
-import { createPassiveTreeRuntime } from "@/services/passiveTree/runtime/createPassiveTreeRuntime";
+import { loadPassiveTree } from "@/infrastructure/loader/loadPassiveTree";
 import { defineStore } from "pinia";
 
 export interface RuntimeState {
@@ -21,8 +21,7 @@ export const useRuntimeStore = defineStore("runtime", {
       this.error = null;
 
       try {
-        const { graph } = await createPassiveTreeRuntime();
-        this.graph = graph;
+        this.graph = await loadPassiveTree();
         this.status = "ready";
       } catch (error) {
         this.graph = null;

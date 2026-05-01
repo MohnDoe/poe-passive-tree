@@ -1,4 +1,4 @@
-import type { MappedPassiveTree } from "@/infrastructure/mapping/MappedPassiveTree";
+import type { MappedPassiveTree } from "@/infrastructure/passiveTree/mapping/MappedPassiveTree";
 import type { PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 
