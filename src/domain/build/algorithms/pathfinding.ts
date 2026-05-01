@@ -1,7 +1,7 @@
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { canTraverse } from "@/domain/build/algorithms/rules/traversal";
-import { Deque } from "@/services/passiveTree/runtime/graph/Deque";
+import { Deque } from "@/shared/collections/Deque";
 
 export interface ComputeWeightedPathsParams {
   graph: PassiveGraph;
