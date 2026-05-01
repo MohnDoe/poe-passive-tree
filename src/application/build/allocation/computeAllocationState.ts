@@ -1,3 +1,5 @@
+import { computeConnectivity, computeDependencies } from "@/domain/build/algorithms/dependencies";
+import { computeWeightedPaths } from "@/domain/build/algorithms/pathfinding";
 import type {
   AllocationNodeState,
   AllocationState,
@@ -8,11 +10,9 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 import { computeEdgeKeysFromNodeIds } from "@/domain/graph/queries/computeEdgeKeysFromNodeIds";
 import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
 import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
-import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
 import { applyConnectivityToNodeState } from "./analysis/applyConnectivityToNodeState";
+import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
-import { computeWeightedPaths } from "@/domain/build/algorithms/pathfinding";
-import { computeDependencies, computeConnectivity } from "@/domain/build/algorithms/dependencies";
 
 export interface ComputeAllocationStateParams {
   graph: PassiveGraph;
