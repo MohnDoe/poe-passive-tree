@@ -1,6 +1,6 @@
 import type {
   AllocationNodeState,
-  AllocationSnapshot,
+  AllocationState,
 } from "@/domain/build/models/allocation/Allocation";
 import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
@@ -22,7 +22,7 @@ export interface BuildAllocationSnapshotParams {
 export function buildAllocationSnapshot({
   graph,
   buildState,
-}: BuildAllocationSnapshotParams): AllocationSnapshot {
+}: BuildAllocationSnapshotParams): AllocationState {
   const allocatedNodeIds = new Set(buildState.allocatedNodeIds);
 
   const rootNodeIds = new Set(

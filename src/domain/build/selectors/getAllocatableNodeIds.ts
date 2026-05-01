@@ -1,7 +1,7 @@
-import type { AllocationSnapshot } from "../models/allocation/Allocation";
+import type { AllocationState } from "../models/allocation/Allocation";
 
 export function getAllocatableNodeIds(
-  snapshot: AllocationSnapshot,
-): AllocationSnapshot["allocatableNodeIds"] {
+  snapshot: AllocationState,
+): AllocationState["allocatableNodeIds"] {
   return snapshot.allocatableNodeIds;
 }

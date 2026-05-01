@@ -1,8 +1,8 @@
-import type { AllocationSnapshot } from "@/domain/build/models/allocation/Allocation";
+import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 import type { TreeVisualStateModel } from "../models/Render";
 
 export interface CreateTreeVisualStateParams {
-  snapshot: AllocationSnapshot | null;
+  snapshot: AllocationState | null;
 }
 
 export function createTreeVisualState({

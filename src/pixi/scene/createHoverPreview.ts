@@ -3,10 +3,10 @@ import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import type { HoverPreviewStateModel } from "../models/Render";
 import { analyzeRefundTarget } from "@/services/passiveTree/allocation/analysis/refund";
 import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
-import type { AllocationSnapshot } from "@/domain/build/models/allocation/Allocation";
+import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 
 export interface createHoverPreviewStateModelParams {
-  snapshot: AllocationSnapshot | null;
+  snapshot: AllocationState | null;
   hoveredNodeId: NodeId | null;
 }
 

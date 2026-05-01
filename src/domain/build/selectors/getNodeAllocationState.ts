@@ -1,8 +1,8 @@
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import type { AllocationNodeState, AllocationSnapshot } from "../models/allocation/Allocation";
+import type { AllocationNodeState, AllocationState } from "../models/allocation/Allocation";
 
 export function getNodeAllocationState(
-  snapshot: AllocationSnapshot,
+  snapshot: AllocationState,
   nodeId: NodeId,
 ): AllocationNodeState | null {
   return snapshot.nodeStateById.get(nodeId) ?? null;

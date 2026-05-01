@@ -1,4 +1,4 @@
-import type { AllocationSnapshot } from "@/domain/build/models/allocation/Allocation";
+import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
@@ -6,7 +6,7 @@ import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 // Returns all the nodes that would be refunded in order to refund the input node
 function computeRefundClosure(
   nodeId: NodeId,
-  nodeStateById: AllocationSnapshot["nodeStateById"],
+  nodeStateById: AllocationState["nodeStateById"],
 ): Set<NodeId> {
   const out = new Set<NodeId>();
   const queue: NodeId[] = [nodeId];
@@ -32,7 +32,7 @@ function computeRefundClosure(
 
 function computeRefundEdgeKeys(
   refundedNodeIds: Set<NodeId>,
-  nodeStateById: AllocationSnapshot["nodeStateById"],
+  nodeStateById: AllocationState["nodeStateById"],
 ): Set<EdgeKey> {
   const edgeKeys = new Set<EdgeKey>();
 
@@ -59,7 +59,7 @@ export interface RefundAnalysis {
 
 export function analyzeRefundTarget(
   nodeId: NodeId,
-  nodeStateById: AllocationSnapshot["nodeStateById"],
+  nodeStateById: AllocationState["nodeStateById"],
 ): RefundAnalysis {
   const nodeState = nodeStateById.get(nodeId);
 

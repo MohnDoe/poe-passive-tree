@@ -21,7 +21,7 @@ export interface AllocationNodeState {
   requiredBy: ReadonlySet<NodeId>;
 }
 
-export interface AllocationSnapshot {
+export interface AllocationState {
   activeClassId: ClassId | null;
 
   rootNodeIds: Set<NodeId>;
