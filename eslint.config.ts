@@ -32,6 +32,7 @@ export default defineConfigWithVueTs(
   skipFormatting,
 
   {
+    ignores: ["src/App.vue", "src/main.ts", "src/utils/**/*"],
     files: ["src/**/*.{js,ts,vue}"],
     plugins: {
       boundaries,
@@ -52,7 +53,7 @@ export default defineConfigWithVueTs(
       ],
     },
     rules: {
-      "boundaries/no-unknown-files": ["warn"],
+      "boundaries/no-unknown-files": ["error"],
       "boundaries/dependencies": [
         "error",
         {
