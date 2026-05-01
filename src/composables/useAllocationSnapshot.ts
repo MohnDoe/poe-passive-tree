@@ -1,4 +1,4 @@
-import { buildAllocationSnapshot } from "@/services/passiveTree/allocation/buildAllocationSnapshot";
+import { computeAllocationState } from "@/services/passiveTree/allocation/computeAllocationState";
 import { cloneBuild, useBuildStore } from "@/stores/build.store";
 import { useRuntimeStore } from "@/stores/runtime.store";
 import { storeToRefs } from "pinia";
@@ -14,7 +14,7 @@ export function useAllocationSnapshot() {
   const snapshot = computed(() => {
     if (!graph.value || build.value.activeClassId === null) return null;
 
-    return buildAllocationSnapshot({
+    return computeAllocationState({
       graph: graph.value,
       buildState: cloneBuild(build.value),
     });

@@ -1,7 +1,7 @@
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { BuildState } from "../models/BuildState";
 import type { BuildCommandContext } from "./types";
-import { buildAllocationSnapshot } from "@/services/passiveTree/allocation/buildAllocationSnapshot";
+import { computeAllocationState } from "@/services/passiveTree/allocation/computeAllocationState";
 
 export function createBuildCommandContext(
   graph: PassiveGraph,
@@ -10,7 +10,7 @@ export function createBuildCommandContext(
   return {
     graph,
     build,
-    snapshot: buildAllocationSnapshot({
+    snapshot: computeAllocationState({
       graph,
       buildState: build,
     }),

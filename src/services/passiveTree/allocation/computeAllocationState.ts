@@ -14,15 +14,15 @@ import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
 import { getActiveRootNodeIds } from "../../../domain/passiveGraph/queries/getActiveRootNodeIds";
 import { computeEdgeKeysFromNodeIds } from "@/domain/passiveGraph/queries/computeEdgeKeysFromNodeIds";
 
-export interface BuildAllocationSnapshotParams {
+export interface ComputeAllocationStateParams {
   graph: PassiveGraph;
   buildState: BuildState;
 }
 
-export function buildAllocationSnapshot({
+export function computeAllocationState({
   graph,
   buildState,
-}: BuildAllocationSnapshotParams): AllocationState {
+}: ComputeAllocationStateParams): AllocationState {
   const allocatedNodeIds = new Set(buildState.allocatedNodeIds);
 
   const rootNodeIds = new Set(
