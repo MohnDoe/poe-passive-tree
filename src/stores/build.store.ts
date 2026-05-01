@@ -1,15 +1,15 @@
 import type { BuildState } from "@/domain/build/models/BuildState";
-import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { ClassId } from "@/domain/graph/PassiveClass";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { BuildCommandResult } from "@/domain/build/commands/types";
-import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
+import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 
 import { createBuildCommandContext } from "@/domain/build/commands/createBuildCommandContext";
 import { planToggleAllocation } from "@/domain/build/commands/planToggleAllocation";
 import { setAscendancy } from "@/domain/build/commands/setAscendancy";
 import { setClass } from "@/domain/build/commands/setClass";
 import { defineStore } from "pinia";
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 
 export interface BuildStoreState {
   build: BuildState;

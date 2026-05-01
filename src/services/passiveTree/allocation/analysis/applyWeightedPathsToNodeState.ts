@@ -1,4 +1,4 @@
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { AllocationNodeState } from "@/domain/build/models/allocation/Allocation";
 import { type WeightedPathsResult, materializePath } from "@/domain/build/algorithms/pathfinding";
 

@@ -1,4 +1,4 @@
-import type { PassiveGroup } from "@/domain/passiveGraph/PassiveGroup";
+import type { PassiveGroup } from "@/domain/graph/PassiveGroup";
 import type { PassiveTreeGroupDto } from "../../dto/passiveTree/Groups.dto";
 
 export function mapPassiveGroupDto(groupId: string, raw: PassiveTreeGroupDto): PassiveGroup {

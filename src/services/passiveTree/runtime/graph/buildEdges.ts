@@ -1,7 +1,7 @@
 import type { MappedPassiveTree } from "@/infrastructure/mapping/MappedPassiveTree";
-import { makeEdgeKey } from "@/domain/passiveGraph/edgeKeys";
-import type { GraphEdge } from "@/domain/passiveGraph/GraphEdge";
-import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
+import { makeEdgeKey } from "@/domain/graph/edgeKeys";
+import type { GraphEdge } from "@/domain/graph/GraphEdge";
+import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
 
 export function buildEdges(nodes: MappedPassiveTree["nodesById"]): GraphEdge[] {
   const edges: GraphEdge[] = [];

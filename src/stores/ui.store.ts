@@ -1,5 +1,5 @@
 import type { UiState } from "@/domain/build/models/UiState";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import { defineStore } from "pinia";
 
 export type UiStoreState = UiState;

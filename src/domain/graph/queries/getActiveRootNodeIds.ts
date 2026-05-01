@@ -1,8 +1,8 @@
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { getClassStartNodeIds } from "@/domain/passiveGraph/queries/getClassStartNodeIds";
 import type { AscendancyId } from "../PassiveAscendancy";
 import type { ClassId } from "../PassiveClass";
+import type { PassiveGraph } from "../PassiveGraph";
+import type { NodeId } from "../PassiveNode";
+import { getClassStartNodeIds } from "./getClassStartNodeIds";
 
 export function getActiveRootNodeIds(
   graph: PassiveGraph,

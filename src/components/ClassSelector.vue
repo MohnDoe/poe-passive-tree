@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useAvailableClassAscendancyIds } from "@/composables/useAvailableClassAscendancyIds";
 import { useTreeInteraction } from "@/composables/useTreeInteraction";
-import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
-import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
+import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
+import type { ClassId } from "@/domain/graph/PassiveClass";
 
 import { useBuildStore } from "@/stores/build.store";
 import { useRuntimeStore } from "@/stores/runtime.store";

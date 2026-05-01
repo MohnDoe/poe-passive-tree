@@ -1,7 +1,7 @@
 import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
-import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
-import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import { makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
+import type { EdgeKey } from "@/domain/graph/GraphEdge";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 
 // Returns all the nodes that would be refunded in order to refund the input node
 export function computeRefundClosure(

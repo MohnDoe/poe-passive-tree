@@ -1,4 +1,4 @@
-import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
+import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 import { useBuildStore } from "@/stores/build.store";
 import { useRuntimeStore } from "@/stores/runtime.store";
 import { storeToRefs } from "pinia";

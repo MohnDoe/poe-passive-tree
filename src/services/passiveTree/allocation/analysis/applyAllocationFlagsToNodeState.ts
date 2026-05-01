@@ -1,8 +1,8 @@
 import type { AllocationNodeState } from "@/domain/build/models/allocation/Allocation";
 import type { BuildState } from "@/domain/build/models/BuildState";
 import { getPointBudgetSummary } from "@/domain/build/selectors/getPointBudgetSummary";
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
+import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
 
 export interface ApplyAllocationFlagsToNodeStateParams {
   graph: PassiveGraph;

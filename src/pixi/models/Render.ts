@@ -1,7 +1,7 @@
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { EdgeRenderModel } from "./Edge";
 import type { NodeRenderModel } from "./Node";
-import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
+import type { EdgeKey } from "@/domain/graph/GraphEdge";
 
 export interface GroupBackgroundRenderModel {
   key: string;

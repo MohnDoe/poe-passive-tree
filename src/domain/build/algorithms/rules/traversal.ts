@@ -1,5 +1,5 @@
-import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
+import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
+import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
 
 function isAscendancyTraversalNode(node: PassiveNode) {
   if (node.kind === "jewel") return false;

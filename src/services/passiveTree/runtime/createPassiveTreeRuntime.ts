@@ -1,6 +1,6 @@
 import { loadPassiveTreeDto } from "@/infrastructure/loadPassiveTreeDto";
 import { mapPassiveTreeDtoToDomain } from "@/infrastructure/mapping/mappers/mapPassiveTreeDtoToDomain";
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import { buildGraph } from "./graph/buildGraph";
 
 export interface PassiveTreeRuntime {

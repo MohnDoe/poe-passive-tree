@@ -1,4 +1,4 @@
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { BuildState } from "../models/BuildState";
 import type { BuildCommandContext } from "./types";
 

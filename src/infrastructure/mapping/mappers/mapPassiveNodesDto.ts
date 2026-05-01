@@ -1,4 +1,4 @@
-import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
 import type { PassiveTreeDto } from "../../dto/passiveTree/PassiveSkillTree.dto";
 import type { MappedPassiveTree } from "../MappedPassiveTree";
 import { isPassiveNode } from "../../dto/passiveTree/Nodes.dto";

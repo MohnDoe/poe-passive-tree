@@ -1,5 +1,5 @@
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import { canTraverse } from "@/domain/build/algorithms/rules/traversal";
 import { Deque } from "@/shared/collections/Deque";
 

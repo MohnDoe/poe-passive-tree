@@ -1,8 +1,8 @@
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { BuildState } from "../models/BuildState";
-import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
+import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 import type { BuildCommandResult } from "./types";
-import { isAscendancyValidForClass } from "@/domain/passiveGraph/queries/isAscendancyValidForClass";
+import { isAscendancyValidForClass } from "@/domain/graph/queries/isAscendancyValidForClass";
 
 export function setAscendancy(
   build: BuildState,

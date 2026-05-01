@@ -1,4 +1,4 @@
-import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
+import type { ClassId } from "@/domain/graph/PassiveClass";
 import type { BuildState } from "../models/BuildState";
 import { createEmptyBuild } from "@/stores/build.store";
 

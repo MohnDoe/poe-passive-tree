@@ -3,7 +3,7 @@ import type {
   PassiveNode,
   PassiveNodeKind,
   PassiveNodePosition,
-} from "@/domain/passiveGraph/PassiveNode";
+} from "@/domain/graph/PassiveNode";
 import { type PassiveTreeNodeDto } from "../../dto/passiveTree/Nodes.dto";
 import type { PassiveTreeDto } from "../../dto/passiveTree/PassiveSkillTree.dto";
 

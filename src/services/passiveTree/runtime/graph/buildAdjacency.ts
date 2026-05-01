@@ -1,6 +1,6 @@
 import type { MappedPassiveTree } from "@/infrastructure/mapping/MappedPassiveTree";
-import type { PassiveTreeAdjacency } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 
 export function buildAdjacency(nodes: MappedPassiveTree["nodesById"]): PassiveTreeAdjacency {
   const adj = new Map<NodeId, Set<NodeId>>();

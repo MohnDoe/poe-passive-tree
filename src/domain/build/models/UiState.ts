@@ -1,4 +1,4 @@
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 
 export interface UiState {
   hoveredNodeId: NodeId | null;

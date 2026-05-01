@@ -3,10 +3,10 @@ import type {
   AllocationState,
 } from "@/domain/build/models/allocation/Allocation";
 import type { BuildState } from "@/domain/build/models/BuildState";
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { computeEdgeKeysFromNodeIds } from "@/domain/passiveGraph/queries/computeEdgeKeysFromNodeIds";
-import { getActiveRootNodeIds } from "@/domain/passiveGraph/queries/getActiveRootNodeIds";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
+import type { NodeId } from "@/domain/graph/PassiveNode";
+import { computeEdgeKeysFromNodeIds } from "@/domain/graph/queries/computeEdgeKeysFromNodeIds";
+import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
 import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
 import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
 import { applyConnectivityToNodeState } from "./analysis/applyConnectivityToNodeState";

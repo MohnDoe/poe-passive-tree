@@ -1,4 +1,4 @@
-import type { GraphEdge } from "@/domain/passiveGraph/GraphEdge";
+import type { GraphEdge } from "@/domain/graph/GraphEdge";
 import type { Graphics, Point } from "pixi.js";
 
 export type EdgeRenderModel =

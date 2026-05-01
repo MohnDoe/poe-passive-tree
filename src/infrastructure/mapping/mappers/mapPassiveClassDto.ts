@@ -1,4 +1,4 @@
-import type { PassiveClass } from "@/domain/passiveGraph/PassiveClass";
+import type { PassiveClass } from "@/domain/graph/PassiveClass";
 import type { PassiveTreeClassDto } from "../../dto/passiveTree/Classes.dto";
 
 export function mapPassiveClassDto(classId: number, raw: PassiveTreeClassDto): PassiveClass {

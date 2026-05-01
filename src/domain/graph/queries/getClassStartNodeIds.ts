@@ -1,6 +1,6 @@
-import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { ClassId } from "../PassiveClass";
+import type { PassiveGraph } from "../PassiveGraph";
+import type { NodeId } from "../PassiveNode";
 
 export function getClassStartNodeIds(
   graph: PassiveGraph,

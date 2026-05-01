@@ -1,8 +1,8 @@
 import type { MappedPassiveTree } from "@/infrastructure/mapping/MappedPassiveTree";
-import type { AscendancyId } from "@/domain/passiveGraph/PassiveAscendancy";
-import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
+import type { ClassId } from "@/domain/graph/PassiveClass";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 
 interface StartNodeIndexes {
   startNodeIdsByClassId: PassiveGraph["startNodeIdsByClassId"];

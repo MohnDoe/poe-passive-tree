@@ -1,7 +1,7 @@
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { EdgeRenderModel } from "../models/Edge";
 import { mapEdgeToRenderModel } from "./mapEdgeToRenderModel";
-import type { GraphEdge } from "@/domain/passiveGraph/GraphEdge";
+import type { GraphEdge } from "@/domain/graph/GraphEdge";
 
 export function mapEdgesToRenderModel(graph: PassiveGraph): EdgeRenderModel[] {
   const links: EdgeRenderModel[] = [];

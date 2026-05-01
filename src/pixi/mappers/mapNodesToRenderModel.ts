@@ -1,4 +1,4 @@
-import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeRenderModel } from "../models/Node";
 import { mapNodeToRenderModel } from "./mapNodeToRenderModel";
 

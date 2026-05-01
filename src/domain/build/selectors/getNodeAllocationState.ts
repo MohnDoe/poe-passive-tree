@@ -1,4 +1,4 @@
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { AllocationNodeState, AllocationState } from "../models/allocation/Allocation";
 
 export function getNodeAllocationState(

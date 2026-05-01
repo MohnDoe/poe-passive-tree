@@ -1,6 +1,6 @@
 import { Container, Graphics } from "pixi.js";
-import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { EdgeKey } from "@/domain/graph/GraphEdge";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { EdgeView, EdgeRenderModel } from "../models/Edge";
 import type { NodeView, NodeRenderModel } from "../models/Node";
 import type {

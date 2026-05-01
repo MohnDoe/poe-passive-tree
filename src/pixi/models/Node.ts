@@ -1,4 +1,4 @@
-import type { NodeId, PassiveNodeKind } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId, PassiveNodeKind } from "@/domain/graph/PassiveNode";
 import type { Container } from "pixi.js";
 
 export interface NodeRenderModel {

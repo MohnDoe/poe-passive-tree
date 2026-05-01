@@ -1,4 +1,4 @@
-import type { GroupId, PassiveGroup } from "@/domain/passiveGraph/PassiveGroup";
+import type { GroupId, PassiveGroup } from "@/domain/graph/PassiveGroup";
 import type { PassiveTreeDto } from "../../dto/passiveTree/PassiveSkillTree.dto";
 import type { MappedPassiveTree } from "../MappedPassiveTree";
 import { mapPassiveGroupDto } from "./mapPassiveGroupDto";

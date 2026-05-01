@@ -1,6 +1,6 @@
 import { computeWeightedPaths, materializePath } from "@/domain/build/algorithms/pathfinding";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { getActiveRootNodeIds } from "@/domain/passiveGraph/queries/getActiveRootNodeIds";
+import type { NodeId } from "@/domain/graph/PassiveNode";
+import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
 import { setsEqual } from "@/utils/utils";
 import type { BuildCommandContext, BuildCommandResult } from "./types";
 

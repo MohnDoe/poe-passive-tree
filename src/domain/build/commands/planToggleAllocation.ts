@@ -1,4 +1,4 @@
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 import { planAllocation } from "./planAllocation";
 import { planRefund } from "./planRefund";
 import type { BuildCommandContext, BuildCommandResult } from "./types";

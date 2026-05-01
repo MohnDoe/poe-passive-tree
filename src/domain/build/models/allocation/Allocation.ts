@@ -1,6 +1,6 @@
-import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
-import type { ClassId } from "@/domain/passiveGraph/PassiveClass";
-import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import type { EdgeKey } from "@/domain/graph/GraphEdge";
+import type { ClassId } from "@/domain/graph/PassiveClass";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 
 export interface AllocationNodeState {
   id: NodeId;

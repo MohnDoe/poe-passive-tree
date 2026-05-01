@@ -1,5 +1,5 @@
-import type { PassiveRootNode } from "@/domain/passiveGraph/PassiveNode";
-import type { PassiveTreeData } from "@/domain/passiveGraph/PassiveTreeData";
+import type { PassiveRootNode } from "@/domain/graph/PassiveNode";
+import type { PassiveTreeData } from "@/domain/graph/PassiveTreeData";
 
 export interface MappedPassiveTree extends PassiveTreeData {
   root: PassiveRootNode;
