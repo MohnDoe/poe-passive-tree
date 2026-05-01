@@ -1,12 +1,10 @@
+import { computeRefundClosure } from "@/domain/build/algorithms/refund";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { getActiveRootNodeIds } from "@/domain/passiveGraph/queries/getActiveRootNodeIds";
-import { computeDependencies } from "@/services/passiveTree/allocation/analysis/computeDependencies";
-import { computeRefundClosure } from "@/services/passiveTree/allocation/analysis/refund";
-import {
-  computeWeightedPaths,
-  materializePath,
-} from "@/services/passiveTree/allocation/pathfinding/computeWeightedPaths";
+
 import { setsEqual } from "@/utils/utils";
+import { computeDependencies } from "../algorithms/dependencies";
+import { computeWeightedPaths, materializePath } from "../algorithms/pathfinding";
 import type { BuildCommandContext, BuildCommandResult } from "./types";
 
 export function planRefund(

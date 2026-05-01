@@ -9,10 +9,10 @@ import { computeEdgeKeysFromNodeIds } from "@/domain/passiveGraph/queries/comput
 import { getActiveRootNodeIds } from "@/domain/passiveGraph/queries/getActiveRootNodeIds";
 import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
 import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
-import { applyConnectivityToNodeState, computeConnectivity } from "./analysis/computeConnectivity";
-import { computeDependencies } from "./analysis/computeDependencies";
+import { applyConnectivityToNodeState } from "./analysis/applyConnectivityToNodeState";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
-import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
+import { computeWeightedPaths } from "@/domain/build/algorithms/pathfinding";
+import { computeDependencies, computeConnectivity } from "@/domain/build/algorithms/dependencies";
 
 export interface ComputeAllocationStateParams {
   graph: PassiveGraph;

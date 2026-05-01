@@ -1,7 +1,7 @@
 import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import type { HoverPreviewStateModel } from "../models/Render";
-import { analyzeRefundTarget } from "@/services/passiveTree/allocation/analysis/refund";
+import { analyzeRefundTarget } from "@/domain/build/algorithms/refund";
 import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
 import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 
