@@ -5,14 +5,14 @@ import type {
 import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
+import { computeEdgeKeysFromNodeIds } from "@/domain/passiveGraph/queries/computeEdgeKeysFromNodeIds";
+import { getActiveRootNodeIds } from "@/domain/passiveGraph/queries/getActiveRootNodeIds";
 import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
 import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
 import { applyConnectivityToNodeState, computeConnectivity } from "./analysis/computeConnectivity";
 import { computeDependencies } from "./analysis/computeDependencies";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
 import { computeWeightedPaths } from "./pathfinding/computeWeightedPaths";
-import { getActiveRootNodeIds } from "../../../domain/passiveGraph/queries/getActiveRootNodeIds";
-import { computeEdgeKeysFromNodeIds } from "@/domain/passiveGraph/queries/computeEdgeKeysFromNodeIds";
 
 export interface ComputeAllocationStateParams {
   graph: PassiveGraph;
@@ -48,9 +48,14 @@ export function computeAllocationState({
     nodeStateById,
   });
 
+  const pathByNodeId = new Map<NodeId, NodeId[]>();
+  for (const [nodeId, nodeState] of nodeStateById) {
+    pathByNodeId.set(nodeId, nodeState.path ?? []);
+  }
+
   const dependencies = computeDependencies({
     allocatedNodeIds,
-    nodeStateById,
+    pathByNodeId,
   });
 
   mergeDependenciesIntoNodeState({

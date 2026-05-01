@@ -1,11 +1,9 @@
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { BuildState } from "../models/BuildState";
-import type { AllocationState } from "../models/allocation/Allocation";
 
 export interface BuildCommandContext {
   graph: PassiveGraph;
   build: BuildState;
-  snapshot: AllocationState;
 }
 
 export type BuildCommandResult =

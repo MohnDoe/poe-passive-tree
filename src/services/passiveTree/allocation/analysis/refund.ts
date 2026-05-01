@@ -4,9 +4,10 @@ import type { EdgeKey } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 
 // Returns all the nodes that would be refunded in order to refund the input node
-function computeRefundClosure(
+export function computeRefundClosure(
   nodeId: NodeId,
-  nodeStateById: AllocationState["nodeStateById"],
+  allocatedNodeIds: ReadonlySet<NodeId>,
+  requiredByNodeId: ReadonlyMap<NodeId, Set<NodeId>>,
 ): Set<NodeId> {
   const out = new Set<NodeId>();
   const queue: NodeId[] = [nodeId];
@@ -14,16 +15,12 @@ function computeRefundClosure(
   while (queue.length > 0) {
     const current = queue.shift()!;
     if (out.has(current)) continue;
+    if (!allocatedNodeIds.has(current)) continue;
 
-    const nodeState = nodeStateById.get(current);
-    if (!nodeState) continue;
-    if (!nodeState.allocated) continue;
     out.add(current);
 
-    for (const dependantId of nodeState.requiredBy) {
-      if (!out.has(dependantId)) {
-        queue.push(dependantId);
-      }
+    for (const dependantId of requiredByNodeId.get(current) ?? []) {
+      if (!out.has(dependantId)) queue.push(dependantId);
     }
   }
 
@@ -31,17 +28,17 @@ function computeRefundClosure(
 }
 
 function computeRefundEdgeKeys(
-  refundedNodeIds: Set<NodeId>,
-  nodeStateById: AllocationState["nodeStateById"],
+  refundedNodeIds: ReadonlySet<NodeId>,
+  pathByNodeId: ReadonlyMap<NodeId, NodeId[]>,
 ): Set<EdgeKey> {
   const edgeKeys = new Set<EdgeKey>();
 
   for (const refundedNodeId of refundedNodeIds) {
-    const nodeState = nodeStateById.get(refundedNodeId);
-    if (!nodeState?.path) continue;
+    const path = pathByNodeId.get(refundedNodeId);
+    if (!path) continue;
 
     for (const edgeKey of makeEdgeKeysFromPath({
-      path: nodeState.path,
+      path,
       allowedNodeIds: refundedNodeIds,
     })) {
       edgeKeys.add(edgeKey);
@@ -71,8 +68,20 @@ export function analyzeRefundTarget(
     };
   }
 
-  const refundedNodeIds = computeRefundClosure(nodeId, nodeStateById);
-  const refundedEdgeKeys = computeRefundEdgeKeys(refundedNodeIds, nodeStateById);
+  const allocatedNodeIds = new Set<NodeId>();
+  const pathByNodeId = new Map<NodeId, NodeId[]>();
+  const requiredByNodeId = new Map<NodeId, Set<NodeId>>();
+
+  for (const [nodeId, nodeState] of nodeStateById) {
+    if (nodeState.allocated) {
+      allocatedNodeIds.add(nodeId);
+    }
+    pathByNodeId.set(nodeId, nodeState.path ?? []);
+    requiredByNodeId.set(nodeId, new Set(nodeState.requiredBy ?? []));
+  }
+
+  const refundedNodeIds = computeRefundClosure(nodeId, allocatedNodeIds, requiredByNodeId);
+  const refundedEdgeKeys = computeRefundEdgeKeys(refundedNodeIds, pathByNodeId);
 
   return {
     canRefund: refundedNodeIds.size > 0,

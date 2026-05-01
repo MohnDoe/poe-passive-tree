@@ -1,27 +1,38 @@
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { canAllocate } from "@/services/passiveTree/allocation/rules/allocation";
+import { getActiveRootNodeIds } from "@/domain/passiveGraph/queries/getActiveRootNodeIds";
+import {
+  computeWeightedPaths,
+  materializePath,
+} from "@/services/passiveTree/allocation/pathfinding/computeWeightedPaths";
 import { setsEqual } from "@/utils/utils";
-import { getNodeAllocationState } from "../selectors/getNodeAllocationState";
 import type { BuildCommandContext, BuildCommandResult } from "./types";
 
-export function planAllocation(ctx: BuildCommandContext, nodeId: NodeId): BuildCommandResult {
-  const nextAllocatedNodeIds = new Set<NodeId>(ctx.build.allocatedNodeIds);
-  if (!canAllocate(ctx.snapshot, nodeId)) {
-    return {
-      ok: false,
-      reason: "NODE_NOT_ALLOCATABLE",
-    };
-  }
+export function planAllocation(
+  { graph, build }: BuildCommandContext,
+  nodeId: NodeId,
+): BuildCommandResult {
+  const rootNodeIds = new Set(
+    getActiveRootNodeIds(graph, build.activeClassId, build.activeAscendancy),
+  );
 
-  const nodeState = getNodeAllocationState(ctx.snapshot, nodeId);
-  if (!nodeState) return { ok: false, reason: "NODE_NOT_FOUND" };
-  const path = nodeState.path ?? [];
+  const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
+    graph,
+    rootNodeIds,
+    allocatedNodeIds: build.allocatedNodeIds,
+  });
+
+  const distance = distanceByNodeId.get(nodeId);
+
+  if (distance === undefined) return { ok: false, reason: "NODE_NOT_ALLOCATABLE" };
+
+  const path = materializePath(nodeId, predecessorByNodeId);
+  const nextAllocatedNodeIds = new Set(build.allocatedNodeIds);
 
   for (const pathNodeId of path) {
     nextAllocatedNodeIds.add(pathNodeId);
   }
 
-  if (setsEqual(nextAllocatedNodeIds, ctx.build.allocatedNodeIds)) {
+  if (setsEqual(nextAllocatedNodeIds, build.allocatedNodeIds)) {
     return {
       ok: false,
       reason: "NO_CHANGE",
@@ -31,7 +42,7 @@ export function planAllocation(ctx: BuildCommandContext, nodeId: NodeId): BuildC
   return {
     ok: true,
     build: {
-      ...ctx.build,
+      ...build,
       allocatedNodeIds: nextAllocatedNodeIds,
     },
   };
