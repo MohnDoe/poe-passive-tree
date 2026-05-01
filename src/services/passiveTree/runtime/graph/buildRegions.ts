@@ -1,4 +1,4 @@
-import type { MappedPassiveTree } from "@/data/mapping/MappedPassiveTree";
+import type { MappedPassiveTree } from "@/infrastructure/mapping/MappedPassiveTree";
 import { traverseAscendancyRegion } from "@/domain/build/algorithms/rules/traversal";
 import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/passiveGraph/PassiveGraph";
 import type {

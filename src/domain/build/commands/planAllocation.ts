@@ -1,7 +1,7 @@
+import { computeWeightedPaths, materializePath } from "@/domain/build/algorithms/pathfinding";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
 import { getActiveRootNodeIds } from "@/domain/passiveGraph/queries/getActiveRootNodeIds";
 import { setsEqual } from "@/utils/utils";
-import { computeWeightedPaths, materializePath } from "../algorithms/pathfinding";
 import type { BuildCommandContext, BuildCommandResult } from "./types";
 
 export function planAllocation(

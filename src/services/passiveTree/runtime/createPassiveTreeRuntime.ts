@@ -1,5 +1,5 @@
-import { loadPassiveTreeDto } from "@/data/loadPassiveTreeDto";
-import { mapPassiveTreeDtoToDomain } from "@/data/mapping/mappers/mapPassiveTreeDtoToDomain";
+import { loadPassiveTreeDto } from "@/infrastructure/loadPassiveTreeDto";
+import { mapPassiveTreeDtoToDomain } from "@/infrastructure/mapping/mappers/mapPassiveTreeDtoToDomain";
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import { buildGraph } from "./graph/buildGraph";
 

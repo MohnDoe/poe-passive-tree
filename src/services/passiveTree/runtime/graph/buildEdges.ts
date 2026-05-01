@@ -1,4 +1,4 @@
-import type { MappedPassiveTree } from "@/data/mapping/MappedPassiveTree";
+import type { MappedPassiveTree } from "@/infrastructure/mapping/MappedPassiveTree";
 import { makeEdgeKey } from "@/domain/passiveGraph/edgeKeys";
 import type { GraphEdge } from "@/domain/passiveGraph/GraphEdge";
 import type { NodeId, PassiveNode } from "@/domain/passiveGraph/PassiveNode";
