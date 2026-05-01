@@ -12,7 +12,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json",
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
-    "lint:eslint": "eslint . --fix --cache",
+    "lint:eslint": "eslint .",
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
@@ -32,6 +32,8 @@
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-boundaries": "^6.0.2",
     "eslint-plugin-oxlint": "~1.60.0",
     "eslint-plugin-vue": "~10.8.0",
     "jiti": "^2.6.1",
