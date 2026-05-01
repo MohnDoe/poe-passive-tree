@@ -1,10 +1,10 @@
-import type { EdgeRenderModel } from "../models/Edge";
-import { normalizeSignedAngle } from "@/utils/math.utils";
+import type { GraphEdge } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { PassiveNode } from "@/domain/graph/PassiveNode";
-import { Point } from "pixi.js";
-import type { GraphEdge } from "@/domain/graph/GraphEdge";
 import { makeEdgeKey } from "@/domain/graph/edgeKeys";
+import { normalizeSignedAngle } from "@/shared/utils/math.utils";
+import { Point } from "pixi.js";
+import type { EdgeRenderModel } from "../models/Edge";
 
 export function mapEdgeToRenderModel(
   graph: PassiveGraph,
