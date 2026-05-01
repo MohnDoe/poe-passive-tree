@@ -1,6 +1,6 @@
 import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 import type { NodeId } from "@/domain/passiveGraph/PassiveNode";
-import { canTraverse } from "@/services/passiveTree/allocation/rules/traversal";
+import { canTraverse } from "@/domain/build/algorithms/rules/traversal";
 import { Deque } from "@/services/passiveTree/runtime/graph/Deque";
 
 export interface ComputeWeightedPathsParams {
