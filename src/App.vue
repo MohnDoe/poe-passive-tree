@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import ClassSelector from "./components/ClassSelector.vue";
-import PassiveTreeCanvas from "./components/PassiveTreeCanvas.vue";
-import { usePassiveTreeRuntime } from "./composables/usePassiveTreeRuntime";
-import StatsPanel from "./components/StatsPanel.vue";
+import ClassSelector from "./presentation/components/ClassSelector.vue";
+import PassiveTreeCanvas from "./presentation/components/PassiveTreeCanvas.vue";
+import { usePassiveTreeRuntime } from "./presentation/composables/usePassiveTreeRuntime";
+import StatsPanel from "./presentation/components/StatsPanel.vue";
 
 const { status, error, ensureLoaded } = usePassiveTreeRuntime();
 

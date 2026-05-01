@@ -1,8 +1,8 @@
 import { getPointBudgetSummary } from "@/domain/build/selectors/getPointBudgetSummary";
-import { useBuildStore } from "@/stores/build.store";
-import { useRuntimeStore } from "@/stores/runtime.store";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import { useBuildStore } from "../stores/build.store";
+import { useRuntimeStore } from "../stores/runtime.store";
 
 export function usePointBudgetSummary() {
   const buildStore = useBuildStore();

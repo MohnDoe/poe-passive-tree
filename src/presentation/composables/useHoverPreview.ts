@@ -1,8 +1,8 @@
-import { createHoverPreviewStateModel } from "@/pixi/scene/createHoverPreview";
-import { useUiStore } from "@/stores/ui.store";
-import { computed } from "vue";
 import { storeToRefs } from "pinia";
-import { useAllocationStore } from "@/stores/allocation.store";
+import { computed } from "vue";
+import { createHoverPreviewStateModel } from "../pixi/scene/createHoverPreview";
+import { useAllocationStore } from "../stores/allocation.store";
+import { useUiStore } from "../stores/ui.store";
 
 export function useHoverPreview() {
   const uiStore = useUiStore();

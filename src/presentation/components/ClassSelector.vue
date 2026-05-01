@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { useAvailableClassAscendancyIds } from "@/composables/useAvailableClassAscendancyIds";
-import { useTreeInteraction } from "@/composables/useTreeInteraction";
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 import type { ClassId } from "@/domain/graph/PassiveClass";
-
-import { useBuildStore } from "@/stores/build.store";
-import { useRuntimeStore } from "@/stores/runtime.store";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import { useAvailableClassAscendancyIds } from "../composables/useAvailableClassAscendancyIds";
+import { useTreeInteraction } from "../composables/useTreeInteraction";
+import { useBuildStore } from "../stores/build.store";
+import { useRuntimeStore } from "../stores/runtime.store";
 
 const buildStore = useBuildStore();
 const treeInteraction = useTreeInteraction();

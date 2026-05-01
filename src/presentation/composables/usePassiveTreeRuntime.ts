@@ -1,5 +1,5 @@
-import { useRuntimeStore } from "@/stores/runtime.store";
 import { storeToRefs } from "pinia";
+import { useRuntimeStore } from "../stores/runtime.store";
 
 export function usePassiveTreeRuntime() {
   const runtimeStore = useRuntimeStore();

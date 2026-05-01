@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePointBudgetSummary } from "@/composables/usePointBudgetSummary";
+import { usePointBudgetSummary } from "../composables/usePointBudgetSummary";
 
 const { pointSummary } = usePointBudgetSummary();
 </script>

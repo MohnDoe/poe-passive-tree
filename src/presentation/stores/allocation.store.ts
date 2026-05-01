@@ -1,8 +1,8 @@
-import { computeAllocationState } from "@/services/passiveTree/allocation/computeAllocationState";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 import { useBuildStore } from "./build.store";
 import { useRuntimeStore } from "./runtime.store";
+import { computeAllocationState } from "@/application/build/allocation/computeAllocationState";
 
 export const useAllocationStore = defineStore("allocation", () => {
   const buildStore = useBuildStore();

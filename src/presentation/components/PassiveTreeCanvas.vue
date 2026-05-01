@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useHoverPreview } from "@/composables/useHoverPreview";
-import { usePassiveTreeVisualState } from "@/composables/usePassiveTreeVisualState";
-import { useTreeInteraction } from "@/composables/useTreeInteraction";
-import { type HoverPreviewStateModel, type HoverVisualDelta } from "@/pixi/models/Render";
-import { createTreeSceneModel } from "@/pixi/scene/createTreeSceneModel";
-import { PassiveTreeStage } from "@/pixi/stage/PassiveTreeStage";
-import { useRuntimeStore } from "@/stores/runtime.store";
-import { useUiStore } from "@/stores/ui.store";
 import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
+import { useHoverPreview } from "../composables/useHoverPreview";
+import { usePassiveTreeVisualState } from "../composables/usePassiveTreeVisualState";
+import { useTreeInteraction } from "../composables/useTreeInteraction";
+import type { HoverPreviewStateModel, HoverVisualDelta } from "../pixi/models/Render";
+import { createTreeSceneModel } from "../pixi/scene/createTreeSceneModel";
+import { PassiveTreeStage } from "../pixi/stage/PassiveTreeStage";
+import { useRuntimeStore } from "../stores/runtime.store";
+import { useUiStore } from "../stores/ui.store";
 
 const uiStore = useUiStore();
 const runtimeStore = useRuntimeStore();
