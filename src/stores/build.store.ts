@@ -9,7 +9,7 @@ import { planToggleAllocation } from "@/domain/build/commands/planToggleAllocati
 import { setAscendancy } from "@/domain/build/commands/setAscendancy";
 import { setClass } from "@/domain/build/commands/setClass";
 import { defineStore } from "pinia";
-import { useRuntimeStore } from "./runtime.store";
+import type { PassiveGraph } from "@/domain/passiveGraph/PassiveGraph";
 
 export interface BuildStoreState {
   build: BuildState;
@@ -52,22 +52,14 @@ export const useBuildStore = defineStore("build", {
     setClass(classId: ClassId) {
       this.build = setClass(this.build, classId);
     },
-    setAscendancy(ascendancyId: AscendancyId | null): BuildCommandResult {
-      const { graph } = useRuntimeStore();
-
-      if (!graph) return { ok: false, reason: "NO_ACTIVE_CLASS" };
+    setAscendancy(graph: PassiveGraph, ascendancyId: AscendancyId | null): BuildCommandResult {
       const result = setAscendancy(this.build, graph, ascendancyId);
 
       if (result.ok) this.build = result.build;
 
       return result;
     },
-    toggleNode(nodeId: NodeId): BuildCommandResult {
-      const runtimeStore = useRuntimeStore();
-      const graph = runtimeStore.graph;
-
-      if (!graph) return { ok: false, reason: "NO_ACTIVE_CLASS" };
-
+    toggleNode(graph: PassiveGraph, nodeId: NodeId): BuildCommandResult {
       const result = planToggleAllocation(createBuildCommandContext(graph, this.build), nodeId);
 
       if (result.ok) this.build = result.build;

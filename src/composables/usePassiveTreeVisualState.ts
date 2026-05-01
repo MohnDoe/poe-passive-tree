@@ -1,11 +1,14 @@
 import { computed } from "vue";
-import { useAllocationSnapshot } from "./useAllocationSnapshot";
 import { createTreeVisualState } from "@/pixi/scene/createTreeVisualStateModel";
+import { useAllocationStore } from "@/stores/allocation.store";
+import { storeToRefs } from "pinia";
 
 export function usePassiveTreeVisualState() {
-  const { snapshot } = useAllocationSnapshot();
+  const { allocationState } = storeToRefs(useAllocationStore());
 
-  const treeVisualState = computed(() => createTreeVisualState({ snapshot: snapshot.value }));
+  const treeVisualState = computed(() =>
+    createTreeVisualState({ allocationState: allocationState.value }),
+  );
 
   return { treeVisualState };
 }

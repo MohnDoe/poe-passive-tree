@@ -13,7 +13,7 @@ export const useAllocationStore = defineStore("allocation", () => {
     const { build } = buildStore;
 
     if (!graph || build.activeClassId === null) return null;
-    return computeAllocationState({ graph, buildState: build });
+    return computeAllocationState({ graph: graph, buildState: build });
   });
 
   return { allocationState };

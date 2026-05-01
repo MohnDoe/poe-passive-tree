@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useHoverPreview } from "@/composables/useHoverPreview";
 import { usePassiveTreeVisualState } from "@/composables/usePassiveTreeVisualState";
+import { useTreeInteraction } from "@/composables/useTreeInteraction";
 import { type HoverPreviewStateModel, type HoverVisualDelta } from "@/pixi/models/Render";
 import { createTreeSceneModel } from "@/pixi/scene/createTreeSceneModel";
 import { PassiveTreeStage } from "@/pixi/stage/PassiveTreeStage";
-import { useBuildStore } from "@/stores/build.store";
 import { useRuntimeStore } from "@/stores/runtime.store";
 import { useUiStore } from "@/stores/ui.store";
 import { storeToRefs } from "pinia";
@@ -12,7 +12,7 @@ import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 
 const uiStore = useUiStore();
 const runtimeStore = useRuntimeStore();
-const buildStore = useBuildStore();
+const treeInteraction = useTreeInteraction();
 
 const { graph } = storeToRefs(runtimeStore);
 const { treeVisualState } = usePassiveTreeVisualState();
@@ -43,7 +43,7 @@ onMounted(async () => {
   await nextStage.mount(hostRef.value, {
     onNodeClick: (nodeId) => {
       console.log("Click node", nodeId);
-      buildStore.toggleNode(nodeId);
+      treeInteraction.toggleNode(nodeId);
     },
     onNodeHover: (nodeId) => {
       uiStore.setHoveredNodeId(nodeId);

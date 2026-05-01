@@ -6,7 +6,7 @@ import { makeEdgeKeysFromPath } from "@/domain/passiveGraph/edgeKeys";
 import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 
 export interface createHoverPreviewStateModelParams {
-  snapshot: AllocationState | null;
+  allocationState: AllocationState | null;
   hoveredNodeId: NodeId | null;
 }
 
@@ -16,7 +16,7 @@ const defaultStates = {
 };
 
 export function createHoverPreviewStateModel({
-  snapshot,
+  allocationState,
   hoveredNodeId,
 }: createHoverPreviewStateModelParams): HoverPreviewStateModel {
   const previewState: HoverPreviewStateModel = {
@@ -25,11 +25,11 @@ export function createHoverPreviewStateModel({
     refund: defaultStates,
   };
 
-  if (!snapshot || !hoveredNodeId) {
+  if (!allocationState || !hoveredNodeId) {
     return previewState;
   }
 
-  const hoveredNodeState = snapshot.nodeStateById.get(hoveredNodeId);
+  const hoveredNodeState = allocationState.nodeStateById.get(hoveredNodeId);
   if (!hoveredNodeState) return previewState;
 
   if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) {
@@ -38,7 +38,7 @@ export function createHoverPreviewStateModel({
 
   const highlightedPath = hoveredNodeState.path ?? [];
 
-  const refundAnalysis = analyzeRefundTarget(hoveredNodeId, snapshot.nodeStateById);
+  const refundAnalysis = analyzeRefundTarget(hoveredNodeId, allocationState.nodeStateById);
 
   return {
     hoveredNodeId,

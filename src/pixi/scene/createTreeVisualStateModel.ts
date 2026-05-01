@@ -2,15 +2,15 @@ import type { AllocationState } from "@/domain/build/models/allocation/Allocatio
 import type { TreeVisualStateModel } from "../models/Render";
 
 export interface CreateTreeVisualStateParams {
-  snapshot: AllocationState | null;
+  allocationState: AllocationState | null;
 }
 
 export function createTreeVisualState({
-  snapshot,
+  allocationState,
 }: CreateTreeVisualStateParams): TreeVisualStateModel {
   //TODO: use it maybe later (hide non-connected or smth)
 
-  if (!snapshot)
+  if (!allocationState)
     return {
       allocatableNodeIds: new Set(),
       activeStartNodeIds: new Set(),
@@ -21,11 +21,11 @@ export function createTreeVisualState({
     };
 
   return {
-    activeStartNodeIds: snapshot.rootNodeIds,
+    activeStartNodeIds: allocationState.rootNodeIds,
     allocated: {
-      nodeIds: snapshot.allocatedNodeIds,
-      edgeKeys: snapshot.activeEdgeKeys,
+      nodeIds: allocationState.allocatedNodeIds,
+      edgeKeys: allocationState.activeEdgeKeys,
     },
-    allocatableNodeIds: snapshot.allocatableNodeIds,
+    allocatableNodeIds: allocationState.allocatableNodeIds,
   };
 }
