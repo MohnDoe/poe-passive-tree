@@ -1,18 +1,17 @@
-import { Container, Graphics } from "pixi.js";
+import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import type { EdgeView, EdgeRenderModel } from "../models/Edge";
-import type { NodeView, NodeRenderModel } from "../models/Node";
+import { Container, Graphics } from "pixi.js";
+import type { EdgeRenderModel, EdgeView } from "../models/Edge";
+import type { NodeRenderModel, NodeView } from "../models/Node";
 import type {
-  TreeSceneRenderModel,
-  TreeVisualStateModel,
   GroupBackgroundRenderModel,
   TreeRendererCallbacks,
-  HoverVisualDelta,
+  TreeSceneRenderModel,
+  TreeVisualStateModel,
 } from "../models/Render";
 import { createEdgeView } from "../views/edge.view";
 import { createNodeView } from "../views/node.view";
-import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -155,79 +154,58 @@ export class PassiveTreeRenderer {
 
   public updateNodeStates(state: TreeVisualStateModel): void {
     for (const [nodeId, view] of this.nodeViews) {
-      view.updateState({
+      view.updateBuildState({
         isAllocated: state.allocated.nodeIds.has(nodeId),
-        // isHovered: state.hoveredNodeId === nodeId,
-        isHovered: false,
         isActiveClassStart: state.activeStartNodeIds.has(nodeId),
-        // isInPreviewPath: state.preview.nodeIds.has(nodeId),
-        isInPreviewPath: false,
-        isInRefundPath: false,
       });
     }
   }
 
   public updateEdgeStates(state: TreeVisualStateModel): void {
     for (const [edgeKey, view] of this.edgeViews) {
-      view.updateState({
-        active: state.allocated.edgeKeys.has(edgeKey),
-        // highlighted: state.preview.nodeIds.has(edgeKey),
-        highlighted: false,
-        refund: false,
+      view.updateBuildState({
+        isActive: state.allocated.edgeKeys.has(edgeKey),
       });
     }
   }
 
   public updateHoverState({
-    delta,
-    treeState,
-    hoverPreviewState,
+    current,
+    previous,
   }: {
-    delta: HoverVisualDelta;
-    treeState: TreeVisualStateModel;
-    hoverPreviewState: HoverPreviewState;
+    current: HoverPreviewState;
+    previous: HoverPreviewState;
   }): void {
-    const changedNodeIds = new Set<NodeId>([
-      ...delta.previous.highlight.nodeIds,
-      ...delta.highlight.nodeIds,
-      ...delta.previous.refund.nodeIds,
-      ...delta.refund.nodeIds,
-    ]);
-
-    if (delta.previous.hoveredNodeId) changedNodeIds.add(delta.previous.hoveredNodeId);
-    if (delta.hoveredNodeId) changedNodeIds.add(delta.hoveredNodeId);
+    const changedNodeIds = new Set<NodeId>(
+      [
+        previous.hoveredNodeId,
+        current.hoveredNodeId,
+        ...previous.highlight.nodeIds,
+        ...current.highlight.nodeIds,
+        ...previous.refund.nodeIds,
+        ...current.refund.nodeIds,
+      ].filter(Boolean) as NodeId[],
+    );
 
     for (const nodeId of changedNodeIds) {
-      const view = this.nodeViews.get(nodeId);
-      if (!view) continue;
-
-      //TODO: DRY
-
-      view.updateState({
-        isAllocated: treeState.allocated.nodeIds.has(nodeId),
-        isHovered: hoverPreviewState.hoveredNodeId === nodeId,
-        isActiveClassStart: treeState.activeStartNodeIds.has(nodeId),
-        isInPreviewPath: delta.highlight.nodeIds.has(nodeId),
-        isInRefundPath: delta.refund.nodeIds.has(nodeId),
+      this.nodeViews.get(nodeId)?.updateHoverState({
+        isHovered: current.hoveredNodeId === nodeId,
+        isInPreviewPath: current.highlight.nodeIds.has(nodeId),
+        isInRefundPath: current.refund.nodeIds.has(nodeId),
       });
     }
 
     const changedEdgeKeys = new Set<EdgeKey>([
-      ...delta.previous.highlight.edgeKeys,
-      ...delta.highlight.edgeKeys,
-      ...delta.previous.refund.edgeKeys,
-      ...delta.refund.edgeKeys,
+      ...previous.highlight.edgeKeys,
+      ...current.highlight.edgeKeys,
+      ...previous.refund.edgeKeys,
+      ...current.refund.edgeKeys,
     ]);
 
-    // TODO: DRY
     for (const edgeKey of changedEdgeKeys) {
-      const view = this.edgeViews.get(edgeKey);
-      if (!view) continue;
-
-      view.updateState({
-        active: treeState.allocated.edgeKeys.has(edgeKey),
-        highlighted: hoverPreviewState.highlight.edgeKeys.has(edgeKey),
-        refund: hoverPreviewState.refund.edgeKeys.has(edgeKey),
+      this.edgeViews.get(edgeKey)?.updateHoverState({
+        isHighlighted: current.highlight.edgeKeys.has(edgeKey),
+        isInRefundPath: current.refund.edgeKeys.has(edgeKey),
       });
     }
   }

@@ -8,12 +8,15 @@ export interface NodeRenderModel {
   kind: PassiveNodeKind;
 }
 
-export interface NodeStateModel {
+export interface NodeBuildState {
   isAllocated: boolean;
+  isActiveClassStart?: boolean;
+}
+
+export interface NodeHoverState {
   isHovered: boolean;
   isInPreviewPath: boolean;
   isInRefundPath: boolean;
-  isActiveClassStart?: boolean;
 }
 
 export interface NodeVisualStyle {
@@ -31,6 +34,7 @@ export interface NodeViewCallbacks {
 export interface NodeView {
   id: NodeId;
   container: Container;
-  updateState: (state: NodeStateModel) => void;
+  updateBuildState: (state: NodeBuildState) => void;
+  updateHoverState: (state: NodeHoverState) => void;
   destroy: () => void;
 }

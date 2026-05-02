@@ -4,7 +4,6 @@ import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 import { usePassiveTreeVisualState } from "../composables/usePassiveTreeVisualState";
 import { useTreeInteraction } from "../composables/useTreeInteraction";
-import type { HoverVisualDelta } from "../pixi/models/Render";
 import { createTreeSceneModel } from "../pixi/scene/createTreeSceneModel";
 import { PassiveTreeStage } from "../pixi/stage/PassiveTreeStage";
 import { useAllocationStore } from "../stores/allocation.store";
@@ -22,7 +21,7 @@ const { hoverPreviewState } = storeToRefs(useAllocationStore());
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = shallowRef<PassiveTreeStage | null>(null);
 
-const previousHoveredState = ref<HoverPreviewState>({
+const defaultHoverPreviewState: HoverPreviewState = {
   hoveredNodeId: null,
   highlight: {
     edgeKeys: new Set(),
@@ -32,7 +31,7 @@ const previousHoveredState = ref<HoverPreviewState>({
     edgeKeys: new Set(),
     nodeIds: new Set(),
   },
-});
+};
 
 onMounted(async () => {
   if (!hostRef.value || !graph.value) return;
@@ -75,24 +74,15 @@ watch(
 
 watch(
   hoverPreviewState,
-  (nextHoverPreviewState) => {
-    if (!nextHoverPreviewState || !treeVisualState.value || !stage.value) return;
+  (current, previous) => {
+    if (!stage.value) return;
 
-    const delta: HoverVisualDelta = {
-      ...nextHoverPreviewState,
-      previous: previousHoveredState.value,
-    };
+    const prev = previous ?? defaultHoverPreviewState;
 
     stage.value.updateHoverState({
-      delta,
-      treeState: treeVisualState.value,
-      hoverPreviewState: nextHoverPreviewState,
+      current,
+      previous: prev,
     });
-
-    previousHoveredState.value = {
-      ...nextHoverPreviewState,
-      hoveredNodeId: nextHoverPreviewState.hoveredNodeId,
-    };
   },
   { immediate: true },
 );

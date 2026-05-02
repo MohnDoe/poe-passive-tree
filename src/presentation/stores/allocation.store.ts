@@ -22,7 +22,6 @@ export const useAllocationStore = defineStore("allocation", () => {
   const hoverPreviewState = computed(() => {
     const { hoveredNodeId } = uiStore;
     const state = allocationState.value;
-    if (!state) return null;
 
     return computeHoverPreviewState({
       allocationState: state,

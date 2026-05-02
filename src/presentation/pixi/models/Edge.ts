@@ -1,4 +1,4 @@
-import type { GraphEdge } from "@/domain/graph/GraphEdge";
+import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { Graphics, Point } from "pixi.js";
 
 export type EdgeRenderModel =
@@ -18,12 +18,13 @@ export type EdgeRenderModel =
       anticlockwise: boolean;
     };
 
-export interface EdgeRenderState {
-  active: boolean;
-  highlighted: boolean;
-  refund: boolean;
+export interface EdgeBuildState {
+  isActive: boolean;
+}
 
-  // TODO: refundable, alternative (for when 2 preview path are equal)
+export interface EdgeHoverState {
+  isHighlighted: boolean;
+  isInRefundPath: boolean;
 }
 
 export interface EdgeVisualStyle {
@@ -33,8 +34,9 @@ export interface EdgeVisualStyle {
 }
 
 export interface EdgeView {
-  key: GraphEdge["key"];
+  key: EdgeKey;
   graphics: Graphics;
   destroy: () => void;
-  updateState: (state: EdgeRenderState) => void;
+  updateBuildState: (state: EdgeBuildState) => void;
+  updateHoverState: (state: EdgeHoverState) => void;
 }

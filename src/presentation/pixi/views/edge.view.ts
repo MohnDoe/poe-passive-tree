@@ -1,16 +1,29 @@
 import { Graphics } from "pixi.js";
-import type { EdgeRenderModel, EdgeRenderState, EdgeView, EdgeVisualStyle } from "../models/Edge";
+import type {
+  EdgeRenderModel,
+  EdgeBuildState,
+  EdgeView,
+  EdgeVisualStyle,
+  EdgeHoverState,
+} from "../models/Edge";
 import { resolveEdgeStyle } from "../theme/edgeStyle.resolver";
 import { makeShallowEqual } from "@/shared/utils/utils";
 
-const defaultState: EdgeRenderState = {
-  highlighted: false,
-  active: false,
-  refund: false,
+const defaultBuildState: EdgeBuildState = {
+  isActive: false,
+};
+const defaultHoverState: EdgeHoverState = {
+  isHighlighted: false,
+  isInRefundPath: false,
 };
 
 export function createEdgeView(edge: EdgeRenderModel): EdgeView {
   const graphics = new Graphics();
+
+  let currentBuildState = { ...defaultBuildState };
+  let currentHoverState = { ...defaultHoverState };
+  let currentStyle = resolveEdgeStyle(currentBuildState, currentHoverState);
+
   const draw = (style: EdgeVisualStyle) => {
     graphics.clear();
     if (edge.kind === "line") {
@@ -34,24 +47,24 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
     });
   };
 
-  let currentState = { ...defaultState };
-  let currentStyle = resolveEdgeStyle(currentState);
-
-  const updateState = (nextState: EdgeRenderState) => {
-    if (sameState(currentState, nextState)) return;
-
-    const nextStyle = resolveEdgeStyle(nextState);
-
+  const redraw = () => {
+    const nextStyle = resolveEdgeStyle(currentBuildState, currentHoverState);
     if (!sameStyle(currentStyle, nextStyle)) {
       draw(nextStyle);
       currentStyle = nextStyle;
     }
-
-    currentState = { ...nextState };
   };
 
-  const destroy = () => {
-    graphics.destroy();
+  const updateBuildState = (next: EdgeBuildState) => {
+    if (sameBuildState(currentBuildState, next)) return;
+    currentBuildState = next;
+    redraw();
+  };
+
+  const updateHoverState = (next: EdgeHoverState) => {
+    if (sameHoverState(currentHoverState, next)) return;
+    currentHoverState = next;
+    redraw();
   };
 
   draw(currentStyle);
@@ -59,15 +72,19 @@ export function createEdgeView(edge: EdgeRenderModel): EdgeView {
   return {
     key: edge.key,
     graphics,
-    destroy,
-    updateState,
+    destroy: () => graphics.destroy(),
+    updateBuildState,
+    updateHoverState,
   };
 }
 
-const sameState = makeShallowEqual<EdgeRenderState>({
-  refund: true,
-  active: true,
-  highlighted: true,
+const sameBuildState = makeShallowEqual<EdgeBuildState>({
+  isActive: true,
+});
+
+const sameHoverState = makeShallowEqual<EdgeHoverState>({
+  isInRefundPath: true,
+  isHighlighted: true,
 });
 
 const sameStyle = makeShallowEqual<EdgeVisualStyle>({

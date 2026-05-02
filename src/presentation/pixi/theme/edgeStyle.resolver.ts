@@ -1,20 +1,15 @@
-import type { EdgeRenderState, EdgeVisualStyle } from "../models/Edge";
+import type { EdgeBuildState, EdgeHoverState, EdgeVisualStyle } from "../models/Edge";
 import { passiveTreeTheme } from "./passiveTree.theme";
 
-export function resolveEdgeStyle(state: EdgeRenderState): EdgeVisualStyle {
+export function resolveEdgeStyle(
+  buildState: EdgeBuildState,
+  hoverState: EdgeHoverState,
+): EdgeVisualStyle {
   let color = passiveTreeTheme.edges.colors.normal;
 
-  if (state.highlighted) {
-    color = passiveTreeTheme.edges.colors.highlighted;
-  }
-
-  if (state.active) {
-    color = passiveTreeTheme.edges.colors.active;
-  }
-
-  if (state.refund) {
-    color = passiveTreeTheme.edges.colors.refund;
-  }
+  if (hoverState.isHighlighted) color = passiveTreeTheme.edges.colors.highlighted;
+  if (buildState.isActive) color = passiveTreeTheme.edges.colors.active;
+  if (hoverState.isInRefundPath) color = passiveTreeTheme.edges.colors.refund;
 
   return {
     strokeWidth: passiveTreeTheme.edges.stroke,

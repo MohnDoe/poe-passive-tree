@@ -1,13 +1,12 @@
+import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import { Viewport } from "pixi-viewport";
 import { Application, Container } from "pixi.js";
 import type {
-  HoverVisualDelta,
   TreeRendererCallbacks,
   TreeSceneRenderModel,
   TreeVisualStateModel,
 } from "../models/Render";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
-import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 
 export interface PassiveTreeStageOptions {
   backgroundColor?: number;
@@ -111,16 +110,14 @@ export class PassiveTreeStage {
   }
 
   public updateHoverState({
-    delta,
-    treeState,
-    hoverPreviewState,
+    current,
+    previous,
   }: {
-    delta: HoverVisualDelta;
-    treeState: TreeVisualStateModel;
-    hoverPreviewState: HoverPreviewState;
+    current: HoverPreviewState;
+    previous: HoverPreviewState;
   }): void {
     if (!this.renderer) return;
-    this.renderer.updateHoverState({ delta, treeState, hoverPreviewState });
+    this.renderer.updateHoverState({ current, previous });
   }
 
   public fitToBounds(bounds: { minX: number; minY: number; maxX: number; maxY: number }): void {
