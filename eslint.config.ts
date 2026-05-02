@@ -48,7 +48,7 @@ export default defineConfigWithVueTs(
         { type: "domain", pattern: "src/domain/**/*" },
         { type: "application", pattern: "src/application/**/*" },
         { type: "infrastructure", pattern: "src/infrastructure/**/*" },
-        { type: "presentation", pattern: ["src/presentation/**/*", "src/App.vue", "src/main.ts"] },
+        { type: "presentation", pattern: "src/presentation/**/*" },
         { type: "shared", pattern: "src/shared/**/*" },
       ],
     },
