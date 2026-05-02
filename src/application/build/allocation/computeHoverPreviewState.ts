@@ -1,11 +1,11 @@
+import { analyzeRefundTarget } from "@/domain/build/algorithms/refund";
+import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
+import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
+import { makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import type { HoverPreviewStateModel } from "../models/Render";
-import { analyzeRefundTarget } from "@/domain/build/algorithms/refund";
-import { makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
-import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 
-export interface createHoverPreviewStateModelParams {
+export interface ComputeHoverPreviewStateParams {
   allocationState: AllocationState | null;
   hoveredNodeId: NodeId | null;
 }
@@ -15,11 +15,11 @@ const defaultStates = {
   edgeKeys: new Set<EdgeKey>(),
 };
 
-export function createHoverPreviewStateModel({
+export function computeHoverPreviewState({
   allocationState,
   hoveredNodeId,
-}: createHoverPreviewStateModelParams): HoverPreviewStateModel {
-  const previewState: HoverPreviewStateModel = {
+}: ComputeHoverPreviewStateParams): HoverPreviewState {
+  const previewState: HoverPreviewState = {
     hoveredNodeId,
     highlight: defaultStates,
     refund: defaultStates,

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
-import { useHoverPreview } from "../composables/useHoverPreview";
 import { usePassiveTreeVisualState } from "../composables/usePassiveTreeVisualState";
 import { useTreeInteraction } from "../composables/useTreeInteraction";
 import type { HoverPreviewStateModel, HoverVisualDelta } from "../pixi/models/Render";
 import { createTreeSceneModel } from "../pixi/scene/createTreeSceneModel";
 import { PassiveTreeStage } from "../pixi/stage/PassiveTreeStage";
+import { useAllocationStore } from "../stores/allocation.store";
 import { useRuntimeStore } from "../stores/runtime.store";
 import { useUiStore } from "../stores/ui.store";
 
@@ -16,7 +16,7 @@ const treeInteraction = useTreeInteraction();
 
 const { graph } = storeToRefs(runtimeStore);
 const { treeVisualState } = usePassiveTreeVisualState();
-const { hoverPreview: hoverPreviewState } = useHoverPreview();
+const { hoverPreviewState } = storeToRefs(useAllocationStore());
 
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = shallowRef<PassiveTreeStage | null>(null);
@@ -75,7 +75,7 @@ watch(
 watch(
   hoverPreviewState,
   (nextHoverPreviewState) => {
-    if (!treeVisualState.value || !stage.value) return;
+    if (!nextHoverPreviewState || !treeVisualState.value || !stage.value) return;
 
     const delta: HoverVisualDelta = {
       ...nextHoverPreviewState,
