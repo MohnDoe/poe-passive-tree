@@ -7,7 +7,7 @@ import type {
   NodeVisualStyle,
 } from "../models/Node";
 import { resolveNodeStyle } from "../theme/nodeStyle.resolver";
-import { makeShallowEqual } from "@/utils/utils";
+import { makeShallowEqual } from "@/shared/utils/utils";
 
 const defaultState: NodeStateModel = {
   isAllocated: false,

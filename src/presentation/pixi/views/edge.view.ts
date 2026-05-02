@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
 import type { EdgeRenderModel, EdgeRenderState, EdgeView, EdgeVisualStyle } from "../models/Edge";
 import { resolveEdgeStyle } from "../theme/edgeStyle.resolver";
-import { makeShallowEqual } from "@/utils/utils";
+import { makeShallowEqual } from "@/shared/utils/utils";
 
 const defaultState: EdgeRenderState = {
   highlighted: false,
