@@ -1,6 +1,7 @@
 import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
-import { makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
+import { makeEdgeKey } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 
 // Returns all the nodes that would be refunded in order to refund the input node
@@ -29,19 +30,20 @@ export function computeRefundClosure(
 
 function computeRefundEdgeKeys(
   refundedNodeIds: ReadonlySet<NodeId>,
-  pathByNodeId: ReadonlyMap<NodeId, NodeId[]>,
+  allocatedNodeIds: ReadonlySet<NodeId>,
+  graph: PassiveGraph,
 ): Set<EdgeKey> {
   const edgeKeys = new Set<EdgeKey>();
 
   for (const refundedNodeId of refundedNodeIds) {
-    const path = pathByNodeId.get(refundedNodeId);
-    if (!path) continue;
-
-    for (const edgeKey of makeEdgeKeysFromPath({
-      path,
-      allowedNodeIds: refundedNodeIds,
-    })) {
-      edgeKeys.add(edgeKey);
+    const neighbors = graph.adjacency.get(refundedNodeId) ?? [];
+    for (const neighborId of neighbors) {
+      // Include edge if neighbor is either:
+      // - also refunded (internal edge within the cluster)
+      // - allocated but not refunded (the "anchor" edge to the remaining tree)
+      if (refundedNodeIds.has(neighborId) || allocatedNodeIds.has(neighborId)) {
+        edgeKeys.add(makeEdgeKey(refundedNodeId, neighborId));
+      }
     }
   }
 
@@ -57,6 +59,7 @@ export interface RefundAnalysis {
 export function analyzeRefundTarget(
   nodeId: NodeId,
   nodeStateById: AllocationState["nodeStateById"],
+  graph: PassiveGraph,
 ): RefundAnalysis {
   const nodeState = nodeStateById.get(nodeId);
 
@@ -81,7 +84,7 @@ export function analyzeRefundTarget(
   }
 
   const refundedNodeIds = computeRefundClosure(nodeId, allocatedNodeIds, requiredByNodeId);
-  const refundedEdgeKeys = computeRefundEdgeKeys(refundedNodeIds, pathByNodeId);
+  const refundedEdgeKeys = computeRefundEdgeKeys(refundedNodeIds, allocatedNodeIds, graph);
 
   return {
     canRefund: refundedNodeIds.size > 0,

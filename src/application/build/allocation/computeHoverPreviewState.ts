@@ -3,11 +3,13 @@ import type { AllocationState } from "@/domain/build/models/allocation/Allocatio
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import { makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 
 export interface ComputeHoverPreviewStateParams {
   allocationState: AllocationState | null;
   hoveredNodeId: NodeId | null;
+  graph: PassiveGraph | null;
 }
 
 const defaultStates = {
@@ -18,6 +20,7 @@ const defaultStates = {
 export function computeHoverPreviewState({
   allocationState,
   hoveredNodeId,
+  graph,
 }: ComputeHoverPreviewStateParams): HoverPreviewState {
   let previewState: HoverPreviewState = {
     hoveredNodeId,
@@ -38,8 +41,8 @@ export function computeHoverPreviewState({
     return previewState;
   }
 
-  if (hoveredNodeState.allocated) {
-    const refundAnalysis = analyzeRefundTarget(hoveredNodeId, allocationState.nodeStateById);
+  if (hoveredNodeState.allocated && graph) {
+    const refundAnalysis = analyzeRefundTarget(hoveredNodeId, allocationState.nodeStateById, graph);
     previewState = {
       ...previewState,
       refund: {
@@ -50,7 +53,7 @@ export function computeHoverPreviewState({
   } else {
     const fullPath = hoveredNodeState.path ?? [];
     const highlightedNodeIds = new Set<NodeId>(
-      fullPath.filter((id) => !allocationState.allocatableNodeIds.has(id)),
+      fullPath.filter((id) => !allocationState.allocatedNodeIds.has(id)),
     );
 
     highlightedNodeIds.add(hoveredNodeId);

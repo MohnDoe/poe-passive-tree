@@ -26,6 +26,7 @@ export const useAllocationStore = defineStore("allocation", () => {
     return computeHoverPreviewState({
       allocationState: state,
       hoveredNodeId,
+      graph: runtimeStore.graph,
     });
   });
 
