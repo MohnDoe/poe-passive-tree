@@ -1,7 +1,7 @@
 import { analyzeRefundTarget } from "@/domain/build/algorithms/refund";
 import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
-import { makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
+import { makeEdgeKey, makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
@@ -28,7 +28,7 @@ export function computeHoverPreviewState({
     refund: defaultStates,
   };
 
-  if (!allocationState || !hoveredNodeId) {
+  if (!allocationState || !hoveredNodeId || !graph) {
     return previewState;
   }
 
@@ -41,7 +41,7 @@ export function computeHoverPreviewState({
     return previewState;
   }
 
-  if (hoveredNodeState.allocated && graph) {
+  if (hoveredNodeState.allocated) {
     const refundAnalysis = analyzeRefundTarget(hoveredNodeId, allocationState.nodeStateById, graph);
     previewState = {
       ...previewState,
@@ -58,11 +58,24 @@ export function computeHoverPreviewState({
 
     highlightedNodeIds.add(hoveredNodeId);
 
+    const highlightedEdgeKeys = makeEdgeKeysFromPath({ path: fullPath });
+
+    // For every node in the path (including hovered), add edges to any allocated neighbor.
+    // This covers: direct connections, loop-closing, and edges from intermediate
+    // path nodes to already-allocated nodes not on the BFS path.
+    for (const pathNodeId of highlightedNodeIds) {
+      for (const neighborId of graph.adjacency.get(pathNodeId) ?? []) {
+        if (allocationState.allocatedNodeIds.has(neighborId)) {
+          highlightedEdgeKeys.add(makeEdgeKey(pathNodeId, neighborId));
+        }
+      }
+    }
+
     previewState = {
       ...previewState,
       highlight: {
         nodeIds: highlightedNodeIds,
-        edgeKeys: makeEdgeKeysFromPath({ path: fullPath }),
+        edgeKeys: highlightedEdgeKeys,
       },
     };
   }
