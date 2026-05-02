@@ -40,6 +40,7 @@ export function computeAllocationState({
   applyWeightedPathsToNodeState({
     nodeStateById,
     weightedPaths,
+    allocatedNodeIds,
   });
 
   applyAllocationFlagsToNodeState({
@@ -54,8 +55,9 @@ export function computeAllocationState({
   }
 
   const dependencies = computeDependencies({
+    graph,
+    rootNodeIds,
     allocatedNodeIds,
-    pathByNodeId,
   });
 
   mergeDependenciesIntoNodeState({

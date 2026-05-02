@@ -7,11 +7,6 @@ export interface ComputeConnectivityParams {
   allocatedNodeIds: ReadonlySet<NodeId>;
 }
 
-export interface ComputeDependenciesParams {
-  pathByNodeId: Map<NodeId, NodeId[]>;
-  allocatedNodeIds: ReadonlySet<NodeId>;
-}
-
 export interface ComputeDependenciesResult {
   dependsOnByNodeId: Map<NodeId, Set<NodeId>>;
   requiredByNodeId: Map<NodeId, Set<NodeId>>;
@@ -40,7 +35,7 @@ export function computeConnectivity({
       const neighbor = graph.nodesById.get(neighborId);
       if (!neighbor) continue;
       if (!allocatedNodeIds.has(neighborId)) continue;
-      if (neighbor.kind === "mastery") continue;
+      // if (neighbor.kind === "mastery") continue;
       if (neighbor.kind === "classStart" || neighbor.kind === "ascendancyStart") continue;
 
       queue.push(neighborId);
@@ -50,31 +45,44 @@ export function computeConnectivity({
   return connectedNodeIds;
 }
 
+export interface ComputeDependenciesParams {
+  graph: PassiveGraph;
+  allocatedNodeIds: ReadonlySet<NodeId>;
+  rootNodeIds: ReadonlySet<NodeId>;
+}
+
 export function computeDependencies({
-  pathByNodeId,
+  graph,
   allocatedNodeIds,
+  rootNodeIds,
 }: ComputeDependenciesParams): ComputeDependenciesResult {
   const dependsOnByNodeId = new Map<NodeId, Set<NodeId>>();
   const requiredByNodeId = new Map<NodeId, Set<NodeId>>();
 
-  for (const nodeId of pathByNodeId.keys()) {
+  for (const nodeId of allocatedNodeIds) {
     dependsOnByNodeId.set(nodeId, new Set<NodeId>());
     requiredByNodeId.set(nodeId, new Set<NodeId>());
   }
 
-  for (const nodeId of allocatedNodeIds) {
-    const path = pathByNodeId.get(nodeId) ?? [];
-    const dependsOn = dependsOnByNodeId.get(nodeId)!;
+  for (const candidateId of allocatedNodeIds) {
+    // roots can't be removed
+    if (rootNodeIds.has(candidateId)) continue;
 
-    for (const dependencyNodeId of path) {
-      if (dependencyNodeId === nodeId) continue;
-      dependsOn.add(dependencyNodeId);
-    }
-  }
+    const hypothetical = new Set(allocatedNodeIds);
+    hypothetical.delete(candidateId);
 
-  for (const [nodeId, dependsOn] of dependsOnByNodeId) {
-    for (const dependencyNodeId of dependsOn) {
-      requiredByNodeId.get(dependencyNodeId)?.add(nodeId);
+    const stillReachableIds = computeConnectivity({
+      graph,
+      rootNodeIds,
+      allocatedNodeIds: hypothetical,
+    });
+
+    for (const nodeId of allocatedNodeIds) {
+      if (nodeId === candidateId) continue;
+      if (!stillReachableIds.has(nodeId)) {
+        dependsOnByNodeId.get(nodeId)!.add(candidateId);
+        requiredByNodeId.get(candidateId)!.add(nodeId);
+      }
     }
   }
 

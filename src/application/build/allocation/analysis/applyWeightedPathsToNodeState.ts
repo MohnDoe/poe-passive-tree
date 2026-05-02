@@ -5,11 +5,13 @@ import { type WeightedPathsResult, materializePath } from "@/domain/build/algori
 export interface MergeWeightedPathsIntoNodeStateParams {
   nodeStateById: Map<NodeId, AllocationNodeState>;
   weightedPaths: WeightedPathsResult;
+  allocatedNodeIds: ReadonlySet<NodeId>;
 }
 
 export function applyWeightedPathsToNodeState({
   nodeStateById,
   weightedPaths,
+  allocatedNodeIds,
 }: MergeWeightedPathsIntoNodeStateParams): void {
   for (const [nodeId, nodeState] of nodeStateById) {
     const pathCost = weightedPaths.distanceByNodeId.get(nodeId) ?? null;
@@ -22,7 +24,7 @@ export function applyWeightedPathsToNodeState({
     }
 
     nodeState.pathCost = pathCost;
-    nodeState.path = materializePath(nodeId, weightedPaths.predecessorByNodeId);
+    nodeState.path = materializePath(nodeId, weightedPaths.predecessorByNodeId, allocatedNodeIds);
 
     if (nodeState.path.length > 0) {
       nodeState.reachable = true;

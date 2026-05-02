@@ -77,6 +77,7 @@ export function computeWeightedPaths({
 export function materializePath(
   targetNodeId: NodeId,
   predecessorByNodeId: ReadonlyMap<NodeId, NodeId | null>,
+  allocatedNodeIds: ReadonlySet<NodeId>,
 ): NodeId[] {
   const reversedPath: NodeId[] = [];
   let currentNodeId: NodeId | null | undefined = targetNodeId;
@@ -87,5 +88,12 @@ export function materializePath(
   }
 
   reversedPath.reverse();
-  return reversedPath;
+
+  // Return the anchor (last allocated node) + all unallocated nodes
+  const firstUnallocated = reversedPath.findIndex((id) => !allocatedNodeIds.has(id));
+  if (firstUnallocated === -1) return [];
+
+  // Include the allocated node just before the gap as anchor for edge drawing
+  const anchorIndex = Math.max(0, firstUnallocated - 1);
+  return reversedPath.slice(anchorIndex);
 }

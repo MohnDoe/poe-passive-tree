@@ -19,7 +19,7 @@ export function computeHoverPreviewState({
   allocationState,
   hoveredNodeId,
 }: ComputeHoverPreviewStateParams): HoverPreviewState {
-  const previewState: HoverPreviewState = {
+  let previewState: HoverPreviewState = {
     hoveredNodeId,
     highlight: defaultStates,
     refund: defaultStates,
@@ -32,23 +32,39 @@ export function computeHoverPreviewState({
   const hoveredNodeState = allocationState.nodeStateById.get(hoveredNodeId);
   if (!hoveredNodeState) return previewState;
 
+  console.log("hovered node state", hoveredNodeState);
+
   if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) {
     return previewState;
   }
 
-  const highlightedPath = hoveredNodeState.path ?? [];
+  if (hoveredNodeState.allocated) {
+    const refundAnalysis = analyzeRefundTarget(hoveredNodeId, allocationState.nodeStateById);
+    previewState = {
+      ...previewState,
+      refund: {
+        nodeIds: refundAnalysis.refundedNodeIds,
+        edgeKeys: refundAnalysis.refundedEdgeKeys,
+      },
+    };
+  } else {
+    const fullPath = hoveredNodeState.path ?? [];
+    const highlightedNodeIds = new Set<NodeId>(
+      fullPath.filter((id) => !allocationState.allocatableNodeIds.has(id)),
+    );
 
-  const refundAnalysis = analyzeRefundTarget(hoveredNodeId, allocationState.nodeStateById);
+    highlightedNodeIds.add(hoveredNodeId);
 
-  return {
-    hoveredNodeId,
-    highlight: {
-      nodeIds: new Set(highlightedPath),
-      edgeKeys: makeEdgeKeysFromPath({ path: highlightedPath }),
-    },
-    refund: {
-      nodeIds: refundAnalysis.refundedNodeIds,
-      edgeKeys: refundAnalysis.refundedEdgeKeys,
-    },
-  };
+    previewState = {
+      ...previewState,
+      highlight: {
+        nodeIds: highlightedNodeIds,
+        edgeKeys: makeEdgeKeysFromPath({ path: fullPath }),
+      },
+    };
+  }
+
+  console.log("previewState", previewState);
+
+  return previewState;
 }

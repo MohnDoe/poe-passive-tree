@@ -25,12 +25,16 @@ export function planRefund(
 
   const pathByNodeId = new Map<NodeId, NodeId[]>();
   for (const allocatedId of build.allocatedNodeIds) {
-    pathByNodeId.set(allocatedId, materializePath(allocatedId, predecessorByNodeId));
+    pathByNodeId.set(
+      allocatedId,
+      materializePath(allocatedId, predecessorByNodeId, build.allocatedNodeIds),
+    );
   }
 
   const { requiredByNodeId } = computeDependencies({
+    graph,
+    rootNodeIds,
     allocatedNodeIds: build.allocatedNodeIds,
-    pathByNodeId,
   });
 
   const refundedIds = computeRefundClosure(nodeId, build.allocatedNodeIds, requiredByNodeId);
