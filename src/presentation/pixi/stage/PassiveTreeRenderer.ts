@@ -9,10 +9,10 @@ import type {
   GroupBackgroundRenderModel,
   TreeRendererCallbacks,
   HoverVisualDelta,
-  HoverPreviewStateModel,
 } from "../models/Render";
 import { createEdgeView } from "../views/edge.view";
 import { createNodeView } from "../views/node.view";
+import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -185,7 +185,7 @@ export class PassiveTreeRenderer {
   }: {
     delta: HoverVisualDelta;
     treeState: TreeVisualStateModel;
-    hoverPreviewState: HoverPreviewStateModel;
+    hoverPreviewState: HoverPreviewState;
   }): void {
     const changedNodeIds = new Set<NodeId>([
       ...delta.previous.highlight.nodeIds,

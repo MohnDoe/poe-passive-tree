@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 import { usePassiveTreeVisualState } from "../composables/usePassiveTreeVisualState";
 import { useTreeInteraction } from "../composables/useTreeInteraction";
-import type { HoverPreviewStateModel, HoverVisualDelta } from "../pixi/models/Render";
+import type { HoverVisualDelta } from "../pixi/models/Render";
 import { createTreeSceneModel } from "../pixi/scene/createTreeSceneModel";
 import { PassiveTreeStage } from "../pixi/stage/PassiveTreeStage";
 import { useAllocationStore } from "../stores/allocation.store";
@@ -21,7 +22,7 @@ const { hoverPreviewState } = storeToRefs(useAllocationStore());
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = shallowRef<PassiveTreeStage | null>(null);
 
-const previousHoveredState = ref<HoverPreviewStateModel>({
+const previousHoveredState = ref<HoverPreviewState>({
   hoveredNodeId: null,
   highlight: {
     edgeKeys: new Set(),
