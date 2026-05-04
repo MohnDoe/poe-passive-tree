@@ -1,54 +1,73 @@
-# poe-passive-tree
+# Path of Exile's passive tree in TypeScript
 
-This template should help get you started developing with Vue 3 in Vite.
+![TypeScript](https://img.shields.io/badge/TypeScript-6-blue?logo=typescript)
+![Vue](https://img.shields.io/badge/Vue-3-42b883?logo=vue.js)
+![Pixi.js](https://img.shields.io/badge/Pixi.js-8-e91e63)
 
-## Recommended IDE Setup
+A faithful, interactive recreation of the **Path of Exile passive skill tree** built as a modern web application. This is a personal deep-dive project combining complex graph data structures, high-performance WebGL rendering, and clean domain-driven architecture.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+> [!NOTE]
+> **Core logic is complete, visual rendering is in progress.** Graph traversal, node allocation, hover pathfinding, and the full DDD architecture are implemented and functional. The Pixi.js rendering layer (sprite assets, visual theming, animations) is actively being built on top of this foundation.
 
-## Recommended Browser Setup
+![Passive tree screenshot](docs/assets/screenshot.png)
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## ✨ Features
 
-## Type Support for `.vue` Imports in TS
+- **Domain-Driven Design (DDD) architecture** with enforced layer boundaries
+- **Graph traversal & pathfinding** — shortest path, reachability, orphan detection
+- **Interactive allocation** — click nodes to allocate/deallocate, with live path preview on hover
+- **Class & Ascendancy selection** — filters the tree per character class starting position
+- **Hover preview** — computes the shortest reachable path from current allocation in real time
+- **Refund dependency tracking** — safely highlights which nodes would be orphaned on refund
+- **Reactive state management** with Pinia -- optimized for high-frequency updates
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+See the [`ROADMAP.md`](ROADMAP.md) for planned features.
 
-## Customize configuration
+## 🛠 Tech Stack
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+| Concern   | Technology                 |
+| --------- | -------------------------- |
+| Framework | Vue 3 (Composition API)    |
+| Rendering | Pixi.js v8 (WebGL)         |
+| Language  | 100% TypeScript (strict)   |
+| State     | Pinia                      |
+| Build     | Vite + Bun                 |
+| Testing   | Vitest                     |
+| Linting   | ESLint + Oxlint + Prettier |
 
-## Project Setup
+---
 
-```sh
+## Architecture
+
+The project follows a strict **Domain-Driven Design** layer structure with enforced boundaries.
+
+See [`docs/architecture.md`](docs/architecture.md) for the full architecture breakdown.
+
+## Status
+
+See the [`ROADMAP.md`](ROADMAP.md) for more details about what has been done, what needs to be done and will be done.
+
+## Getting Started
+
+Requires [Bun](https://bun.sh/) or Node.js `^20.19.0 || >=22.12.0`.
+
+```bash
 bun install
+bun run dev
+
+bun run test:unit   # unit tests
+bun run lint        # oxlint + ESLint
+bun run type-check  # vue-tsc
 ```
 
-### Compile and Hot-Reload for Development
+## Further Reading
 
-```sh
-bun dev
-```
+- [Architecture decisions](docs/architecture.md)
+- [Roadmap so far](ROADMAP.md)
 
-### Type-Check, Compile and Minify for Production
+## Final notes
 
-```sh
-bun run build
-```
+This project is open source but does not seek contribution (it's not ready for that).
+Obviously this does not replace tools like Path of Building or other PoE build planners, but it aims to be as accurate and easy to use as the in-game passive tree.
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-bun test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-bun lint
-```
+Path of Exile and all related assets are property of [Grinding Gear Games](https://www.grindinggear.com/).
