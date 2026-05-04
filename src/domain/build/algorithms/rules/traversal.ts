@@ -43,6 +43,7 @@ export function getNeighborIds(nodeId: NodeId, adj: PassiveTreeAdjacency): Set<N
 }
 
 export function canTraverse(graph: PassiveGraph, from: PassiveNode, to: PassiveNode): boolean {
+  if (from.id === to.id) return false;
   if (from.kind === "mastery") return false;
   if (to.kind === "classStart" || to.kind === "ascendancyStart") return false;
 
