@@ -1,3 +1,4 @@
+import { makeEdgeKey } from "../edgeKeys";
 import type { GraphEdge } from "../GraphEdge";
 import type { ClassId } from "../PassiveClass";
 import type { PassiveGraph } from "../PassiveGraph";
@@ -23,7 +24,7 @@ export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): Passiv
 }
 
 function makeEdge(edge: Partial<GraphEdge> & { source: NodeId; target: NodeId }): GraphEdge {
-  const key = edge.key ?? `${edge.source}-${edge.target}`;
+  const key = edge.key ?? makeEdgeKey(edge.source, edge.target);
   return {
     key,
     source: edge.source,
