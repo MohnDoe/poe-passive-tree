@@ -17,14 +17,14 @@ describe("canExpandTo", () => {
   });
 
   it("returns false when the edge is structurally illegal", () => {
-    const graph = makeRegionGraph();
+    const region = makeRegionGraph();
 
-    const allowedFrom = graph.nodesById.get("2")!;
-    const allowedTo = graph.nodesById.get("3")!;
-    const blockedTo = graph.nodesById.get("4")!;
+    const allowedFrom = region.nodes.ascendancyA.start;
+    const allowedTo = region.nodes.ascendancyA.normal;
+    const blockedTo = region.nodes.ascendancyB.start;
 
-    expect(canExpandTo(graph, allowedFrom, allowedTo)).toBe(true);
-    expect(canExpandTo(graph, allowedFrom, blockedTo)).toBe(false);
+    expect(canExpandTo(region.graph, allowedFrom, allowedTo)).toBe(true);
+    expect(canExpandTo(region.graph, allowedFrom, blockedTo)).toBe(false);
   });
 });
 
@@ -78,12 +78,12 @@ describe("isTraversableEdge", () => {
   });
 
   it("returns true for two nodes in the main region", () => {
-    const graph = makeRegionGraph();
+    const region = makeRegionGraph();
 
-    const source = graph.nodesById.get("0")!;
-    const target = graph.nodesById.get("1")!;
+    const source = region.nodes.main.start;
+    const target = region.nodes.main.normal;
 
-    expect(isTraversableEdge(graph, source, target)).toBe(true);
+    expect(isTraversableEdge(region.graph, source, target)).toBe(true);
   });
 
   it("returns false when moving to an ascendancyStart node", () => {
@@ -117,28 +117,28 @@ describe("isTraversableEdge", () => {
   });
 
   it("returns false when moving between different regions", () => {
-    const graph = makeRegionGraph();
+    const region = makeRegionGraph();
 
-    const from = graph.nodesById.get("0")!;
-    const to = graph.nodesById.get("2")!;
+    const from = region.nodes.main.start;
+    const to = region.nodes.ascendancyA.normal;
 
-    expect(isTraversableEdge(graph, from, to)).toBe(false);
+    expect(isTraversableEdge(region.graph, from, to)).toBe(false);
   });
 
   it("returns true when moving within the same ascendancy subregion", () => {
-    const graph = makeRegionGraph();
+    const region = makeRegionGraph();
 
-    const from = graph.nodesById.get("2")!;
-    const to = graph.nodesById.get("3")!;
+    const from = region.nodes.ascendancyA.start;
+    const to = region.nodes.ascendancyA.normal;
 
-    expect(isTraversableEdge(graph, from, to)).toBe(true);
+    expect(isTraversableEdge(region.graph, from, to)).toBe(true);
   });
 
   it("returns false when moving between different ascendancy subregions", () => {
-    const graph = makeRegionGraph();
+    const { graph, nodes } = makeRegionGraph();
 
-    const from = graph.nodesById.get("2")!;
-    const to = graph.nodesById.get("4")!;
+    const from = nodes.ascendancyA.normal;
+    const to = nodes.ascendancyB.normal;
 
     expect(isTraversableEdge(graph, from, to)).toBe(false);
   });

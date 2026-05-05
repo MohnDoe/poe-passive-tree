@@ -114,7 +114,25 @@ export function makeForkGraph(): PassiveGraph {
   });
 }
 
-export function makeRegionGraph(): PassiveGraph {
+export interface RegionGraphFixture {
+  graph: PassiveGraph;
+  nodes: {
+    main: {
+      start: PassiveNode;
+      normal: PassiveNode;
+    };
+    ascendancyA: {
+      start: PassiveNode;
+      normal: PassiveNode;
+    };
+    ascendancyB: {
+      start: PassiveNode;
+      normal: PassiveNode;
+    };
+  };
+}
+
+export function makeRegionGraph(): RegionGraphFixture {
   /**
    * main:
    * 0 -- 1
@@ -143,7 +161,7 @@ export function makeRegionGraph(): PassiveGraph {
   subregionByNodeId.set("4", "ascendancyB");
   subregionByNodeId.set("5", "ascendancyB");
 
-  return buildGraph({
+  const graph = buildGraph({
     nodes: [
       makeNode({ id: "0", kind: "classStart", classStartIndex: 1 }),
       makeNode({ id: "1" }),
@@ -160,4 +178,22 @@ export function makeRegionGraph(): PassiveGraph {
     regionByNodeId,
     subregionByNodeId,
   });
+
+  return {
+    graph,
+    nodes: {
+      main: {
+        start: graph.nodesById.get("0")!,
+        normal: graph.nodesById.get("1")!,
+      },
+      ascendancyA: {
+        start: graph.nodesById.get("2")!,
+        normal: graph.nodesById.get("3")!,
+      },
+      ascendancyB: {
+        start: graph.nodesById.get("4")!,
+        normal: graph.nodesById.get("5")!,
+      },
+    },
+  };
 }
