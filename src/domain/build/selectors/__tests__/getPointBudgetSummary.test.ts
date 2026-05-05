@@ -1,6 +1,6 @@
 import { makeRegionGraph } from "@/domain/graph/__tests__/PassiveGraph.fixtures";
 import { describe, expect, it } from "vitest";
-import { makeBuild } from "@/domain/build/__tests__/BuildState.fixtures";
+import { makeBuildState } from "@/domain/build/__tests__/BuildState.fixtures";
 import { getPointBudgetSummary } from "../getPointBudgetSummary";
 
 describe("getPointBugetSummary", () => {
@@ -9,7 +9,7 @@ describe("getPointBugetSummary", () => {
   it("should correctly count passive point budget", () => {
     const passivePointsBudget = 2;
     const ascendancyPointsBudget = 2;
-    const build = makeBuild({
+    const build = makeBuildState({
       allocatedNodeIds: new Set([nodes.main.normal.id]),
       passivePointsBudget,
       ascendancyPointsBudget,
@@ -28,7 +28,7 @@ describe("getPointBugetSummary", () => {
   it("should correctly count ascendancy point budget", () => {
     const passivePointsBudget = 2;
     const ascendancyPointsBudget = 2;
-    const build = makeBuild({
+    const build = makeBuildState({
       allocatedNodeIds: new Set([nodes.ascendancyA.normal.id, nodes.ascendancyB.normal.id]),
       passivePointsBudget,
       ascendancyPointsBudget,
@@ -44,7 +44,7 @@ describe("getPointBugetSummary", () => {
   it("clamps budget to 0 when it gets lower", () => {
     const passivePointsBudget = 0;
     const ascendancyPointsBudget = 0;
-    const build = makeBuild({
+    const build = makeBuildState({
       allocatedNodeIds: new Set([nodes.ascendancyA.normal.id, nodes.main.normal.id]),
       passivePointsBudget,
       ascendancyPointsBudget,
@@ -62,7 +62,7 @@ describe("getPointBugetSummary", () => {
   it("does not count nodes more than once", () => {
     const passivePointsBudget = 4;
     const ascendancyPointsBudget = 2;
-    const build = makeBuild({
+    const build = makeBuildState({
       allocatedNodeIds: new Set([nodes.main.normal.id, nodes.main.normal.id]),
       passivePointsBudget,
       ascendancyPointsBudget,
