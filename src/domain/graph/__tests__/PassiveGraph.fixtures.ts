@@ -1,7 +1,7 @@
 import type { GraphEdge } from "../GraphEdge";
 import type { ClassId } from "../PassiveClass";
 import type { PassiveGraph } from "../PassiveGraph";
-import type { NodeId, PassiveNode } from "../PassiveNode";
+import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "../PassiveNode";
 
 export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): PassiveNode {
   return {
@@ -34,22 +34,33 @@ function makeEdge(edge: Partial<GraphEdge> & { source: NodeId; target: NodeId })
   };
 }
 
-export function buildGraph(nodes: PassiveNode[], edgePairs: [NodeId, NodeId][]): PassiveGraph {
-  const edges: GraphEdge[] = edgePairs.map(([source, target]) => makeEdge({ source, target }));
-  const nodesById = new Map<NodeId, PassiveNode>(nodes.map((n) => [n.id, n]));
+export function buildGraph(params: {
+  nodes: PassiveNode[];
+  edgePairs: [NodeId, NodeId][];
+  regionByNodeId?: Map<NodeId, PassiveNodeRegion>;
+  subregionByNodeId?: Map<NodeId, PassiveNodeSubregion>;
+}): PassiveGraph {
+  const edges: GraphEdge[] = params.edgePairs.map(([source, target]) =>
+    makeEdge({ source, target }),
+  );
+  const nodesById = new Map<NodeId, PassiveNode>(params.nodes.map((n) => [n.id, n]));
   const classId = 1 as ClassId;
   const classesById = new Map([[classId, { id: classId, name: "TestClass", ascendancyIds: [] }]]);
 
   const adjacency = new Map<NodeId, Set<NodeId>>();
-  for (const n of nodes) adjacency.set(n.id, new Set());
+  for (const n of params.nodes) adjacency.set(n.id, new Set());
   for (const e of edges) {
     adjacency.get(e.source)!.add(e.target);
     adjacency.get(e.target)!.add(e.source);
   }
 
-  const regionByNodeId = new Map<NodeId, "main" | "ascendancy">(nodes.map((n) => [n.id, "main"]));
-  const subregionByNodeId = new Map<NodeId, string | null>(nodes.map((n) => [n.id, null]));
-  const startNodes = nodes.filter((n) => n.kind === "classStart");
+  const regionByNodeId =
+    params.regionByNodeId ??
+    new Map<NodeId, PassiveNodeRegion>(params.nodes.map((n) => [n.id, "main"]));
+  const subregionByNodeId =
+    params.subregionByNodeId ??
+    new Map<NodeId, PassiveNodeSubregion>(params.nodes.map((n) => [n.id, null]));
+  const startNodes = params.nodes.filter((n) => n.kind === "classStart");
   const allStartNodeIds = new Set<NodeId>(startNodes.map((n) => n.id));
 
   return {
@@ -72,32 +83,80 @@ export function buildGraph(nodes: PassiveNode[], edgePairs: [NodeId, NodeId][]):
 
 /** Straight line: start(0) -- normal(1) -- normal(2) */
 export function makeLineGraph(): PassiveGraph {
-  return buildGraph(
-    [
+  return buildGraph({
+    nodes: [
       makeNode({ id: "start", kind: "classStart", classStartIndex: 1 as ClassId }),
       makeNode({ id: "1" }),
       makeNode({ id: "end" }),
     ],
-    [
+    edgePairs: [
       ["start", "1"],
       ["1", "end"],
     ],
-  );
+  });
 }
 
 /** Fork: start(0) -- normal(1) -< normal(2)  <> normal(3) */
 export function makeForkGraph(): PassiveGraph {
-  return buildGraph(
-    [
+  return buildGraph({
+    nodes: [
       makeNode({ id: "start", kind: "classStart", classStartIndex: 1 }),
       makeNode({ id: "1" }),
       makeNode({ id: "end-a" }),
       makeNode({ id: "end-b" }),
     ],
-    [
+    edgePairs: [
       ["start", "1"],
       ["1", "end-a"],
       ["1", "end-b"],
     ],
-  );
+  });
+}
+
+export function makeRegionGraph(): PassiveGraph {
+  /**
+   * main:
+   * 0 -- 1
+   *
+   * ascendancy:
+   * 2 -- 3 (ascendancyA)
+   * 4 -- 5 (ascendancyB)
+   *
+   * */
+  const regionByNodeId = new Map<NodeId, PassiveNodeRegion>();
+  const subregionByNodeId = new Map<NodeId, PassiveNodeSubregion>();
+  regionByNodeId.set("0", "main");
+  regionByNodeId.set("1", "main");
+  regionByNodeId.set("2", "ascendancy");
+  regionByNodeId.set("3", "ascendancy");
+
+  regionByNodeId.set("4", "ascendancy");
+  regionByNodeId.set("5", "ascendancy");
+
+  subregionByNodeId.set("0", null);
+  subregionByNodeId.set("1", null);
+
+  subregionByNodeId.set("2", "ascendancyA");
+  subregionByNodeId.set("3", "ascendancyA");
+
+  subregionByNodeId.set("4", "ascendancyB");
+  subregionByNodeId.set("5", "ascendancyB");
+
+  return buildGraph({
+    nodes: [
+      makeNode({ id: "0" }),
+      makeNode({ id: "1" }),
+      makeNode({ id: "2" }),
+      makeNode({ id: "3" }),
+      makeNode({ id: "4" }),
+      makeNode({ id: "5" }),
+    ],
+    edgePairs: [
+      ["0", "1"],
+      ["2", "3"],
+      ["4", "5"],
+    ],
+    regionByNodeId,
+    subregionByNodeId,
+  });
 }

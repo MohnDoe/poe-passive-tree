@@ -3,6 +3,7 @@ import {
   makeForkGraph,
   makeLineGraph,
   makeNode,
+  makeRegionGraph,
 } from "@/domain/graph/__tests__/PassiveGraph.fixtures";
 import { describe, expect, it } from "vitest";
 import { canTraverse } from "../traversal";
@@ -60,8 +61,44 @@ describe("canTraverse", () => {
       id: "1",
     });
 
-    const graph = buildGraph([masteryNode, otherNode], [["0", "1"]]);
+    const graph = buildGraph({ nodes: [masteryNode, otherNode], edgePairs: [["0", "1"]] });
 
     expect(canTraverse(graph, masteryNode, otherNode)).toBe(false);
+  });
+
+  it("respects regions' boundaries", () => {
+    const graph = makeRegionGraph();
+
+    // region = main
+    const nodeInMainRegionA = graph.nodesById.get("0")!;
+    const nodeInMainRegionB = graph.nodesById.get("1")!;
+    // region = ascendancy / subregion = ascendancyA
+    const nodeInAscendancyRegionA = graph.nodesById.get("2")!;
+    const nodeInAscendancyRegionB = graph.nodesById.get("3")!;
+    // region = ascendancy / subregion = ascendancyB
+    const nodeInAnotherAscendancyRegionA = graph.nodesById.get("4")!;
+    const nodeInAnotherAscendancyRegionB = graph.nodesById.get("5")!;
+
+    expect(canTraverse(graph, nodeInMainRegionA, nodeInMainRegionB)).toBe(true);
+    expect(canTraverse(graph, nodeInAscendancyRegionA, nodeInAscendancyRegionB)).toBe(true);
+    expect(canTraverse(graph, nodeInAnotherAscendancyRegionA, nodeInAnotherAscendancyRegionB)).toBe(
+      true,
+    );
+
+    // main -> ascendancy:ascendancyA
+    expect(canTraverse(graph, nodeInMainRegionA, nodeInAscendancyRegionA)).toBe(false);
+    expect(canTraverse(graph, nodeInMainRegionB, nodeInAscendancyRegionA)).toBe(false);
+    expect(canTraverse(graph, nodeInMainRegionA, nodeInAscendancyRegionB)).toBe(false);
+    expect(canTraverse(graph, nodeInMainRegionB, nodeInAscendancyRegionB)).toBe(false);
+    // main -> ascendancy:ascendancyB
+    expect(canTraverse(graph, nodeInMainRegionA, nodeInAnotherAscendancyRegionA)).toBe(false);
+    expect(canTraverse(graph, nodeInMainRegionB, nodeInAnotherAscendancyRegionA)).toBe(false);
+    expect(canTraverse(graph, nodeInMainRegionA, nodeInAnotherAscendancyRegionB)).toBe(false);
+    expect(canTraverse(graph, nodeInMainRegionB, nodeInAnotherAscendancyRegionB)).toBe(false);
+    // ascendancy:ascendancyA -> ascendancy:ascendancyB
+    expect(canTraverse(graph, nodeInAscendancyRegionA, nodeInAnotherAscendancyRegionA)).toBe(false);
+    expect(canTraverse(graph, nodeInAscendancyRegionB, nodeInAnotherAscendancyRegionA)).toBe(false);
+    expect(canTraverse(graph, nodeInAscendancyRegionA, nodeInAnotherAscendancyRegionB)).toBe(false);
+    expect(canTraverse(graph, nodeInAscendancyRegionB, nodeInAnotherAscendancyRegionB)).toBe(false);
   });
 });
