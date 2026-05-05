@@ -1,6 +1,6 @@
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import { canTraverse } from "@/domain/build/algorithms/rules/traversal";
+import { canExpandTo } from "@/domain/build/algorithms/rules/traversal";
 import { Deque } from "@/shared/collections/Deque";
 
 export interface ComputeWeightedPathsParams {
@@ -46,7 +46,7 @@ export function computeWeightedPaths({
       const neighborNode = graph.nodesById.get(neighborId);
       if (!neighborNode) continue;
 
-      if (!canTraverse(graph, currentNode, neighborNode)) continue;
+      if (!canExpandTo(graph, currentNode, neighborNode)) continue;
 
       // allocated nodes are free
       const stepCost = allocatedNodeIds.has(neighborId) ? 0 : 1;

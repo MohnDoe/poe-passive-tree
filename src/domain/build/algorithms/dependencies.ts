@@ -1,3 +1,4 @@
+import { canExpandTo } from "@/domain/build/algorithms/rules/traversal";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 
@@ -35,8 +36,8 @@ export function computeConnectivity({
       const neighbor = graph.nodesById.get(neighborId);
       if (!neighbor) continue;
       if (!allocatedNodeIds.has(neighborId)) continue;
-      // if (neighbor.kind === "mastery") continue;
-      if (neighbor.kind === "classStart" || neighbor.kind === "ascendancyStart") continue;
+
+      if (!canExpandTo(graph, node, neighbor)) continue;
 
       queue.push(neighborId);
     }

@@ -1,57 +1,35 @@
+import { describe, expect, it } from "vitest";
 import {
   buildGraph,
-  makeForkGraph,
   makeLineGraph,
   makeNode,
   makeRegionGraph,
 } from "@/domain/graph/__tests__/PassiveGraph.fixtures";
-import { describe, expect, it } from "vitest";
-import { canTraverse } from "../traversal";
+import { isTraversableEdge, canExpandTo } from "../traversal";
+import type { NodeId, PassiveNodeRegion, PassiveNodeSubregion } from "@/domain/graph/PassiveNode";
 
-describe("canTraverse", () => {
-  it("cannot move to a classStart node", () => {
+describe("canExpandTo", () => {
+  it("returns false when source and target are the same node", () => {
     const graph = makeLineGraph();
+    const node = graph.nodesById.get("1")!;
 
-    const source = graph.nodesById.get("end")!;
-    const target = graph.nodesById.get("start")!;
-
-    expect(canTraverse(graph, source, target)).toBe(false);
+    expect(canExpandTo(graph, node, node)).toBe(false);
   });
 
-  it("cannot move from and to the same node", () => {
-    const graph = makeLineGraph();
+  it("returns false when the edge is structurally illegal", () => {
+    const graph = makeRegionGraph();
 
-    const source = graph.nodesById.get("start")!;
-    const target = graph.nodesById.get("start")!;
+    const allowedFrom = graph.nodesById.get("2")!;
+    const allowedTo = graph.nodesById.get("3")!;
+    const blockedTo = graph.nodesById.get("4")!;
 
-    expect(canTraverse(graph, source, target)).toBe(false);
+    expect(canExpandTo(graph, allowedFrom, allowedTo)).toBe(true);
+    expect(canExpandTo(graph, allowedFrom, blockedTo)).toBe(false);
   });
+});
 
-  it("can traverse a line graph", () => {
-    const graph = makeLineGraph();
-
-    const source = graph.nodesById.get("start")!;
-    const target = graph.nodesById.get("end")!;
-
-    expect(canTraverse(graph, source, target)).toBe(true);
-  });
-
-  it("can traverse a fork graph", () => {
-    const graph = makeForkGraph();
-
-    const start = graph.nodesById.get("start")!;
-    const endA = graph.nodesById.get("end-a")!;
-    const endB = graph.nodesById.get("end-b")!;
-
-    expect(canTraverse(graph, start, endA)).toBe(true);
-    expect(canTraverse(graph, start, endB)).toBe(true);
-    expect(canTraverse(graph, endB, endA)).toBe(true);
-    expect(canTraverse(graph, endA, endB)).toBe(true);
-
-    expect(canTraverse(graph, endA, start)).toBe(false);
-  });
-
-  it("cannot move from a mastery node", () => {
+describe("isTraversableEdge", () => {
+  it("returns false when moving from a mastery node", () => {
     const masteryNode = makeNode({
       id: "0",
       kind: "mastery",
@@ -63,42 +41,122 @@ describe("canTraverse", () => {
 
     const graph = buildGraph({ nodes: [masteryNode, otherNode], edgePairs: [["0", "1"]] });
 
-    expect(canTraverse(graph, masteryNode, otherNode)).toBe(false);
+    expect(isTraversableEdge(graph, masteryNode, otherNode)).toBe(false);
   });
 
-  it("respects regions' boundaries", () => {
+  it("returns true when moving to a mastery node", () => {
+    const masteryNode = makeNode({
+      id: "0",
+    });
+
+    const otherNode = makeNode({
+      id: "1",
+      kind: "mastery",
+    });
+
+    const graph = buildGraph({ nodes: [masteryNode, otherNode], edgePairs: [["0", "1"]] });
+
+    expect(isTraversableEdge(graph, masteryNode, otherNode)).toBe(true);
+  });
+
+  it("returns false when moving to a classStart node", () => {
+    const graph = makeLineGraph();
+
+    const source = graph.nodesById.get("end")!;
+    const target = graph.nodesById.get("start")!;
+
+    expect(isTraversableEdge(graph, source, target)).toBe(false);
+  });
+
+  it("returns true when moving from a classStart node", () => {
+    const graph = makeLineGraph();
+
+    const source = graph.nodesById.get("start")!;
+    const target = graph.nodesById.get("1")!;
+
+    expect(isTraversableEdge(graph, source, target)).toBe(true);
+  });
+
+  it("returns true for two nodes in the main region", () => {
     const graph = makeRegionGraph();
 
-    // region = main
-    const nodeInMainRegionA = graph.nodesById.get("0")!;
-    const nodeInMainRegionB = graph.nodesById.get("1")!;
-    // region = ascendancy / subregion = ascendancyA
-    const nodeInAscendancyRegionA = graph.nodesById.get("2")!;
-    const nodeInAscendancyRegionB = graph.nodesById.get("3")!;
-    // region = ascendancy / subregion = ascendancyB
-    const nodeInAnotherAscendancyRegionA = graph.nodesById.get("4")!;
-    const nodeInAnotherAscendancyRegionB = graph.nodesById.get("5")!;
+    const source = graph.nodesById.get("0")!;
+    const target = graph.nodesById.get("1")!;
 
-    expect(canTraverse(graph, nodeInMainRegionA, nodeInMainRegionB)).toBe(true);
-    expect(canTraverse(graph, nodeInAscendancyRegionA, nodeInAscendancyRegionB)).toBe(true);
-    expect(canTraverse(graph, nodeInAnotherAscendancyRegionA, nodeInAnotherAscendancyRegionB)).toBe(
-      true,
-    );
+    expect(isTraversableEdge(graph, source, target)).toBe(true);
+  });
 
-    // main -> ascendancy:ascendancyA
-    expect(canTraverse(graph, nodeInMainRegionA, nodeInAscendancyRegionA)).toBe(false);
-    expect(canTraverse(graph, nodeInMainRegionB, nodeInAscendancyRegionA)).toBe(false);
-    expect(canTraverse(graph, nodeInMainRegionA, nodeInAscendancyRegionB)).toBe(false);
-    expect(canTraverse(graph, nodeInMainRegionB, nodeInAscendancyRegionB)).toBe(false);
-    // main -> ascendancy:ascendancyB
-    expect(canTraverse(graph, nodeInMainRegionA, nodeInAnotherAscendancyRegionA)).toBe(false);
-    expect(canTraverse(graph, nodeInMainRegionB, nodeInAnotherAscendancyRegionA)).toBe(false);
-    expect(canTraverse(graph, nodeInMainRegionA, nodeInAnotherAscendancyRegionB)).toBe(false);
-    expect(canTraverse(graph, nodeInMainRegionB, nodeInAnotherAscendancyRegionB)).toBe(false);
-    // ascendancy:ascendancyA -> ascendancy:ascendancyB
-    expect(canTraverse(graph, nodeInAscendancyRegionA, nodeInAnotherAscendancyRegionA)).toBe(false);
-    expect(canTraverse(graph, nodeInAscendancyRegionB, nodeInAnotherAscendancyRegionA)).toBe(false);
-    expect(canTraverse(graph, nodeInAscendancyRegionA, nodeInAnotherAscendancyRegionB)).toBe(false);
-    expect(canTraverse(graph, nodeInAscendancyRegionB, nodeInAnotherAscendancyRegionB)).toBe(false);
+  it("returns false when moving to an ascendancyStart node", () => {
+    const ascendancyStart = makeNode({
+      id: "asc-start",
+      kind: "ascendancyStart",
+    });
+
+    const ascendancyNode = makeNode({
+      id: "asc-1",
+    });
+
+    const regionByNodeId = new Map<NodeId, PassiveNodeRegion>([
+      ["asc-start", "ascendancy"],
+      ["asc-1", "ascendancy"],
+    ]);
+
+    const subregionByNodeId = new Map<NodeId, PassiveNodeSubregion>([
+      ["asc-start", "juggernaut"],
+      ["asc-1", "juggernaut"],
+    ]);
+
+    const graph = buildGraph({
+      nodes: [ascendancyStart, ascendancyNode],
+      edgePairs: [["asc-start", "asc-1"]],
+      regionByNodeId,
+      subregionByNodeId,
+    });
+
+    expect(isTraversableEdge(graph, ascendancyNode, ascendancyStart)).toBe(false);
+  });
+
+  it("returns false when moving between different regions", () => {
+    const graph = makeRegionGraph();
+
+    const from = graph.nodesById.get("0")!;
+    const to = graph.nodesById.get("2")!;
+
+    expect(isTraversableEdge(graph, from, to)).toBe(false);
+  });
+
+  it("returns true when moving within the same ascendancy subregion", () => {
+    const graph = makeRegionGraph();
+
+    const from = graph.nodesById.get("2")!;
+    const to = graph.nodesById.get("3")!;
+
+    expect(isTraversableEdge(graph, from, to)).toBe(true);
+  });
+
+  it("returns false when moving between different ascendancy subregions", () => {
+    const graph = makeRegionGraph();
+
+    const from = graph.nodesById.get("2")!;
+    const to = graph.nodesById.get("4")!;
+
+    expect(isTraversableEdge(graph, from, to)).toBe(false);
+  });
+
+  it("returns false when one node has no region mapping", () => {
+    const a = makeNode({ id: "a" });
+    const b = makeNode({ id: "b" });
+
+    const graph = buildGraph({
+      nodes: [a, b],
+      edgePairs: [["a", "b"]],
+      regionByNodeId: new Map([["a", "main"]]),
+      subregionByNodeId: new Map([
+        ["a", null],
+        ["b", null],
+      ]),
+    });
+
+    expect(isTraversableEdge(graph, a, b)).toBe(false);
   });
 });

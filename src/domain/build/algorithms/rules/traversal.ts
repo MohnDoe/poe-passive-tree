@@ -42,8 +42,16 @@ export function getNeighborIds(nodeId: NodeId, adj: PassiveTreeAdjacency): Set<N
   return adj.get(nodeId) || new Set();
 }
 
-export function canTraverse(graph: PassiveGraph, from: PassiveNode, to: PassiveNode): boolean {
+export function canExpandTo(graph: PassiveGraph, from: PassiveNode, to: PassiveNode): boolean {
   if (from.id === to.id) return false;
+  return isTraversableEdge(graph, from, to);
+}
+
+export function isTraversableEdge(
+  graph: PassiveGraph,
+  from: PassiveNode,
+  to: PassiveNode,
+): boolean {
   if (from.kind === "mastery") return false;
   if (to.kind === "classStart" || to.kind === "ascendancyStart") return false;
 
