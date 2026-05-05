@@ -144,12 +144,12 @@ export function makeRegionGraph(): PassiveGraph {
 
   return buildGraph({
     nodes: [
-      makeNode({ id: "0" }),
+      makeNode({ id: "0", kind: "classStart", classStartIndex: 1 }),
       makeNode({ id: "1" }),
-      makeNode({ id: "2" }),
-      makeNode({ id: "3" }),
-      makeNode({ id: "4" }),
-      makeNode({ id: "5" }),
+      makeNode({ id: "2", kind: "ascendancyStart", ascendancyName: "ascendancyA" }),
+      makeNode({ id: "3", ascendancyName: "ascendancyA" }),
+      makeNode({ id: "4", kind: "ascendancyStart", ascendancyName: "ascendancyB" }),
+      makeNode({ id: "5", ascendancyName: "ascendancyB" }),
     ],
     edgePairs: [
       ["0", "1"],
