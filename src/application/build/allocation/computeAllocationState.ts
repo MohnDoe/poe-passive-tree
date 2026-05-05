@@ -74,7 +74,7 @@ export function computeAllocationState({
   );
 
   const connectedNodeIds = computeConnectivity({
-    allocatedNodeIds,
+    whitelistedNodeIds: allocatedNodeIds,
     graph,
     rootNodeIds,
   });
