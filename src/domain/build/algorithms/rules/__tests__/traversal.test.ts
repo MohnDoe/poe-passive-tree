@@ -10,8 +10,8 @@ import type { NodeId, PassiveNodeRegion, PassiveNodeSubregion } from "@/domain/g
 
 describe("canExpandTo", () => {
   it("returns false when source and target are the same node", () => {
-    const graph = makeLineGraph();
-    const node = graph.nodesById.get("1")!;
+    const { graph, nodes } = makeLineGraph();
+    const node = nodes.first;
 
     expect(canExpandTo(graph, node, node)).toBe(false);
   });
@@ -60,19 +60,19 @@ describe("isTraversableEdge", () => {
   });
 
   it("returns false when moving to a classStart node", () => {
-    const graph = makeLineGraph();
+    const { graph, nodes } = makeLineGraph();
 
-    const source = graph.nodesById.get("end")!;
-    const target = graph.nodesById.get("start")!;
+    const source = nodes.first;
+    const target = nodes.start;
 
     expect(isTraversableEdge(graph, source, target)).toBe(false);
   });
 
   it("returns true when moving from a classStart node", () => {
-    const graph = makeLineGraph();
+    const { graph, nodes } = makeLineGraph();
 
-    const source = graph.nodesById.get("start")!;
-    const target = graph.nodesById.get("1")!;
+    const source = nodes.start;
+    const target = nodes.first;
 
     expect(isTraversableEdge(graph, source, target)).toBe(true);
   });
