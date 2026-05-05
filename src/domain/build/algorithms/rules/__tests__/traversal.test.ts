@@ -5,7 +5,7 @@ import {
   makeNode,
   makeRegionGraph,
 } from "@/domain/graph/__tests__/PassiveGraph.fixtures";
-import { isTraversableEdge, canExpandTo } from "../traversal";
+import { isTraversableEdge, canExpandTo, isAscendancyTraversalNode } from "../traversal";
 import type { NodeId, PassiveNodeRegion, PassiveNodeSubregion } from "@/domain/graph/PassiveNode";
 
 describe("canExpandTo", () => {
@@ -158,5 +158,41 @@ describe("isTraversableEdge", () => {
     });
 
     expect(isTraversableEdge(graph, a, b)).toBe(false);
+  });
+});
+
+describe("isAscendancyTraversalNode", () => {
+  it("returns false for jewel socket", () => {
+    const node = makeNode({
+      id: "0",
+      kind: "jewel",
+    });
+
+    expect(isAscendancyTraversalNode(node)).toBe(false);
+  });
+
+  it("returns true for ascendancyStart node", () => {
+    const node = makeNode({ id: "0", kind: "ascendancyStart" });
+    expect(isAscendancyTraversalNode(node)).toBe(true);
+  });
+
+  it("returns true for multiple choice node", () => {
+    const node = makeNode({ id: "0", isMultipleChoice: true });
+    expect(isAscendancyTraversalNode(node)).toBe(true);
+  });
+
+  it("returns true for multiple choice option node", () => {
+    const node = makeNode({ id: "0", isMultipleChoiceOption: true });
+    expect(isAscendancyTraversalNode(node)).toBe(true);
+  });
+
+  it("returns true for proxy node", () => {
+    const node = makeNode({ id: "0", kind: "proxy" });
+    expect(isAscendancyTraversalNode(node)).toBe(true);
+  });
+
+  it("returns true if ascendancyName is provided", () => {
+    const node = makeNode({ id: "0", ascendancyName: "juggernaut" });
+    expect(isAscendancyTraversalNode(node)).toBe(true);
   });
 });
