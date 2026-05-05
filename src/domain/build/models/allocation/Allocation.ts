@@ -7,8 +7,6 @@ export interface AllocationNodeState {
 
   // There is a valid path from a root
   reachable: boolean;
-  // allocated and still attached to active  allocated tree
-  connectedToStart: boolean;
   // reachable and allowed by rules
   allocatable: boolean;
 
