@@ -3,11 +3,15 @@ import { normalizeSignedAngle } from "../math.utils";
 
 describe("normalizeSignedAngle", () => {
   it("returns the same angle when already in (-pi, pi]", () => {
-    const angles = [0, Math.PI / 2, -Math.PI / 2, Math.PI, -Math.PI + 0.001];
+    const angles = [Math.PI / 2, -Math.PI / 2, Math.PI, -Math.PI + 0.001];
 
     for (const angle of angles) {
       expect(normalizeSignedAngle(angle)).toBe(angle);
     }
+  });
+
+  it("returns zero when the angle is zero", () => {
+    expect(normalizeSignedAngle(0)).toBe(0);
   });
 
   it("normalize -pi to pi", () => {
@@ -22,7 +26,7 @@ describe("normalizeSignedAngle", () => {
   });
 
   it("wraps angles smaller than -pi up into the range", () => {
-    // -3 * pi is equivalent to -pi.
+    // -3 * pi is equivalent to -pi but we normalize -pi to pi.
     expect(normalizeSignedAngle(-3 * Math.PI)).toBe(Math.PI);
     // -5 * pi / 2 should normalize to -pi / 2.
     expect(normalizeSignedAngle((-5 * Math.PI) / 2)).toBe(-Math.PI / 2);
