@@ -12,18 +12,10 @@ describe("makeEdgeKey", () => {
     expect(key).toBe("1-2");
   });
 
-  it("order the IDs correctly", () => {
-    expect(makeEdgeKey("1", "a")).toBe("a-1");
-    expect(makeEdgeKey("a", "aa")).toBe("aa-a");
-  });
-
-  it("orders the IDs in ascending order", () => {
-    const aId = "22382098";
-    const bId = "112331";
-
-    const key = makeEdgeKey(aId, bId);
-
-    expect(key).toBe("112331-22382098");
+  it("order the IDs correctly (in ascending order)", () => {
+    expect(makeEdgeKey("2", "1")).toBe("1-2");
+    expect(makeEdgeKey("10", "1")).toBe("1-10");
+    expect(makeEdgeKey("22382098", "112331")).toBe("112331-22382098");
   });
 });
 
@@ -41,6 +33,17 @@ describe("makeEdgeKeysFromPath", () => {
     expect(third).toBe("2-3");
     expect(fourth).toBe("3-12");
     expect(fifth).toBe("4-12");
+  });
+
+  it("creates no edges from an empty path", () => {
+    const edges = makeEdgeKeysFromPath({ path: [] });
+
+    expect(edges.size).toBe(0);
+  });
+
+  it("creates no edges from single node path", () => {
+    const edges = makeEdgeKeysFromPath({ path: ["0"] });
+    expect(edges.size).toBe(0);
   });
 
   it("does not create keys if no IDs are allowed", () => {
