@@ -184,6 +184,55 @@ export function makeForkGraph(): ForkGraphFixture {
   };
 }
 
+export interface DiamondGraphFixture {
+  graph: PassiveGraph;
+  nodes: {
+    start: PassiveNode;
+    left: {
+      first: PassiveNode;
+    };
+    right: {
+      first: PassiveNode;
+      second: PassiveNode;
+    };
+    end: PassiveNode;
+  };
+}
+
+export function makeDiamondGraph(): DiamondGraphFixture {
+  const graph = buildGraph({
+    nodes: [
+      makeNode({ id: "start", kind: "classStart", classStartIndex: 1 }),
+      makeNode({ id: "left-1" }),
+      makeNode({ id: "right-1" }),
+      makeNode({ id: "right-2" }),
+      makeNode({ id: "end" }),
+    ],
+    edgePairs: [
+      ["start", "left-1"],
+      ["start", "right-1"],
+      ["right-1", "right-2"],
+      ["left-1", "end"],
+      ["right-2", "end"],
+    ],
+  });
+
+  return {
+    graph,
+    nodes: {
+      start: graph.nodesById.get("start")!,
+      left: {
+        first: graph.nodesById.get("left-1")!,
+      },
+      right: {
+        first: graph.nodesById.get("right-1")!,
+        second: graph.nodesById.get("right-2")!,
+      },
+      end: graph.nodesById.get("end")!,
+    },
+  };
+}
+
 export interface RegionGraphFixture {
   graph: PassiveGraph;
   nodes: {
