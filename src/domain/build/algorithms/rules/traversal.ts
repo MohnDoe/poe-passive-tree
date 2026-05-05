@@ -1,7 +1,7 @@
 import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
 import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
 
-function isAscendancyTraversalNode(node: PassiveNode) {
+export function isAscendancyTraversalNode(node: PassiveNode) {
   if (node.kind === "jewel") return false;
   return (
     node.kind === "ascendancyStart" ||
@@ -10,32 +10,6 @@ function isAscendancyTraversalNode(node: PassiveNode) {
     node.isMultipleChoiceOption ||
     node.kind == "proxy"
   );
-}
-
-export function traverseAscendancyRegion(
-  startNode: PassiveNode,
-  adj: PassiveTreeAdjacency,
-  nodes: PassiveGraph["nodesById"],
-): Set<NodeId> {
-  const visited = new Set<NodeId>();
-
-  const DFSRecursive = (node: PassiveNode) => {
-    visited.add(node.id);
-
-    const neighbors = getNeighborIds(node.id, adj);
-
-    for (const neighbor of neighbors) {
-      if (!visited.has(neighbor)) {
-        const neighborNode = nodes.get(neighbor);
-        if (!neighborNode) continue;
-        if (!isAscendancyTraversalNode(neighborNode)) continue;
-        DFSRecursive(neighborNode);
-      }
-    }
-  };
-
-  DFSRecursive(startNode);
-  return visited;
 }
 
 export function getNeighborIds(nodeId: NodeId, adj: PassiveTreeAdjacency): Set<NodeId> {

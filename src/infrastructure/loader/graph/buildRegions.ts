@@ -1,7 +1,15 @@
 import type { MappedPassiveTree } from "@/infrastructure/passiveTree/mapping/MappedPassiveTree";
-import { traverseAscendancyRegion } from "@/domain/build/algorithms/rules/traversal";
+import {
+  getNeighborIds,
+  isAscendancyTraversalNode,
+} from "@/domain/build/algorithms/rules/traversal";
 import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
-import type { NodeId, PassiveNodeRegion, PassiveNodeSubregion } from "@/domain/graph/PassiveNode";
+import type {
+  NodeId,
+  PassiveNode,
+  PassiveNodeRegion,
+  PassiveNodeSubregion,
+} from "@/domain/graph/PassiveNode";
 
 export interface RegionIndexes {
   regionByNodeId: PassiveGraph["regionByNodeId"];
@@ -32,9 +40,9 @@ export function buildRegionIndexes(
     subregionByNodeId.set(seedId, subregion);
     regionByNodeId.set(seedId, "ascendancy");
 
-    const visited = traverseAscendancyRegion(seedNode, adjacendy, input.nodesById);
+    const discovered = discoverAscendancyNodes(seedNode, adjacendy, input.nodesById);
 
-    for (const nodeId of visited) {
+    for (const nodeId of discovered) {
       regionByNodeId.set(nodeId, "ascendancy");
       subregionByNodeId.set(nodeId, subregion);
     }
@@ -44,4 +52,30 @@ export function buildRegionIndexes(
     subregionByNodeId,
     regionByNodeId,
   };
+}
+
+export function discoverAscendancyNodes(
+  startNode: PassiveNode,
+  adj: PassiveTreeAdjacency,
+  nodes: PassiveGraph["nodesById"],
+): Set<NodeId> {
+  const visited = new Set<NodeId>();
+
+  const DFSRecursive = (node: PassiveNode) => {
+    visited.add(node.id);
+
+    const neighbors = getNeighborIds(node.id, adj);
+
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor)) {
+        const neighborNode = nodes.get(neighbor);
+        if (!neighborNode) continue;
+        if (!isAscendancyTraversalNode(neighborNode)) continue;
+        DFSRecursive(neighborNode);
+      }
+    }
+  };
+
+  DFSRecursive(startNode);
+  return visited;
 }
