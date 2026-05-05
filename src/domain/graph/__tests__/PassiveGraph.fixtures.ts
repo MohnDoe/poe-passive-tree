@@ -92,7 +92,7 @@ export interface LineGraphFixture {
   };
 }
 
-/** Straight line: start(0) -- normal(1) -- normal(2) */
+/** Straight line: start(0) -- normal(1) -- normal(2) -- normal(3) */
 export function makeLineGraph(): LineGraphFixture {
   const graph = buildGraph({
     nodes: [
@@ -119,21 +119,57 @@ export function makeLineGraph(): LineGraphFixture {
   };
 }
 
-/** Fork: start(0) -- normal(1) -< normal(2)  <> normal(3) */
-export function makeForkGraph(): PassiveGraph {
-  return buildGraph({
+export interface ForkGraphFixture {
+  graph: PassiveGraph;
+  nodes: {
+    start: PassiveNode;
+    first: PassiveNode;
+    left: {
+      first: PassiveNode;
+      second: PassiveNode;
+    };
+    right: {
+      first: PassiveNode;
+      second: PassiveNode;
+    };
+  };
+}
+
+/** Fork: start(0) -- normal(1) -< [left 1 -- left-2 <> right-1 -- right-2] */
+export function makeForkGraph(): ForkGraphFixture {
+  const graph = buildGraph({
     nodes: [
       makeNode({ id: "start", kind: "classStart", classStartIndex: 1 }),
       makeNode({ id: "1" }),
-      makeNode({ id: "end-a" }),
-      makeNode({ id: "end-b" }),
+      makeNode({ id: "left-1" }),
+      makeNode({ id: "left-2" }),
+      makeNode({ id: "right-1" }),
+      makeNode({ id: "right-2" }),
     ],
     edgePairs: [
       ["start", "1"],
-      ["1", "end-a"],
-      ["1", "end-b"],
+      ["1", "left-1"],
+      ["1", "right-1"],
+      ["left-1", "left-2"],
+      ["right-1", "right-2"],
     ],
   });
+
+  return {
+    graph,
+    nodes: {
+      start: graph.nodesById.get("start")!,
+      first: graph.nodesById.get("1")!,
+      left: {
+        first: graph.nodesById.get("left-1")!,
+        second: graph.nodesById.get("left-2")!,
+      },
+      right: {
+        first: graph.nodesById.get("right-1")!,
+        second: graph.nodesById.get("right-2")!,
+      },
+    },
+  };
 }
 
 export interface RegionGraphFixture {
