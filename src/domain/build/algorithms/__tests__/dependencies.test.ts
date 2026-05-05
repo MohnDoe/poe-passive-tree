@@ -1,7 +1,13 @@
-import { makeForkGraph, makeLineGraph } from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
+import {
+  buildGraph,
+  makeDiamondGraph,
+  makeForkGraph,
+  makeLineGraph,
+  makeNode,
+} from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
+import type { NodeId } from "@/domain/graph/PassiveNode.ts";
 import { describe, expect, it } from "vitest";
 import { computeConnectivity } from "../dependencies.ts";
-import type { NodeId } from "@/domain/graph/PassiveNode.ts";
 
 describe("computeConnectivity", () => {
   it("returns all whitelisted nodes in a simple line", () => {
@@ -98,5 +104,91 @@ describe("computeConnectivity", () => {
     for (const expectedNodeId of expectedNodeIds) {
       expect(connectedNodeIds.has(expectedNodeId)).toBe(true);
     }
+  });
+
+  it("reaches all paths of a diamond graph", () => {
+    const { graph, nodes } = makeDiamondGraph();
+    const rootNodeIds = new Set([nodes.start.id]);
+    const whitelistedNodeIds = new Set([
+      nodes.left.first.id,
+      nodes.right.first.id,
+      nodes.right.second.id,
+      nodes.end.id,
+    ]);
+
+    const connectedNodeIds = computeConnectivity({
+      graph,
+      rootNodeIds,
+      whitelistedNodeIds,
+    });
+
+    const expectedNodeIds = new Set([...rootNodeIds, ...whitelistedNodeIds]);
+
+    expect(connectedNodeIds.size).toBe(expectedNodeIds.size);
+
+    for (const expectedNodeId of expectedNodeIds) {
+      expect(connectedNodeIds.has(expectedNodeId)).toBe(true);
+    }
+  });
+
+  it("still reaches convergence node of diamond graph when one path is complete", () => {
+    const { graph, nodes } = makeDiamondGraph();
+    const rootNodeIds = new Set([nodes.start.id]);
+    const whitelistedNodeIds = new Set([nodes.left.first.id, nodes.right.first.id, nodes.end.id]);
+
+    const connectedNodeIds = computeConnectivity({
+      graph,
+      rootNodeIds,
+      whitelistedNodeIds,
+    });
+
+    const expectedNodeIds = new Set([...rootNodeIds, ...whitelistedNodeIds]);
+
+    expect(connectedNodeIds.size).toBe(expectedNodeIds.size);
+
+    for (const expectedNodeId of expectedNodeIds) {
+      expect(connectedNodeIds.has(expectedNodeId)).toBe(true);
+    }
+  });
+
+  it("does not reach convergence node of diamond graph if all path are incomplete", () => {
+    const { graph, nodes } = makeDiamondGraph();
+    const rootNodeIds = new Set([nodes.start.id]);
+    const whitelistedNodeIds = new Set([nodes.right.first.id, nodes.end.id]);
+
+    const connectedNodeIds = computeConnectivity({
+      graph,
+      rootNodeIds,
+      whitelistedNodeIds,
+    });
+
+    const expectedNodeIds = new Set([...rootNodeIds, nodes.right.first.id]);
+
+    expect(connectedNodeIds.size).toBe(expectedNodeIds.size);
+
+    for (const expectedNodeId of expectedNodeIds) {
+      expect(connectedNodeIds.has(expectedNodeId)).toBe(true);
+    }
+  });
+
+  it("does not reach a disconnected island", () => {
+    const root = makeNode({ id: "0", kind: "classStart" });
+    const node1 = makeNode({ id: "1" });
+    const islandNode1 = makeNode({ id: "5" });
+    const islandNode2 = makeNode({ id: "6" });
+    const graph = buildGraph({
+      nodes: [root, node1, islandNode1, islandNode2],
+      edgePairs: [
+        [root.id, node1.id],
+        [islandNode1.id, islandNode2.id],
+      ],
+    });
+
+    const connectedNodeIds = computeConnectivity({
+      graph,
+      rootNodeIds: new Set([root.id]),
+      whitelistedNodeIds: new Set([node1.id, islandNode1.id, islandNode2.id]),
+    });
+    expect(connectedNodeIds).toEqual(new Set([root.id, node1.id]));
   });
 });
