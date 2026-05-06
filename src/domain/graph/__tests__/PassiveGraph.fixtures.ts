@@ -1,5 +1,6 @@
 import { makeEdgeKey } from "../edgeKeys";
 import type { GraphEdge } from "../GraphEdge";
+import type { AscendancyId } from "../PassiveAscendancy";
 import type { ClassId } from "../PassiveClass";
 import type { PassiveGraph } from "../PassiveGraph";
 import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "../PassiveNode";
@@ -64,6 +65,23 @@ export function buildGraph(params: {
   const startNodes = params.nodes.filter((n) => n.kind === "classStart");
   const allStartNodeIds = new Set<NodeId>(startNodes.map((n) => n.id));
 
+  const ascendancyStartNodes = params.nodes.filter((n) => n.kind === "ascendancyStart");
+  const ascendancyStartNodeIds = new Set<NodeId>(ascendancyStartNodes.map((n) => n.id));
+
+  const ascendancyStartNodeIdsByAscendancyId = new Map<AscendancyId, ReadonlySet<NodeId>>();
+
+  for (const n of ascendancyStartNodes) {
+    if (!n.ascendancyName) continue;
+    const existing = ascendancyStartNodeIdsByAscendancyId.get(n.ascendancyName) as
+      | Set<NodeId>
+      | undefined;
+    if (existing) {
+      existing.add(n.id);
+    } else {
+      ascendancyStartNodeIdsByAscendancyId.set(n.ascendancyName, new Set([n.id]));
+    }
+  }
+
   return {
     nodesById,
     groupsById: new Map(),
@@ -75,8 +93,8 @@ export function buildGraph(params: {
     allStartNodeIds,
     startNodeIdsByClassId: new Map([[classId, allStartNodeIds]]),
     classByStartNodeId: new Map(startNodes.map((n) => [n.id, classId])),
-    ascendancyStartNodeIds: new Set(),
-    ascendancyStartNodeIdsByAscendancyId: new Map(),
+    ascendancyStartNodeIds,
+    ascendancyStartNodeIdsByAscendancyId,
     ascendancyIdsByClassId: new Map([[classId, new Set()]]),
     edges,
   };
@@ -198,6 +216,12 @@ export interface DiamondGraphFixture {
     end: PassiveNode;
   };
 }
+
+/*
+ * Creates an asymetrical diamond graph :
+ * start -> left-1 -> end
+ * start -> right-1 -> right-2 -> end
+ * */
 
 export function makeDiamondGraph(): DiamondGraphFixture {
   const graph = buildGraph({
