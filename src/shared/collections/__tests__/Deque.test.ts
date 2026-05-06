@@ -70,4 +70,21 @@ describe("Deque", () => {
     expect(deque.size).toBe(0);
     expect(deque.isEmpty()).toBe(true);
   });
+
+  it("handles interleaved pushes and pops correctly", () => {
+    const deque = new Deque<number>();
+    deque.pushBack(1); // [1]
+
+    expect(deque.popFront()).toBe(1); // [1] → []
+
+    deque.pushBack(2); // [2]
+    deque.pushBack(3); // [2, 3]
+    expect(deque.popBack()).toBe(3); // [2, 3] → [2]
+
+    deque.pushFront(0); // [0, 2]
+    expect(deque.popFront()).toBe(0); // [0, 2] → [2]
+    expect(deque.popFront()).toBe(2); // [2] → []
+
+    expect(deque.isEmpty()).toBe(true);
+  });
 });
