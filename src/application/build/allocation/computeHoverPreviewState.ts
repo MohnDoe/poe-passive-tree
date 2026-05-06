@@ -12,7 +12,7 @@ export interface ComputeHoverPreviewStateParams {
   graph: PassiveGraph | null;
 }
 
-const defaultStates = {
+const emptyHighlight = {
   nodeIds: new Set<NodeId>(),
   edgeKeys: new Set<EdgeKey>(),
 };
@@ -22,65 +22,59 @@ export function computeHoverPreviewState({
   hoveredNodeId,
   graph,
 }: ComputeHoverPreviewStateParams): HoverPreviewState {
-  let previewState: HoverPreviewState = {
+  const defaultPreviewState: HoverPreviewState = {
     hoveredNodeId,
-    highlight: defaultStates,
-    refund: defaultStates,
+    highlight: emptyHighlight,
+    refund: emptyHighlight,
   };
 
   if (!allocationState || !hoveredNodeId || !graph) {
-    return previewState;
+    return defaultPreviewState;
   }
 
   const hoveredNodeState = allocationState.nodeStateById.get(hoveredNodeId);
-  if (!hoveredNodeState) return previewState;
-
-  console.log("hovered node state", hoveredNodeState);
-
-  if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) {
-    return previewState;
-  }
+  if (!hoveredNodeState) return defaultPreviewState;
+  if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) return defaultPreviewState;
 
   if (hoveredNodeState.allocated) {
     const refundAnalysis = getRefundAnalysis(hoveredNodeId, allocationState.nodeStateById, graph);
-    previewState = {
-      ...previewState,
+    return {
+      ...defaultPreviewState,
       refund: {
         nodeIds: refundAnalysis.refundedNodeIds,
         edgeKeys: refundAnalysis.refundedEdgeKeys,
       },
     };
-  } else {
-    const fullPath = hoveredNodeState.path ?? [];
-    const highlightedNodeIds = new Set<NodeId>(
-      fullPath.filter((id) => !allocationState.allocatedNodeIds.has(id)),
-    );
-
-    highlightedNodeIds.add(hoveredNodeId);
-
-    const highlightedEdgeKeys = makeEdgeKeysFromPath({ path: fullPath });
-
-    // For every node in the path (including hovered), add edges to any allocated neighbor.
-    // This covers: direct connections, loop-closing, and edges from intermediate
-    // path nodes to already-allocated nodes not on the BFS path.
-    for (const pathNodeId of highlightedNodeIds) {
-      for (const neighborId of graph.adjacency.get(pathNodeId) ?? []) {
-        if (allocationState.allocatedNodeIds.has(neighborId)) {
-          highlightedEdgeKeys.add(makeEdgeKey(pathNodeId, neighborId));
-        }
-      }
-    }
-
-    previewState = {
-      ...previewState,
-      highlight: {
-        nodeIds: highlightedNodeIds,
-        edgeKeys: highlightedEdgeKeys,
-      },
-    };
   }
 
-  console.log("previewState", previewState);
+  // Unallocated node
+  const fullPath = hoveredNodeState.path;
+  if (!fullPath) return defaultPreviewState;
 
-  return previewState;
+  const highlightedNodeIds = new Set<NodeId>(
+    fullPath.filter((id) => !allocationState.allocatedNodeIds.has(id)),
+  );
+
+  highlightedNodeIds.add(hoveredNodeId);
+
+  const highlightedEdgeKeys = makeEdgeKeysFromPath({ path: fullPath });
+
+  // For every node in the path (including hovered), add edges to any allocated neighbor.
+  // This covers: direct connections, loop-closing, and edges from intermediate
+  // path nodes to already-allocated nodes not on the BFS path.
+  for (const pathNodeId of highlightedNodeIds) {
+    for (const neighborId of graph.adjacency.get(pathNodeId) ?? []) {
+      if (allocationState.allocatedNodeIds.has(neighborId)) {
+        highlightedEdgeKeys.add(makeEdgeKey(pathNodeId, neighborId));
+      }
+    }
+  }
+
+  return {
+    ...defaultPreviewState,
+    highlight: {
+      nodeIds: highlightedNodeIds,
+      edgeKeys: highlightedEdgeKeys,
+    },
+  };
 }
