@@ -48,11 +48,6 @@ export function computeAllocationState({
     nodeStateById,
   });
 
-  const pathByNodeId = new Map<NodeId, NodeId[]>();
-  for (const [nodeId, nodeState] of nodeStateById) {
-    pathByNodeId.set(nodeId, nodeState.path ?? []);
-  }
-
   const dependencies = computeDependencies({
     graph,
     rootNodeIds,
