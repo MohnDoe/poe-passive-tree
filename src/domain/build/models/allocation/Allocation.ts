@@ -5,9 +5,10 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 export interface AllocationNodeState {
   id: NodeId;
 
-  // There is a valid path from a root
+  // There is a valid path to it from a root
   reachable: boolean;
-  // reachable and allowed by rules
+
+  // The node is *reachable* AND path cost fits point budget and/or rule set
   allocatable: boolean;
 
   allocated: boolean;
