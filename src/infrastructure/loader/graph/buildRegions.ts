@@ -1,8 +1,4 @@
-import type { MappedPassiveTree } from "@/infrastructure/passiveTree/mapping/MappedPassiveTree";
-import {
-  getNeighborIds,
-  isAscendancyTraversalNode,
-} from "@/domain/build/algorithms/rules/traversal";
+import { isAscendancyTraversalNode } from "@/domain/build/algorithms/rules/traversal";
 import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
 import type {
   NodeId,
@@ -10,6 +6,7 @@ import type {
   PassiveNodeRegion,
   PassiveNodeSubregion,
 } from "@/domain/graph/PassiveNode";
+import type { MappedPassiveTree } from "@/infrastructure/passiveTree/mapping/MappedPassiveTree";
 
 export interface RegionIndexes {
   regionByNodeId: PassiveGraph["regionByNodeId"];
@@ -64,7 +61,7 @@ export function discoverAscendancyNodes(
   const DFSRecursive = (node: PassiveNode) => {
     visited.add(node.id);
 
-    const neighbors = getNeighborIds(node.id, adj);
+    const neighbors = adj.get(node.id) ?? new Set();
 
     for (const neighbor of neighbors) {
       if (!visited.has(neighbor)) {

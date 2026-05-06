@@ -1,5 +1,5 @@
-import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
-import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
+import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
+import type { PassiveNode } from "@/domain/graph/PassiveNode";
 
 export function isAscendancyTraversalNode(node: PassiveNode) {
   if (node.kind === "jewel") return false;
@@ -10,10 +10,6 @@ export function isAscendancyTraversalNode(node: PassiveNode) {
     node.isMultipleChoiceOption ||
     node.kind == "proxy"
   );
-}
-
-export function getNeighborIds(nodeId: NodeId, adj: PassiveTreeAdjacency): Set<NodeId> {
-  return adj.get(nodeId) || new Set();
 }
 
 export function canExpandTo(graph: PassiveGraph, from: PassiveNode, to: PassiveNode): boolean {
