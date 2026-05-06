@@ -108,6 +108,8 @@ export function materializePath(
   targetNodeId: NodeId,
   predecessorByNodeId: ReadonlyMap<NodeId, NodeId | null>,
 ): NodeId[] {
+  // If the target itself has no entry, it was never reached by BFS
+  if (!predecessorByNodeId.has(targetNodeId)) return [];
   const reversedPath: NodeId[] = [];
   let currentNodeId: NodeId | null | undefined = targetNodeId;
 

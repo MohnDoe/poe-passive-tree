@@ -5,7 +5,8 @@ import {
   makeNode,
 } from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
 import { describe, expect, it } from "vitest";
-import { computeWeightedPaths } from "../pathfinding.ts";
+import { computeWeightedPaths, materializePath } from "../pathfinding.ts";
+import type { NodeId } from "@/domain/graph/PassiveNode.ts";
 
 describe("computeWeightedPaths", () => {
   it("root nodes have distance 0 and no predecessor", () => {
@@ -170,4 +171,54 @@ describe("computeWeightedPaths", () => {
   });
 });
 
-describe("materializePath", () => {});
+describe("materializePath", () => {
+  it("returns an empty array for an unreachable node", () => {
+    const emptyPredecessorByNodeId = new Map<NodeId, NodeId | null>();
+    // "C" has no entry at all
+
+    expect(materializePath("C", emptyPredecessorByNodeId)).toEqual([]);
+  });
+
+  it("returns only the root when target is a root node", () => {
+    const predecessorByNodeId = new Map<NodeId, NodeId | null>([["root", null]]);
+
+    expect(materializePath("root", predecessorByNodeId)).toEqual(["root"]);
+  });
+
+  it("returns [root, target] for a direct neighbour of root", () => {
+    const predecessorByNodeId = new Map<NodeId, NodeId | null>([
+      ["root", null],
+      ["A", "root"],
+    ]);
+
+    expect(materializePath("A", predecessorByNodeId)).toEqual(["root", "A"]);
+  });
+
+  it("returns the full path in root → target order and nothing more", () => {
+    const predecessorByNodeId = new Map<NodeId, NodeId | null>([
+      ["root", null],
+      ["A", "root"],
+      ["B", "A"],
+      ["C", "B"],
+    ]);
+
+    expect(materializePath("A", predecessorByNodeId)).toEqual(["root", "A"]);
+    expect(materializePath("B", predecessorByNodeId)).toEqual(["root", "A", "B"]);
+    expect(materializePath("C", predecessorByNodeId)).toEqual(["root", "A", "B", "C"]);
+  });
+
+  it("does not mutate the predecessor map", () => {
+    const predecessorByNodeId = new Map<NodeId, NodeId | null>([
+      ["root", null],
+      ["A", "root"],
+      ["B", "A"],
+    ]);
+    const sizeBefore = predecessorByNodeId.size;
+    const entriesBefore = [...predecessorByNodeId.entries()];
+
+    materializePath("B", predecessorByNodeId);
+
+    expect(predecessorByNodeId.size).toBe(sizeBefore);
+    expect([...predecessorByNodeId.entries()]).toEqual(entriesBefore);
+  });
+});
