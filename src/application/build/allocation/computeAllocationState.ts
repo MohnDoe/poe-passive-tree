@@ -39,7 +39,6 @@ export function computeAllocationState({
   applyWeightedPathsToNodeState({
     nodeStateById,
     weightedPaths,
-    allocatedNodeIds,
   });
 
   applyAllocationFlagsToNodeState({

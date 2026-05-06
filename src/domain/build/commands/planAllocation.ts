@@ -22,7 +22,7 @@ export function planAllocation(
 
   if (distance === undefined) return { ok: false, reason: "NODE_NOT_ALLOCATABLE" };
 
-  const path = materializePath(nodeId, predecessorByNodeId, build.allocatedNodeIds);
+  const path = materializePath(nodeId, predecessorByNodeId);
   const nextAllocatedNodeIds = new Set(build.allocatedNodeIds);
 
   for (const pathNodeId of path) {

@@ -1,5 +1,4 @@
 import { computeDependencies } from "@/domain/build/algorithms/dependencies";
-import { computeWeightedPaths, materializePath } from "@/domain/build/algorithms/pathfinding";
 import { computeRefundClosure } from "@/domain/build/algorithms/refund";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
@@ -17,20 +16,6 @@ export function planRefund(
     getActiveRootNodeIds(graph, build.activeClassId, build.activeAscendancy),
   );
 
-  const { predecessorByNodeId } = computeWeightedPaths({
-    graph,
-    rootNodeIds,
-    allocatedNodeIds: build.allocatedNodeIds,
-  });
-
-  const pathByNodeId = new Map<NodeId, NodeId[]>();
-  for (const allocatedId of build.allocatedNodeIds) {
-    pathByNodeId.set(
-      allocatedId,
-      materializePath(allocatedId, predecessorByNodeId, build.allocatedNodeIds),
-    );
-  }
-
   const { requiredByNodeId } = computeDependencies({
     graph,
     rootNodeIds,
@@ -47,7 +32,6 @@ export function planRefund(
   }
 
   const nextAllocatedNodeIds = new Set(build.allocatedNodeIds);
-
   for (const refundedNodeId of refundedIds) {
     nextAllocatedNodeIds.delete(refundedNodeId);
   }
