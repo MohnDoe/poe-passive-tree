@@ -65,7 +65,7 @@ describe("computeConnectivity", () => {
     expect(connectedNodeIds.has(nodes.second.id)).toBe(false);
   });
 
-  it("reach all branches of forked graph", () => {
+  it("reaches all branches of forked graph", () => {
     const { graph, nodes } = makeForkGraph();
 
     const whitelistedNodeIds = new Set<NodeId>([
@@ -89,18 +89,22 @@ describe("computeConnectivity", () => {
     }
   });
 
-  it("spreads from root nodes", () => {
+  it("spreads from root nodes in a disconnected graph", () => {
     const { graph, nodes } = makeLineGraph();
     const connectedNodeIds = computeConnectivity({
       graph,
       rootNodeIds: new Set([nodes.start.id, nodes.sixth.id]),
+      // 0 -- 1 || 5 -- 6
       whitelistedNodeIds: new Set([nodes.first.id, nodes.fifth.id]),
     });
 
-    expect(connectedNodeIds.size).toBe(4);
     expect(connectedNodeIds.has(nodes.second.id)).toBe(false);
+    expect(connectedNodeIds.has(nodes.third.id)).toBe(false);
+    expect(connectedNodeIds.has(nodes.fourth.id)).toBe(false);
 
     const expectedNodeIds = [nodes.first.id, nodes.fifth.id, nodes.start.id, nodes.sixth.id];
+    expect(connectedNodeIds.size).toBe(expectedNodeIds.length);
+
     for (const expectedNodeId of expectedNodeIds) {
       expect(connectedNodeIds.has(expectedNodeId)).toBe(true);
     }
