@@ -1,4 +1,4 @@
-import { computeConnectivity, computeDependencies } from "@/domain/build/algorithms/dependencies";
+import { computeDependencies } from "@/domain/build/algorithms/dependencies";
 import { computeWeightedPaths } from "@/domain/build/algorithms/pathfinding";
 import type {
   AllocationNodeState,
@@ -10,7 +10,6 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 import { computeEdgeKeysFromNodeIds } from "@/domain/graph/queries/computeEdgeKeysFromNodeIds";
 import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
 import { applyAllocationFlagsToNodeState } from "./analysis/applyAllocationFlagsToNodeState";
-import { applyConnectivityToNodeState } from "./analysis/applyConnectivityToNodeState";
 import { applyWeightedPathsToNodeState } from "./analysis/applyWeightedPathsToNodeState";
 import { mergeDependenciesIntoNodeState } from "./analysis/mergeDependenciesIntoNodeState";
 
@@ -49,11 +48,6 @@ export function computeAllocationState({
     nodeStateById,
   });
 
-  const pathByNodeId = new Map<NodeId, NodeId[]>();
-  for (const [nodeId, nodeState] of nodeStateById) {
-    pathByNodeId.set(nodeId, nodeState.path ?? []);
-  }
-
   const dependencies = computeDependencies({
     graph,
     rootNodeIds,
@@ -72,14 +66,6 @@ export function computeAllocationState({
         return nodeId;
       }),
   );
-
-  const connectedNodeIds = computeConnectivity({
-    allocatedNodeIds,
-    graph,
-    rootNodeIds,
-  });
-
-  applyConnectivityToNodeState(nodeStateById, connectedNodeIds);
 
   const activeEdgeKeys = computeEdgeKeysFromNodeIds(graph, allocatedNodeIds);
 
@@ -102,7 +88,6 @@ function createDefaultNodeState(
   for (const [nodeId] of nodesById) {
     out.set(nodeId, {
       id: nodeId,
-      connectedToStart: false,
       allocatable: false,
       reachable: false,
       allocated: allocatedNodeIds.has(nodeId),

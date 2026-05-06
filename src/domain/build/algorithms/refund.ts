@@ -28,7 +28,7 @@ export function computeRefundClosure(
   return out;
 }
 
-function computeRefundEdgeKeys(
+export function computeRefundEdgeKeys(
   refundedNodeIds: ReadonlySet<NodeId>,
   allocatedNodeIds: ReadonlySet<NodeId>,
   graph: PassiveGraph,
