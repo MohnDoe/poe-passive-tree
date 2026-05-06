@@ -24,8 +24,8 @@ export function applyAllocationFlagsToNodeState({
       continue;
     }
 
-    const costsSomething = nodeState.pathCost !== null && nodeState.pathCost > 0;
-    const cost = nodeState.pathCost ?? 0;
+    const costsSomething = nodeState.cheapestPathCost !== null && nodeState.cheapestPathCost > 0;
+    const cost = nodeState.cheapestPathCost ?? 0;
 
     const region = graph.regionByNodeId.get(nodeId);
 

@@ -26,14 +26,12 @@ export function getRefundAnalysis(
   }
 
   const allocatedNodeIds = new Set<NodeId>();
-  const pathByNodeId = new Map<NodeId, NodeId[]>();
   const requiredByNodeId = new Map<NodeId, Set<NodeId>>();
 
   for (const [nodeId, nodeState] of nodeStateById) {
     if (nodeState.allocated) {
       allocatedNodeIds.add(nodeId);
     }
-    pathByNodeId.set(nodeId, nodeState.path ?? []);
     requiredByNodeId.set(nodeId, new Set(nodeState.requiredBy ?? []));
   }
 

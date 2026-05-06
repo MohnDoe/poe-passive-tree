@@ -48,16 +48,15 @@ export function computeHoverPreviewState({
   }
 
   // Unallocated node
-  const fullPath = hoveredNodeState.path;
-  if (!fullPath) return defaultPreviewState;
+  const cheapestPath = hoveredNodeState.cheapestPath;
+  if (!cheapestPath) return defaultPreviewState;
 
   const highlightedNodeIds = new Set<NodeId>(
-    fullPath.filter((id) => !allocationState.allocatedNodeIds.has(id)),
+    cheapestPath.filter((id) => !allocationState.allocatedNodeIds.has(id)),
   );
-
   highlightedNodeIds.add(hoveredNodeId);
 
-  const highlightedEdgeKeys = makeEdgeKeysFromPath({ path: fullPath });
+  const highlightedEdgeKeys = makeEdgeKeysFromPath({ path: cheapestPath });
 
   // For every node in the path (including hovered), add edges to any allocated neighbor.
   // This covers: direct connections, loop-closing, and edges from intermediate

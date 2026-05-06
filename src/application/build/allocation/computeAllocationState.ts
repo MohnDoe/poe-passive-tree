@@ -90,8 +90,8 @@ function createDefaultNodeState(
       allocatable: false,
       reachable: false,
       allocated: allocatedNodeIds.has(nodeId),
-      path: null,
-      pathCost: null,
+      cheapestPath: null,
+      cheapestPathCost: null,
       dependsOn: new Set<NodeId>(),
       requiredBy: new Set<NodeId>(),
     });

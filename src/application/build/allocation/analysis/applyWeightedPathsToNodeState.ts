@@ -15,16 +15,16 @@ export function applyWeightedPathsToNodeState({
     const pathCost = weightedPaths.distanceByNodeId.get(nodeId) ?? null;
 
     if (pathCost === null) {
-      nodeState.pathCost = null;
-      nodeState.path = null;
+      nodeState.cheapestPathCost = null;
+      nodeState.cheapestPath = null;
       nodeState.reachable = false;
       continue;
     }
 
-    nodeState.pathCost = pathCost;
-    nodeState.path = materializePath(nodeId, weightedPaths.predecessorByNodeId);
+    nodeState.cheapestPathCost = pathCost;
+    nodeState.cheapestPath = materializePath(nodeId, weightedPaths.predecessorByNodeId);
 
-    if (nodeState.path.length > 0) {
+    if (nodeState.cheapestPath.length > 0) {
       nodeState.reachable = true;
     }
   }

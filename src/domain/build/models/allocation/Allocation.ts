@@ -13,8 +13,9 @@ export interface AllocationNodeState {
 
   allocated: boolean;
 
-  path: NodeId[] | null;
-  pathCost: number | null;
+  // Cheapest path to any root
+  cheapestPath: NodeId[] | null;
+  cheapestPathCost: number | null;
 
   dependsOn: Set<NodeId>;
   requiredBy: ReadonlySet<NodeId>;
