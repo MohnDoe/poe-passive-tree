@@ -41,7 +41,7 @@ describe("computeRefundClosure", () => {
     expect(refundedNodeIds.has("2")).toBe(true);
   });
 
-  it("refunds a node that cascades to a chain of dependants - fork", () => {
+  it("refunds a node that cascades to a chain of dependants - fanning out", () => {
     const targetNodeId = "refund-me";
     const allocatedNodeIds = new Set(["refund-me", "1", "2a", "2b", "3a", "3b"]);
     // refund-me -- 1 -- [2a -- 3a, 2b -- 3b]
