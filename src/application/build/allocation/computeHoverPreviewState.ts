@@ -1,6 +1,6 @@
-import { analyzeRefundTarget } from "@/domain/build/algorithms/refund";
 import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
+import { getRefundAnalysis } from "@/domain/build/selectors/getRefundAnalysis";
 import { makeEdgeKey, makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
@@ -42,7 +42,7 @@ export function computeHoverPreviewState({
   }
 
   if (hoveredNodeState.allocated) {
-    const refundAnalysis = analyzeRefundTarget(hoveredNodeId, allocationState.nodeStateById, graph);
+    const refundAnalysis = getRefundAnalysis(hoveredNodeId, allocationState.nodeStateById, graph);
     previewState = {
       ...previewState,
       refund: {
