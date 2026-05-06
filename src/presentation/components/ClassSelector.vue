@@ -27,7 +27,7 @@ const selectedAscendancyId = computed({
 });
 </script>
 <template>
-  <div>
+  <div class="class-selection">
     <select v-model="selectedClassId">
       <option disabled :value="null">Choose a class</option>
       <option v-for="[classId, pClass] of graph?.classesById" :key="classId" :value="classId">
@@ -46,3 +46,9 @@ const selectedAscendancyId = computed({
     </select>
   </div>
 </template>
+<style scoped>
+.class-selection {
+  display: flex;
+  gap: 8px;
+}
+</style>

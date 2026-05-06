@@ -5,10 +5,13 @@ const { pointSummary } = usePointBudgetSummary();
 </script>
 
 <template>
-  <section v-if="pointSummary">
-    <p>
-      {{ pointSummary.remaining.passive }}/{{ pointSummary.budget.passive }} -
-      {{ pointSummary.remaining.ascendancy }}/{{ pointSummary.budget.ascendancy }}
-    </p>
-  </section>
+  <span v-if="pointSummary">
+    {{ pointSummary.remaining.passive }}/{{ pointSummary.budget.passive }} -
+    {{ pointSummary.remaining.ascendancy }}/{{ pointSummary.budget.ascendancy }}
+  </span>
 </template>
+<style scoped>
+span {
+  color: white;
+}
+</style>
