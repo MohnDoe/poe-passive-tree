@@ -75,13 +75,3 @@ export interface PassiveTreeExpansionJewelDto {
 }
 
 export const ROOT_NODE_ID = "root" as const;
-
-export function isPassiveNode(
-  node: PassiveTreeNodeEntryDto | undefined,
-): node is PassiveTreeNodeDto {
-  return !!node && typeof (node as PassiveTreeNodeDto).skill === "number";
-}
-
-export function isRootNodeId(id: string): id is typeof ROOT_NODE_ID {
-  return id === ROOT_NODE_ID;
-}

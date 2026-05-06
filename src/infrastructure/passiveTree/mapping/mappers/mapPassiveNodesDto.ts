@@ -1,7 +1,7 @@
 import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
+import type { PassiveTreeNodeDto, PassiveTreeNodeEntryDto } from "../../dto/passiveTree/Nodes.dto";
 import type { PassiveTreeDto } from "../../dto/passiveTree/PassiveSkillTree.dto";
 import type { MappedPassiveTree } from "../MappedPassiveTree";
-import { isPassiveNode } from "../../dto/passiveTree/Nodes.dto";
 import { mapPassiveNodeDto } from "./mapPassiveNodeDto";
 
 export function mapPassiveNodesDto(tree: PassiveTreeDto): MappedPassiveTree["nodesById"] {
@@ -16,4 +16,8 @@ export function mapPassiveNodesDto(tree: PassiveTreeDto): MappedPassiveTree["nod
   }
 
   return out;
+}
+
+function isPassiveNode(node: PassiveTreeNodeEntryDto | undefined): node is PassiveTreeNodeDto {
+  return !!node && typeof (node as PassiveTreeNodeDto).skill === "number";
 }
