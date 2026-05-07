@@ -1,11 +1,12 @@
+const NORMAL_BASE = 50;
 export const passiveTreeTheme = {
   nodes: {
     sizeByKind: {
-      normal: 40,
-      notable: 55,
-      mastery: 70,
-      keystone: 85,
-      jewel: 55,
+      normal: NORMAL_BASE,
+      notable: NORMAL_BASE * 1.5,
+      mastery: NORMAL_BASE * 1.5,
+      keystone: NORMAL_BASE * 2.3,
+      jewel: NORMAL_BASE * 1.3,
       proxy: 25,
       ascendancyStart: 20,
       classStart: 200,
