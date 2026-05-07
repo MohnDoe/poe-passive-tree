@@ -1,11 +1,11 @@
 import type {
   PassiveTreeRenderAssets,
   SpriteCategory,
+  SpriteCategoryName,
   ZoomLevel,
 } from "@/domain/graph/PassiveTreeRenderAssets";
 import { Assets, Rectangle, Texture } from "pixi.js";
-import type { NodeBuildState, NodeHoverState, NodeRenderModel } from "./models/Node";
-import { resolveSpriteCategoryName } from "./theme/spriteCategory.resolver";
+import type { NodeRenderModel } from "./models/Node";
 
 function nearestZoomLevel(target: number, available: ZoomLevel[]): ZoomLevel {
   return available.reduce((best, z) => (Math.abs(z - target) < Math.abs(best - target) ? z : best));
@@ -29,12 +29,9 @@ export class PassiveTreeAssetStore {
 
   getNodeIconTexture(
     model: NodeRenderModel,
-    build: NodeBuildState,
-    hover: NodeHoverState,
+    categoryName: SpriteCategoryName,
     currentZoom: number,
   ): Texture {
-    const categoryName = resolveSpriteCategoryName(model.kind, build, hover);
-
     const spriteCategoryIndex = this.renderAssets.sprites[categoryName] as SpriteCategory;
 
     const zoomLevel = nearestZoomLevel(
@@ -51,13 +48,6 @@ export class PassiveTreeAssetStore {
     if (!coords) return Texture.EMPTY;
 
     const baseTexture = Assets.get(this.renderAssets.imageRoot + sheet.filename);
-
-    console.log({
-      categoryName,
-      zoom: currentZoom,
-      zoomLevel,
-      baseTexture,
-    });
 
     const tex = new Texture({
       source: baseTexture.source,

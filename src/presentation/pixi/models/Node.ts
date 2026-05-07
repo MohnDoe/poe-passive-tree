@@ -1,5 +1,5 @@
 import type { NodeId, PassiveNodeKind } from "@/domain/graph/PassiveNode";
-import type { Container } from "pixi.js";
+import type { SpriteCategoryName } from "@/domain/graph/PassiveTreeRenderAssets";
 
 export interface NodeRenderModel {
   id: NodeId;
@@ -21,20 +21,11 @@ export interface NodeHoverState {
 }
 
 export interface NodeVisualStyle {
-  radius: number;
-  alpha: number;
-  scale: number;
+  size: number;
+  iconSpriteCategory: SpriteCategoryName;
 }
 
 export interface NodeViewCallbacks {
   onClick?: (nodeId: NodeId) => void;
   onHover?: (nodeId: NodeId | null) => void;
-}
-
-export interface NodeView {
-  id: NodeId;
-  container: Container;
-  updateBuildState: (state: NodeBuildState) => void;
-  updateHoverState: (state: NodeHoverState) => void;
-  destroy: () => void;
 }

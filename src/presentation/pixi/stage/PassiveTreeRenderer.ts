@@ -3,7 +3,7 @@ import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { Container, Graphics } from "pixi.js";
 import type { EdgeRenderModel, EdgeView } from "../models/Edge";
-import type { NodeRenderModel, NodeView } from "../models/Node";
+import type { NodeRenderModel } from "../models/Node";
 import type {
   GroupBackgroundRenderModel,
   TreeRendererCallbacks,
@@ -11,8 +11,8 @@ import type {
   TreeVisualStateModel,
 } from "../models/Render";
 import { createEdgeView } from "../views/edge.view";
-import { createNodeView } from "../views/node.view";
 import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
+import { NodeView } from "../views/NodeView";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -93,13 +93,9 @@ export class PassiveTreeRenderer {
     this.nodeLayer.removeChildren();
 
     for (const node of nodes) {
-      const view = createNodeView({
-        model: node,
-        assetStore: this.assetStore,
-        callbacks: {
-          onClick: this.callbacks.onNodeClick,
-          onHover: this.callbacks.onNodeHover,
-        },
+      const view = new NodeView(node, this.assetStore, {
+        onClick: this.callbacks.onNodeClick,
+        onHover: this.callbacks.onNodeHover,
       });
 
       this.nodeViews.set(node.id, view);

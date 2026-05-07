@@ -1,6 +1,6 @@
 export const passiveTreeTheme = {
   nodes: {
-    radiusByKind: {
+    sizeByKind: {
       normal: 40,
       notable: 55,
       mastery: 70,
