@@ -1,8 +1,11 @@
 # Path of Exile's passive tree in TypeScript
 
-![TypeScript](https://img.shields.io/badge/TypeScript-6-blue?logo=typescript)
-![Vue](https://img.shields.io/badge/Vue-3-42b883?logo=vue.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)
+![Vue.js](https://img.shields.io/badge/Vue.js-4FC08D?logo=vuedotjs&logoColor=fff)
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=fff) 
 ![Pixi.js](https://img.shields.io/badge/Pixi.js-8-e91e63)
+![Coverage](https://img.shields.io/badge/Coverage-25%25-red)
+
 
 A faithful, interactive recreation of the **Path of Exile passive skill tree** built as a modern web application. This is a personal deep-dive project combining complex graph data structures, high-performance WebGL rendering, and clean domain-driven architecture.
 
