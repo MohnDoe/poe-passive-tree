@@ -1,4 +1,4 @@
-import type { PassiveTreeAssetsDto, PassiveTreeExtraImageDto } from "./Assets.dto";
+import type { PassiveTreeExtraImageDto } from "./Assets.dto";
 import type { PassiveTreeClassDto } from "./Classes.dto";
 import type { PassiveTreeConstantsDto } from "./Constants.dto";
 import type { PassiveTreeGroupDto } from "./Groups.dto";
@@ -24,12 +24,9 @@ export interface PassiveTreeDto {
   max_x: number;
   max_y: number;
 
-  /** Asset paths per zoom level (frame borders, etc.). */
-  assets: PassiveTreeAssetsDto;
-
   constants: PassiveTreeConstantsDto;
 
-  skillSprites: PassiveTreeSkillSpritesDto;
+  sprites: PassiveTreeSkillSpritesDto;
 
   imageZoomLevels: number[];
 }
