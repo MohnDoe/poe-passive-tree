@@ -14,7 +14,9 @@
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint .",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "sync:assets": "bun run scripts/sync-tree-assets.ts",
+    "sync:assets:force": "bun run scripts/sync-tree-assets.ts --force"
   },
   "dependencies": {
     "pinia": "^3.0.4",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
+    "@types/bun": "^1.3.13",
     "@types/jsdom": "^28.0.1",
     "@types/node": "^24.12.2",
     "@vitejs/plugin-vue": "^6.0.6",

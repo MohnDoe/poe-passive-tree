@@ -54,6 +54,7 @@ export type SpriteCategoryName =
 export type SpriteIndex = Record<SpriteCategoryName, SpriteCategory>;
 
 export interface PassiveTreeRenderAssets {
+  imageRoot: string;
   zoomLevels: ZoomLevel[];
   sprites: SpriteIndex;
 }

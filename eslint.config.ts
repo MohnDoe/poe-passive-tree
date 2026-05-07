@@ -32,7 +32,7 @@ export default defineConfigWithVueTs(
   skipFormatting,
 
   {
-    ignores: ["src/App.vue", "src/main.ts", "src/utils/**/*"],
+    ignores: ["src/App.vue", "src/main.ts", "scripts/**/*"],
     files: ["src/**/*.{js,ts,vue}"],
     plugins: {
       boundaries,
