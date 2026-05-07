@@ -13,7 +13,11 @@ export interface SpriteSheet {
   coords: Record<string, SpriteCoords>; // key: node.icon path
 }
 
-export type SpriteCategory =
+export interface SpriteCategory {
+  [zoom: number]: SpriteSheet;
+}
+
+export type SpriteCategoryName =
   | "background"
   | "normalActive"
   | "notableActive"
@@ -47,7 +51,7 @@ export type SpriteCategory =
   | "line"
   | "jewelRadius";
 
-export type SpriteIndex = Record<SpriteCategory, SpriteSheet[]>;
+export type SpriteIndex = Record<SpriteCategoryName, SpriteCategory>;
 
 export interface PassiveTreeRenderAssets {
   zoomLevels: ZoomLevel[];
