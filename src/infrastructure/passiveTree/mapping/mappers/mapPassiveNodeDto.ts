@@ -22,6 +22,7 @@ export function mapPassiveNodeDto(
     orbit: raw.orbit ?? 0,
     orbitIndex: raw.orbit ?? 0,
     stats: raw.stats,
+    icon: raw.icon,
     kind: getPassiveNodeKind(raw),
     groupId: raw.group?.toString() ?? undefined,
     position: getPassiveNodePosition(nodeId, tree),

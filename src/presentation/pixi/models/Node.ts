@@ -6,6 +6,7 @@ export interface NodeRenderModel {
   x: number;
   y: number;
   kind: PassiveNodeKind;
+  icon: string;
 }
 
 export interface NodeBuildState {

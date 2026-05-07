@@ -33,6 +33,7 @@ export interface PassiveNode extends PassiveRootNode {
   id: NodeId;
   name: string;
   stats: string[];
+  icon: string;
   position?: PassiveNodePosition;
   kind: PassiveNodeKind;
   isMultipleChoice: boolean;
