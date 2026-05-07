@@ -14,7 +14,7 @@ const uiStore = useUiStore();
 const runtimeStore = useRuntimeStore();
 const treeInteraction = useTreeInteraction();
 
-const { graph } = storeToRefs(runtimeStore);
+const { graph, assets } = storeToRefs(runtimeStore);
 const { treeVisualState } = usePassiveTreeVisualState();
 const { hoverPreviewState } = storeToRefs(useAllocationStore());
 
@@ -34,13 +34,13 @@ const defaultHoverPreviewState: HoverPreviewState = {
 };
 
 onMounted(async () => {
-  if (!hostRef.value || !graph.value) return;
+  if (!hostRef.value || !graph.value || !assets.value) return;
 
   const nextStage = new PassiveTreeStage();
 
   stage.value = nextStage;
 
-  await nextStage.mount(hostRef.value, {
+  await nextStage.mount(hostRef.value, assets.value, {
     onNodeClick: (nodeId) => {
       console.log("Click node", nodeId);
       treeInteraction.toggleNode(nodeId);

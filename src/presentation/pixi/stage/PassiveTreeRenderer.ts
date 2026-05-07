@@ -12,6 +12,7 @@ import type {
 } from "../models/Render";
 import { createEdgeView } from "../views/edge.view";
 import { createNodeView } from "../views/node.view";
+import type { PassiveTreeAssetStore } from "../assets";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -19,6 +20,7 @@ export interface PassiveTreeRendererDeps {
   nodeLayer: Container;
   overlayLayer: Container;
   callbacks: TreeRendererCallbacks;
+  assetStore: PassiveTreeAssetStore;
 }
 
 export class PassiveTreeRenderer {
@@ -27,6 +29,7 @@ export class PassiveTreeRenderer {
   private readonly nodeLayer: Container;
   private readonly overlayLayer: Container;
   private readonly callbacks: TreeRendererCallbacks;
+  private readonly assetStore: PassiveTreeAssetStore;
 
   private nodeViews = new Map<NodeId, NodeView>();
   private edgeViews = new Map<EdgeKey, EdgeView>();
@@ -38,6 +41,7 @@ export class PassiveTreeRenderer {
     this.nodeLayer = deps.nodeLayer;
     this.overlayLayer = deps.overlayLayer;
     this.callbacks = deps.callbacks;
+    this.assetStore = deps.assetStore;
   }
 
   public render(scene: TreeSceneRenderModel): void {
@@ -89,9 +93,13 @@ export class PassiveTreeRenderer {
     this.nodeLayer.removeChildren();
 
     for (const node of nodes) {
-      const view = createNodeView(node, {
-        onClick: this.callbacks.onNodeClick,
-        onHover: this.callbacks.onNodeHover,
+      const view = createNodeView({
+        model: node,
+        assetStore: this.assetStore,
+        callbacks: {
+          onClick: this.callbacks.onNodeClick,
+          onHover: this.callbacks.onNodeHover,
+        },
       });
 
       this.nodeViews.set(node.id, view);

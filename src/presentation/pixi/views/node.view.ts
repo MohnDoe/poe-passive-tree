@@ -1,14 +1,15 @@
-import { Container, Graphics } from "pixi.js";
+import { makeShallowEqual } from "@/shared/utils/utils";
+import { Container, Sprite } from "pixi.js";
+import type { PassiveTreeAssetStore } from "../assets";
 import type {
-  NodeRenderModel,
   NodeBuildState,
+  NodeHoverState,
+  NodeRenderModel,
   NodeView,
   NodeViewCallbacks,
   NodeVisualStyle,
-  NodeHoverState,
 } from "../models/Node";
 import { resolveNodeStyle } from "../theme/nodeStyle.resolver";
-import { makeShallowEqual } from "@/shared/utils/utils";
 
 const defaultBuildState: NodeBuildState = {
   isAllocated: false,
@@ -21,14 +22,21 @@ const defaultHoverState: NodeHoverState = {
   isInRefundPath: false,
 };
 
-export function createNodeView(
-  model: NodeRenderModel,
-  callbacks: NodeViewCallbacks = {},
-): NodeView {
+export interface CreateNodeViewParams {
+  model: NodeRenderModel;
+  assetStore: PassiveTreeAssetStore;
+  callbacks: NodeViewCallbacks;
+}
+
+export function createNodeView({
+  model,
+  assetStore,
+  callbacks = {},
+}: CreateNodeViewParams): NodeView {
   let currentBuildState = { ...defaultBuildState };
   let currentHoverState = { ...defaultHoverState };
 
-  let currentStyle = resolveNodeStyle(model, currentBuildState, currentHoverState);
+  let currentStyle = resolveNodeStyle(model);
 
   const container = new Container({
     position: { x: model.x, y: model.y },
@@ -37,24 +45,25 @@ export function createNodeView(
     cursor: "pointer",
   });
 
-  const visible = new Graphics();
-
-  container.addChild(visible);
+  const iconSprite = new Sprite();
+  container.addChild(iconSprite);
 
   const draw = (style: NodeVisualStyle) => {
-    // use sprite later
-    const { radius, fill, scale, alpha } = style;
+    const { scale, alpha, radius } = style;
 
-    visible.clear();
-    visible.circle(0, 0, radius);
-    visible.fill(fill);
+    //TODO: use currentZoom from stage
+    const texture = assetStore.getNodeIconTexture(model, currentBuildState, currentHoverState, 1);
+
+    iconSprite.texture = texture;
+    iconSprite.anchor.set(0.5);
+    iconSprite.setSize(radius);
 
     container.scale.set(scale);
     container.alpha = alpha;
   };
 
   const redraw = () => {
-    const nextStyle = resolveNodeStyle(model, currentBuildState, currentHoverState);
+    const nextStyle = resolveNodeStyle(model);
 
     if (!sameStyle(currentStyle, nextStyle)) {
       draw(nextStyle);
@@ -113,7 +122,6 @@ const sameHoverState = makeShallowEqual<NodeHoverState>({
 
 const sameStyle = makeShallowEqual<NodeVisualStyle>({
   alpha: true,
-  fill: true,
   radius: true,
   scale: true,
 });

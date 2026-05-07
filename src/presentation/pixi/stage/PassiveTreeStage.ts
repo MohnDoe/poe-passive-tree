@@ -7,6 +7,8 @@ import type {
   TreeVisualStateModel,
 } from "../models/Render";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
+import type { PassiveTreeRenderAssets } from "@/domain/graph/PassiveTreeRenderAssets";
+import { PassiveTreeAssetStore } from "../assets";
 
 export interface PassiveTreeStageOptions {
   backgroundColor?: number;
@@ -39,6 +41,7 @@ export class PassiveTreeStage {
 
   public async mount(
     host: HTMLElement,
+    renderAssets: PassiveTreeRenderAssets,
     callbacks: TreeRendererCallbacks,
     options: PassiveTreeStageOptions = {},
   ): Promise<void> {
@@ -70,12 +73,16 @@ export class PassiveTreeStage {
     this.viewport.addChild(this.world);
     this.app.stage.addChild(this.viewport);
 
+    const assetStore = new PassiveTreeAssetStore(renderAssets);
+    await assetStore.preloadAll();
+
     this.renderer = new PassiveTreeRenderer({
       backgroundLayer: this.backgroundLayer,
       edgeLayer: this.edgeLayer,
       nodeLayer: this.nodeLayer,
       overlayLayer: this.overlayLayer,
       callbacks,
+      assetStore,
     });
 
     // debug

@@ -22,7 +22,6 @@ export interface NodeHoverState {
 
 export interface NodeVisualStyle {
   radius: number;
-  fill: number;
   alpha: number;
   scale: number;
 }
