@@ -1,6 +1,6 @@
 import { makeShallowEqual } from "@/shared/utils/utils";
 import { Container, Sprite } from "pixi.js";
-import type { PassiveTreeAssetStore } from "../assets";
+import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 import type {
   NodeBuildState,
   NodeHoverState,

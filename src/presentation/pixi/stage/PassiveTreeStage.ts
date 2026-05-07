@@ -8,7 +8,7 @@ import type {
 } from "../models/Render";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
 import type { PassiveTreeRenderAssets } from "@/domain/graph/PassiveTreeRenderAssets";
-import { PassiveTreeAssetStore } from "../assets";
+import { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 
 export interface PassiveTreeStageOptions {
   backgroundColor?: number;

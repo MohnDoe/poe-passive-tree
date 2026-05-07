@@ -12,7 +12,7 @@ import type {
 } from "../models/Render";
 import { createEdgeView } from "../views/edge.view";
 import { createNodeView } from "../views/node.view";
-import type { PassiveTreeAssetStore } from "../assets";
+import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
