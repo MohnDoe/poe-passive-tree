@@ -1,4 +1,5 @@
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
+import type { PassiveTreeRenderAssets, ZoomLevel } from "@/domain/graph/PassiveTreeRenderAssets";
 import { Viewport } from "pixi-viewport";
 import { Application, Container } from "pixi.js";
 import type {
@@ -6,10 +7,10 @@ import type {
   TreeSceneRenderModel,
   TreeVisualStateModel,
 } from "../models/Render";
+import { PassiveTreeAssetStore, snapZoomLevel } from "../PassiveTreeAssetStore";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
-import type { PassiveTreeRenderAssets } from "@/domain/graph/PassiveTreeRenderAssets";
-import { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
-
+const VIEWPORT_ZOOM_MIN = 0.5; // can zoom out a bit from initial fit
+const VIEWPORT_ZOOM_MAX = 10; // can zoom into individual nodes clearly
 export interface PassiveTreeStageOptions {
   backgroundColor?: number;
   antialias?: boolean;
@@ -39,6 +40,8 @@ export class PassiveTreeStage {
   private viewport: Viewport | null = null;
   private renderer: PassiveTreeRenderer | null = null;
 
+  private zoomLevel: ZoomLevel = 0.1246;
+
   public async mount(
     host: HTMLElement,
     renderAssets: PassiveTreeRenderAssets,
@@ -64,7 +67,21 @@ export class PassiveTreeStage {
       events: this.app.renderer.events,
     });
 
-    this.viewport.drag().pinch().wheel().decelerate();
+    this.viewport.drag().pinch().wheel().decelerate().clampZoom({
+      minScale: VIEWPORT_ZOOM_MIN,
+      maxScale: VIEWPORT_ZOOM_MAX,
+    });
+
+    this.zoomLevel = snapZoomLevel(this.getEffectiveZoom(this.viewport), renderAssets.zoomLevels);
+
+    this.viewport.on("zoomed", ({ viewport }) => {
+      const effectiveZoom = this.getEffectiveZoom(viewport);
+
+      const next = snapZoomLevel(effectiveZoom, renderAssets.zoomLevels);
+      if (next === this.zoomLevel) return; // still in same band, skip
+      this.zoomLevel = next;
+      this.updateZoomLevel(this.zoomLevel);
+    });
 
     this.host.appendChild(app.canvas);
 
@@ -100,6 +117,11 @@ export class PassiveTreeStage {
     this.render(scene);
   }
 
+  public updateZoomLevel(zl: ZoomLevel): void {
+    if (!this.renderer) return;
+    this.renderer.updateZoomLevel(zl);
+  }
+
   public updateVisualStates(state: TreeVisualStateModel): void {
     this.updateNodeStates(state);
     this.updateEdgeStates(state);
@@ -125,6 +147,11 @@ export class PassiveTreeStage {
   }): void {
     if (!this.renderer) return;
     this.renderer.updateHoverState({ current, previous });
+  }
+
+  private getEffectiveZoom(viewport?: Viewport): number {
+    const viewportScale = viewport?.scale.x ?? 1;
+    return (viewportScale - VIEWPORT_ZOOM_MIN) / (VIEWPORT_ZOOM_MAX - VIEWPORT_ZOOM_MIN);
   }
 
   public fitToBounds(bounds: { minX: number; minY: number; maxX: number; maxY: number }): void {

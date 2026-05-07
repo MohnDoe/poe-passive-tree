@@ -7,8 +7,10 @@ import type {
 import { Assets, Rectangle, Texture } from "pixi.js";
 import type { NodeRenderModel } from "./models/Node";
 
-function nearestZoomLevel(target: number, available: ZoomLevel[]): ZoomLevel {
-  return available.reduce((best, z) => (Math.abs(z - target) < Math.abs(best - target) ? z : best));
+export function snapZoomLevel(target: number, available: ZoomLevel[]): ZoomLevel {
+  return available.reduce((best, candidate) =>
+    Math.abs(candidate - target) < Math.abs(best - target) ? candidate : best,
+  );
 }
 
 export class PassiveTreeAssetStore {
@@ -34,7 +36,7 @@ export class PassiveTreeAssetStore {
   ): Texture {
     const spriteCategoryIndex = this.renderAssets.sprites[categoryName] as SpriteCategory;
 
-    const zoomLevel = nearestZoomLevel(
+    const zoomLevel = snapZoomLevel(
       currentZoom,
       Object.keys(spriteCategoryIndex).map((zoom) => Number(zoom) as ZoomLevel),
     );

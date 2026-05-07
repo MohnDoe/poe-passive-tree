@@ -13,6 +13,7 @@ import type {
 import { createEdgeView } from "../views/edge.view";
 import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 import { NodeView } from "../views/NodeView";
+import type { ZoomLevel } from "@/domain/graph/PassiveTreeRenderAssets";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -102,25 +103,6 @@ export class PassiveTreeRenderer {
       this.nodeLayer.addChild(view.container);
     }
   }
-
-  // private renderOverlays(scene: TreeSceneRenderModel): void {
-  //   this.overlayLayer.removeChildren();
-  //
-  //   if (!scene.highlightedPath.length) return;
-  //
-  //   const graphics = new Graphics();
-  //
-  //   graphics.moveTo(scene.highlightedPath[0]!.x, scene.highlightedPath[0]!.y);
-  //
-  //   for (let i = 1; i < scene.highlightedPath.length; i += 1) {
-  //     const point = scene.highlightedPath[i]!;
-  //     graphics.lineTo(point.x, point.y);
-  //   }
-  //
-  //   graphics.stroke({ color: 0xffd166, width: 6, alpha: 0.85 });
-  //
-  //   this.overlayLayer.addChild(graphics);
-  // }
 
   private createBackgroundView(background: GroupBackgroundRenderModel): Graphics {
     const graphics = new Graphics();
@@ -212,5 +194,13 @@ export class PassiveTreeRenderer {
         isInRefundPath: current.refund.edgeKeys.has(edgeKey),
       });
     }
+  }
+
+  public updateZoomLevel(zoom: ZoomLevel): void {
+    console.log("updateZoomLevel", zoom);
+    for (const view of this.nodeViews.values()) {
+      view.updateZoomLevel(zoom);
+    }
+    // Later: same for edge views, group background views
   }
 }

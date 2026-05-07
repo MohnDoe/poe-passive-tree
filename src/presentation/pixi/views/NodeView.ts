@@ -98,19 +98,18 @@ export class NodeView implements INodeView {
   updateBuildState(next: NodeBuildState) {
     if (sameBuildState(this.#buildState, next)) return;
     this.#buildState = next;
-    this.#redraw();
+    this.#redraw(this.#zoomLevel);
   }
 
   updateHoverState(next: NodeHoverState) {
     if (sameHoverState(this.#hoverState, next)) return;
     this.#hoverState = next;
-    this.#redraw();
+    this.#redraw(this.#zoomLevel);
   }
 
   updateZoomLevel(nextZoomLevel: ZoomLevel) {
     if (this.#zoomLevel === nextZoomLevel) return;
-    this.#zoomLevel = nextZoomLevel;
-    this.#redraw();
+    this.#redraw(nextZoomLevel);
   }
 
   destroy() {
@@ -132,11 +131,12 @@ export class NodeView implements INodeView {
     this.iconSprite.setSize(size);
   }
 
-  #redraw() {
+  #redraw(nextZoomLevel: ZoomLevel) {
     const nextStyle = resolveNodeStyle(this.model, this.#buildState, this.#hoverState);
-    if (!sameStyle(this.#style, nextStyle)) {
+    if (!sameStyle(this.#style, nextStyle) || this.#zoomLevel !== nextZoomLevel) {
       this.#draw(nextStyle);
       this.#style = nextStyle;
+      this.#zoomLevel = nextZoomLevel;
     }
   }
 
