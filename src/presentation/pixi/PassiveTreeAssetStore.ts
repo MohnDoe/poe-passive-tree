@@ -46,25 +46,16 @@ export class PassiveTreeAssetStore {
       currentZoom,
       this.getSpriteSheetIndexAvailableZoomLevels(categorySpriteSheetIndex),
     );
-    const cacheKey = `${model.id}|${categoryName}|${zoomLevel}`;
-    const cached = this.getCachedTexture(cacheKey);
-    if (cached) return cached;
 
     const sheet = categorySpriteSheetIndex[zoomLevel];
     if (!sheet) return Texture.EMPTY;
 
     const tex = this.getTextureFromSheet(sheet, model.icon);
 
-    this.textureCache.set(cacheKey, tex);
-
     return tex;
   }
 
-  getNodeFrameTexture(
-    model: NodeRenderModel,
-    frameCoordsKey: string,
-    currentZoom: ZoomLevel,
-  ): Texture {
+  getNodeFrameTexture(frameCoordsKey: string, currentZoom: ZoomLevel): Texture {
     const frameSpriteSheetIndex = this.renderAssets.sprites["frame"];
     if (!frameSpriteSheetIndex) {
       console.error("Missing 'frame' spritesheet");
@@ -76,29 +67,34 @@ export class PassiveTreeAssetStore {
       this.getSpriteSheetIndexAvailableZoomLevels(frameSpriteSheetIndex),
     );
 
-    const cacheKey = `${model.kind}|frame|${zoomLevel}`;
-    const cached = this.getCachedTexture(cacheKey);
-    if (cached) return cached;
-
     const sheet = frameSpriteSheetIndex[zoomLevel];
     if (!sheet) return Texture.EMPTY;
 
     const tex = this.getTextureFromSheet(sheet, frameCoordsKey);
 
-    this.textureCache.set(cacheKey, tex);
-
     return tex;
   }
 
   getTextureFromSheet(sheet: SpriteSheet, coordsKey: string): Texture {
+    const cacheKey = `${sheet.filename}|${coordsKey}`;
+    const cached = this.getCachedTexture(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    console.warn("texture cache miss", cacheKey);
+
     const coords = sheet.coords[coordsKey];
     if (!coords) return Texture.EMPTY;
 
     const baseTexture = Assets.get(this.renderAssets.imageRoot + sheet.filename);
-    return new Texture({
+    const tex = new Texture({
       source: baseTexture.source,
       frame: new Rectangle(coords.x, coords.y, coords.w, coords.h),
     });
+
+    this.textureCache.set(cacheKey, tex);
+    return tex;
   }
 
   getCachedTexture(key: string): Texture | undefined {
