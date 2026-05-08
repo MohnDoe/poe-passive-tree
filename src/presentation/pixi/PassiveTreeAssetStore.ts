@@ -5,8 +5,9 @@ import type {
   SpriteSheet,
   ZoomLevel,
 } from "@/domain/graph/PassiveTreeRenderAssets";
-import { Assets, Rectangle, Texture } from "pixi.js";
+import { Assets, GraphicsContext, Rectangle, Texture } from "pixi.js";
 import type { NodeRenderModel } from "./models/Node";
+import { passiveTreeTheme } from "./theme/passiveTree.theme";
 
 export function snapZoomLevel(target: number, available: ZoomLevel[]): ZoomLevel {
   return available.reduce((best, candidate) =>
@@ -16,8 +17,11 @@ export function snapZoomLevel(target: number, available: ZoomLevel[]): ZoomLevel
 
 export class PassiveTreeAssetStore {
   private textureCache = new Map<string, Texture>();
+  #circleContexts = new Map<number, GraphicsContext>();
 
-  constructor(private readonly renderAssets: PassiveTreeRenderAssets) {}
+  constructor(private readonly renderAssets: PassiveTreeRenderAssets) {
+    this.#initCircleContexts();
+  }
 
   // Pre-warms base textures for all sheets (call once on load)
   async preloadAll(): Promise<void> {
@@ -103,5 +107,22 @@ export class PassiveTreeAssetStore {
 
   getSpriteSheetIndexAvailableZoomLevels(category: SpriteCategory): ZoomLevel[] {
     return Object.keys(category).map((zoom) => Number(zoom) as ZoomLevel);
+  }
+
+  getCircleContext(size: number) {
+    if (!this.#circleContexts.has(size)) {
+      const radius = size / 2;
+      const circleContext = new GraphicsContext().circle(0, 0, radius).fill(0xffffff);
+      this.#circleContexts.set(size, circleContext);
+      return circleContext;
+    }
+    return this.#circleContexts.get(size)!;
+  }
+
+  #initCircleContexts() {
+    console.log("initializing circleContexts", Object.values(passiveTreeTheme.nodes.sizeByKind));
+    for (const radius of Object.values(passiveTreeTheme.nodes.sizeByKind)) {
+      this.getCircleContext(radius);
+    }
   }
 }

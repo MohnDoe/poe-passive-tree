@@ -5,7 +5,7 @@ export const passiveTreeTheme = {
       normal: NORMAL_BASE,
       notable: NORMAL_BASE * 1.5,
       mastery: NORMAL_BASE * 1.5,
-      keystone: NORMAL_BASE * 2.3,
+      keystone: Math.ceil(NORMAL_BASE * 2.3),
       jewel: NORMAL_BASE * 1.3,
       proxy: 25,
       ascendancyStart: 20,

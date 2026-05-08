@@ -1,7 +1,7 @@
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { ZoomLevel } from "@/domain/graph/PassiveTreeRenderAssets";
 import { makeShallowEqual } from "@/shared/utils/utils";
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Texture } from "pixi.js";
 import type {
   NodeBuildState,
   NodeHoverState,
@@ -56,7 +56,11 @@ export class NodeView implements INodeView {
   protected readonly model: NodeRenderModel;
   protected readonly callbacks: NodeViewCallbacks;
 
+  protected readonly iconHolder: Container;
+
   protected readonly iconSprite: Sprite;
+  protected iconMask: Graphics;
+
   protected readonly frameSprite: Sprite;
 
   #buildState: NodeBuildState;
@@ -81,15 +85,15 @@ export class NodeView implements INodeView {
       cursor: "pointer",
     });
 
-    this.iconSprite = new Sprite({
-      anchor: 0.5,
-    });
+    this.iconHolder = new Container({});
+    this.iconSprite = new Sprite({ anchor: 0.5 });
+    this.iconMask = new Graphics();
 
-    this.frameSprite = new Sprite({
-      anchor: 0.5,
-    });
+    this.iconHolder.addChild(this.iconMask, this.iconSprite);
 
-    this.container.addChild(this.iconSprite, this.frameSprite);
+    this.frameSprite = new Sprite({ anchor: 0.5 });
+
+    this.container.addChild(this.iconHolder, this.frameSprite);
 
     this.#buildState = { ...defaultBuildState };
     this.#hoverState = { ...defaultHoverState };
@@ -151,6 +155,9 @@ export class NodeView implements INodeView {
 
     this.iconSprite.texture = iconTexture;
     this.iconSprite.setSize(size);
+
+    this.iconMask.context = this.assetStore.getCircleContext(size);
+    this.iconSprite.mask = this.iconMask;
   }
 
   #redraw(nextZoomLevel: ZoomLevel) {
