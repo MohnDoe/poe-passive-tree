@@ -66,7 +66,7 @@ export class NodeView implements INodeView {
   #buildState: NodeBuildState;
   #hoverState: NodeHoverState;
   #style: NodeVisualStyle;
-  #zoomLevel: ZoomLevel = 0.5;
+  #zoomLevel: ZoomLevel = 0.1246;
 
   constructor(
     model: NodeRenderModel,
@@ -122,7 +122,9 @@ export class NodeView implements INodeView {
   }
 
   updateZoomLevel(nextZoomLevel: ZoomLevel) {
+    console.log("updateZoomLevel", this.model.id, nextZoomLevel);
     if (this.#zoomLevel === nextZoomLevel) return;
+    console.log("updateZoomLevel accepted", this.model.id, nextZoomLevel);
     this.#redraw(nextZoomLevel);
   }
 

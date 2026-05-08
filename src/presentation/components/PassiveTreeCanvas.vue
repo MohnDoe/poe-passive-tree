@@ -9,6 +9,7 @@ import { PassiveTreeStage } from "../pixi/stage/PassiveTreeStage";
 import { useAllocationStore } from "../stores/allocation.store";
 import { useRuntimeStore } from "../stores/runtime.store";
 import { useUiStore } from "../stores/ui.store";
+import type { StageReadyState } from "../pixi/models/Render";
 
 const uiStore = useUiStore();
 const runtimeStore = useRuntimeStore();
@@ -20,6 +21,7 @@ const { hoverPreviewState } = storeToRefs(useAllocationStore());
 
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = shallowRef<PassiveTreeStage | null>(null);
+const readyState = ref<StageReadyState>("mounting");
 
 const defaultHoverPreviewState: HoverPreviewState = {
   hoveredNodeId: null,
@@ -47,6 +49,9 @@ onMounted(async () => {
     },
     onNodeHover: (nodeId) => {
       uiStore.setHoveredNodeId(nodeId);
+    },
+    onReadyStateChange(state) {
+      readyState.value = state;
     },
   });
 
@@ -93,9 +98,30 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
+  <Transition name="fade">
+    <div v-if="readyState !== 'ready'" class="loading-overlay">
+      <span v-if="readyState === 'mounting'">Initializing…</span>
+      <span v-else-if="readyState === 'skeleton'">Loading sprites…</span>
+    </div>
+  </Transition>
   <div ref="hostRef" class="the-tree"></div>
 </template>
 <style scoped>
+.loading-overlay {
+  background: black;
+  color: white;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .the-tree {
   width: 100%;
   height: 100vh;

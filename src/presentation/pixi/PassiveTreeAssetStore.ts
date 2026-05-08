@@ -17,21 +17,47 @@ export function snapZoomLevel(target: number, available: ZoomLevel[]): ZoomLevel
 
 export class PassiveTreeAssetStore {
   private textureCache = new Map<string, Texture>();
+
   #circleContexts = new Map<number, GraphicsContext>();
+  #warmedZoomLevels = new Set<ZoomLevel>();
 
   constructor(private readonly renderAssets: PassiveTreeRenderAssets) {
     this.#initCircleContexts();
   }
 
-  // Pre-warms base textures for all sheets (call once on load)
-  async preloadAll(): Promise<void> {
+  async preloadZoomLevel(zoomLevel: ZoomLevel): Promise<void> {
+    if (this.#warmedZoomLevels.has(zoomLevel)) return;
+
     const urls = new Set<string>();
     for (const [, sheets] of Object.entries(this.renderAssets.sprites)) {
-      for (const [, sheet] of Object.entries(sheets)) {
-        urls.add(this.renderAssets.imageRoot + sheet.filename);
+      const sheet = (sheets as SpriteCategory)[zoomLevel];
+      if (sheet) urls.add(this.renderAssets.imageRoot + sheet.filename);
+    }
+
+    await Promise.all([...urls].map((url) => Assets.load(url)));
+    this.#warmTextureCacheForZoom(zoomLevel);
+  }
+
+  preloadRemainingZoomLevels(alreadyLoaded: ZoomLevel): void {
+    const remaining = this.renderAssets.zoomLevels.filter((z) => z !== alreadyLoaded);
+    for (const zoomLevel of remaining) {
+      // Stagger with a small delay so the main thread stays free during
+      // the first render pass.
+      setTimeout(() => {
+        this.preloadZoomLevel(zoomLevel).catch(console.error);
+      }, 200);
+    }
+  }
+
+  #warmTextureCacheForZoom(zoomLevel: ZoomLevel): void {
+    for (const [, sheets] of Object.entries(this.renderAssets.sprites)) {
+      const sheet = (sheets as SpriteCategory)[zoomLevel];
+      if (!sheet) continue;
+      for (const coordsKey of Object.keys(sheet.coords)) {
+        this.getTextureFromSheet(sheet, coordsKey); // populates textureCache
       }
     }
-    await Promise.all([...urls].map((url) => Assets.load(url)));
+    this.#warmedZoomLevels.add(zoomLevel);
   }
 
   getNodeIconTexture(
@@ -82,12 +108,18 @@ export class PassiveTreeAssetStore {
       return cached;
     }
 
-    console.warn("texture cache miss", cacheKey);
+    // console.warn("texture cache miss", cacheKey);
 
     const coords = sheet.coords[coordsKey];
     if (!coords) return Texture.EMPTY;
 
     const baseTexture = Assets.get(this.renderAssets.imageRoot + sheet.filename);
+
+    if (!baseTexture) {
+      // console.error("Texture missing", this.renderAssets.imageRoot + sheet.filename);
+      return Texture.EMPTY;
+    }
+
     const tex = new Texture({
       source: baseTexture.source,
       frame: new Rectangle(coords.x, coords.y, coords.w, coords.h),

@@ -58,15 +58,15 @@ export class PassiveTreeStage {
 
     this.host = host;
 
-    const app = new Application();
+    callbacks.onReadyStateChange?.("mounting");
 
+    const app = new Application();
     await app.init({
       resizeTo: host,
       backgroundColor: options.backgroundColor ?? 0x080c11,
       antialias: options.antialias ?? true,
       autoDensity: true,
     });
-
     this.app = app;
 
     this.viewport = new Viewport({
@@ -83,31 +83,15 @@ export class PassiveTreeStage {
     this.resizeObserver = new ResizeObserver(() => {
       this.viewport?.resize(host.clientWidth, host.clientHeight);
     });
-
     this.resizeObserver.observe(host);
-
-    this.zoomLevel = snapZoomLevel(this.getEffectiveZoom(this.viewport), renderAssets.zoomLevels);
-
-    this.viewport.on("zoomed", ({ viewport }) => {
-      const effectiveZoom = this.getEffectiveZoom(viewport);
-
-      const next = snapZoomLevel(effectiveZoom, renderAssets.zoomLevels);
-      if (next === this.zoomLevel) {
-        this.zoomLevel = next;
-        this.updateZoomLevel(this.zoomLevel);
-      }
-    });
-
-    this.host.appendChild(app.canvas);
 
     this.world.addChild(this.backgroundLayer, this.edgeLayer, this.nodeLayer, this.overlayLayer);
 
     this.viewport.addChild(this.world);
     this.app.stage.addChild(this.viewport);
+    this.host.appendChild(app.canvas);
 
     const assetStore = new PassiveTreeAssetStore(renderAssets);
-    await assetStore.preloadAll();
-
     this.renderer = new PassiveTreeRenderer({
       backgroundLayer: this.backgroundLayer,
       edgeLayer: this.edgeLayer,
@@ -117,10 +101,28 @@ export class PassiveTreeStage {
       assetStore,
     });
 
+    this.zoomLevel = snapZoomLevel(this.getEffectiveZoom(this.viewport), renderAssets.zoomLevels);
+
+    this.viewport.on("zoomed", ({ viewport }) => {
+      const effectiveZoom = this.getEffectiveZoom(viewport);
+
+      const next = snapZoomLevel(effectiveZoom, renderAssets.zoomLevels);
+      if (next !== this.zoomLevel) {
+        this.zoomLevel = next;
+        this.updateZoomLevel(this.zoomLevel);
+      }
+    });
+
+    callbacks.onReadyStateChange?.("skeleton");
+
+    await assetStore.preloadZoomLevel(this.zoomLevel);
+    this.updateZoomLevel(this.zoomLevel); // force update NodeView
+
+    callbacks.onReadyStateChange?.("ready");
+    assetStore.preloadRemainingZoomLevels(this.zoomLevel);
+
     this.stats = new Stats(this.app.renderer, this.app.ticker);
     host.parentElement?.prepend(this.stats.domElement!);
-
-    // debug
     // @ts-expect-error has to be any
     globalThis.__PIXI_APP__ = this.app;
     // @ts-expect-error has to be any

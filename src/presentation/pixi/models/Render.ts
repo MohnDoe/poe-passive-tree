@@ -42,7 +42,10 @@ export interface HoverVisualDelta extends HoverPreviewState {
   previous: HoverPreviewState;
 }
 
+export type StageReadyState = "mounting" | "skeleton" | "ready";
+
 export interface TreeRendererCallbacks {
   onNodeClick?: (nodeId: NodeId) => void;
   onNodeHover?: (nodeId: NodeId | null) => void;
+  onReadyStateChange?: (state: StageReadyState) => void;
 }
