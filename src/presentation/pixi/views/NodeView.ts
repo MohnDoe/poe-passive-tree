@@ -81,17 +81,17 @@ export class NodeView implements INodeView {
 
     this.container = new Container({
       position: { x: model.x, y: model.y },
-      eventMode: "static",
+      eventMode: "none",
       cursor: "pointer",
     });
 
     this.iconHolder = new Container({});
     this.iconSprite = new Sprite({ anchor: 0.5 });
+
+    this.frameSprite = new Sprite({ anchor: 0.5 });
     this.iconMask = new Graphics();
 
     this.iconHolder.addChild(this.iconMask, this.iconSprite);
-
-    this.frameSprite = new Sprite({ anchor: 0.5 });
 
     this.container.addChild(this.iconHolder, this.frameSprite);
 
@@ -128,11 +128,6 @@ export class NodeView implements INodeView {
     this.#redraw(nextZoomLevel);
   }
 
-  destroy() {
-    this.container.removeAllListeners();
-    this.container.destroy({ children: true });
-  }
-
   #draw(style: NodeVisualStyle) {
     const { size, iconSpriteCategory, frameCoordsKey } = style;
 
@@ -167,9 +162,9 @@ export class NodeView implements INodeView {
   #redraw(nextZoomLevel: ZoomLevel) {
     const nextStyle = resolveNodeStyle(this.model, this.#buildState, this.#hoverState);
     if (!sameStyle(this.#style, nextStyle) || this.#zoomLevel !== nextZoomLevel) {
-      this.#draw(nextStyle);
       this.#style = nextStyle;
       this.#zoomLevel = nextZoomLevel;
+      this.#draw(nextStyle);
       this.container.updateCacheTexture();
     }
   }
@@ -184,5 +179,10 @@ export class NodeView implements INodeView {
     this.container.on("pointerout", () => {
       this.callbacks.onHover?.(null);
     });
+  }
+
+  destroy() {
+    this.container.removeAllListeners();
+    this.container.destroy({ children: true });
   }
 }

@@ -11,9 +11,6 @@ import { PassiveTreeAssetStore, snapZoomLevel } from "../PassiveTreeAssetStore";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
 import { Stats } from "pixi-stats";
 
-const VIEWPORT_ZOOM_MIN = 0.5; // can zoom out a bit from initial fit
-const VIEWPORT_ZOOM_MAX = 10; // can zoom into individual nodes clearly
-
 export interface PassiveTreeStageOptions {
   backgroundColor?: number;
   antialias?: boolean;
