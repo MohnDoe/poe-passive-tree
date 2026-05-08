@@ -1,4 +1,4 @@
-const NORMAL_BASE = 50;
+const NORMAL_BASE = 100;
 export const passiveTreeTheme = {
   nodes: {
     sizeByKind: {

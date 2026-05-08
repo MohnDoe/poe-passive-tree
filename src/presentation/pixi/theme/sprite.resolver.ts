@@ -32,3 +32,46 @@ export function resolveSpriteCategoryName(
       return active ? "normalActive" : "normalInactive";
   }
 }
+
+export function resolveFrameCoordsKey(
+  kind: PassiveNodeKind,
+  build: NodeBuildState,
+  hover: NodeHoverState,
+): string | null {
+  let key = null;
+
+  if (kind == "keystone") {
+    key = "KeystoneFrame";
+  } else if (kind == "notable") {
+    key = "NotableFrame";
+  } else if (kind == "jewel") {
+    key = "JewelFrame";
+  } else if (kind == "normal") {
+    key = "PSSkillFrame";
+  } else {
+    return null;
+  }
+
+  if (kind == "normal") {
+    if (build.isAllocated) {
+      key += "Active";
+    } else if (hover.isInRefundPath || hover.isInPreviewPath || hover.isHovered) {
+      key += "Highlighted";
+    } else {
+      // no suffix
+      key += "";
+    }
+  } else {
+    if (build.isAllocated) {
+      key += "Allocated";
+    } else {
+      if (hover.isInPreviewPath || hover.isInRefundPath || hover.isHovered) {
+        key += "CanAllocate";
+      } else {
+        key += "Unallocated";
+      }
+    }
+  }
+
+  return key;
+}

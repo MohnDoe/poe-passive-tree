@@ -2,6 +2,7 @@ import type {
   PassiveTreeRenderAssets,
   SpriteCategory,
   SpriteCategoryName,
+  SpriteSheet,
   ZoomLevel,
 } from "@/domain/graph/PassiveTreeRenderAssets";
 import { Assets, Rectangle, Texture } from "pixi.js";
@@ -32,37 +33,75 @@ export class PassiveTreeAssetStore {
   getNodeIconTexture(
     model: NodeRenderModel,
     categoryName: SpriteCategoryName,
-    currentZoom: number,
+    currentZoom: ZoomLevel,
   ): Texture {
-    const spriteCategoryIndex = this.renderAssets.sprites[categoryName] as SpriteCategory;
-    if (!spriteCategoryIndex) return Texture.EMPTY;
+    const categorySpriteSheetIndex = this.renderAssets.sprites[categoryName] as SpriteCategory;
+    if (!categorySpriteSheetIndex) return Texture.EMPTY;
 
     const zoomLevel = snapZoomLevel(
       currentZoom,
-      this.getSpriteCategoryZoomLevels(spriteCategoryIndex),
+      this.getSpriteSheetIndexAvailableZoomLevels(categorySpriteSheetIndex),
     );
     const cacheKey = `${model.id}|${categoryName}|${zoomLevel}`;
-    const cached = this.textureCache.get(cacheKey);
+    const cached = this.getCachedTexture(cacheKey);
     if (cached) return cached;
 
-    const sheet = spriteCategoryIndex[zoomLevel];
+    const sheet = categorySpriteSheetIndex[zoomLevel];
     if (!sheet) return Texture.EMPTY;
-    const coords = sheet.coords[model.icon];
-    if (!coords) return Texture.EMPTY;
 
-    const baseTexture = Assets.get(this.renderAssets.imageRoot + sheet.filename);
-
-    const tex = new Texture({
-      source: baseTexture.source,
-      frame: new Rectangle(coords.x, coords.y, coords.w, coords.h),
-    });
+    const tex = this.getTextureFromSheet(sheet, model.icon);
 
     this.textureCache.set(cacheKey, tex);
 
     return tex;
   }
 
-  getSpriteCategoryZoomLevels(category: SpriteCategory): ZoomLevel[] {
+  getNodeFrameTexture(
+    model: NodeRenderModel,
+    frameCoordsKey: string,
+    currentZoom: ZoomLevel,
+  ): Texture {
+    const frameSpriteSheetIndex = this.renderAssets.sprites["frame"];
+    if (!frameSpriteSheetIndex) {
+      console.error("Missing 'frame' spritesheet");
+      return Texture.EMPTY;
+    }
+
+    const zoomLevel = snapZoomLevel(
+      currentZoom,
+      this.getSpriteSheetIndexAvailableZoomLevels(frameSpriteSheetIndex),
+    );
+
+    const cacheKey = `${model.kind}|frame|${zoomLevel}`;
+    const cached = this.getCachedTexture(cacheKey);
+    if (cached) return cached;
+
+    const sheet = frameSpriteSheetIndex[zoomLevel];
+    if (!sheet) return Texture.EMPTY;
+
+    const tex = this.getTextureFromSheet(sheet, frameCoordsKey);
+
+    this.textureCache.set(cacheKey, tex);
+
+    return tex;
+  }
+
+  getTextureFromSheet(sheet: SpriteSheet, coordsKey: string): Texture {
+    const coords = sheet.coords[coordsKey];
+    if (!coords) return Texture.EMPTY;
+
+    const baseTexture = Assets.get(this.renderAssets.imageRoot + sheet.filename);
+    return new Texture({
+      source: baseTexture.source,
+      frame: new Rectangle(coords.x, coords.y, coords.w, coords.h),
+    });
+  }
+
+  getCachedTexture(key: string): Texture | undefined {
+    return this.textureCache.get(key);
+  }
+
+  getSpriteSheetIndexAvailableZoomLevels(category: SpriteCategory): ZoomLevel[] {
     return Object.keys(category).map((zoom) => Number(zoom) as ZoomLevel);
   }
 }

@@ -44,6 +44,7 @@ const sameHoverState = makeShallowEqual<NodeHoverState>({
 
 const sameStyle = makeShallowEqual<NodeVisualStyle>({
   iconSpriteCategory: true,
+  frameCoordsKey: true,
   size: true,
 });
 
@@ -56,8 +57,7 @@ export class NodeView implements INodeView {
   protected readonly callbacks: NodeViewCallbacks;
 
   protected readonly iconSprite: Sprite;
-
-  // protected readonly frameSprite: Sprite;
+  protected readonly frameSprite: Sprite;
 
   #buildState: NodeBuildState;
   #hoverState: NodeHoverState;
@@ -85,7 +85,11 @@ export class NodeView implements INodeView {
       anchor: 0.5,
     });
 
-    this.container.addChild(this.iconSprite);
+    this.frameSprite = new Sprite({
+      anchor: 0.5,
+    });
+
+    this.container.addChild(this.iconSprite, this.frameSprite);
 
     this.#buildState = { ...defaultBuildState };
     this.#hoverState = { ...defaultHoverState };
@@ -118,20 +122,34 @@ export class NodeView implements INodeView {
   }
 
   #draw(style: NodeVisualStyle) {
-    const { size, iconSpriteCategory } = style;
+    const { size, iconSpriteCategory, frameCoordsKey } = style;
 
-    const texture = this.assetStore.getNodeIconTexture(
+    const iconTexture = this.assetStore.getNodeIconTexture(
       this.model,
       iconSpriteCategory,
       this.#zoomLevel,
     );
 
-    if (texture === Texture.EMPTY) {
+    if (iconTexture === Texture.EMPTY) {
       console.warn(`No icon texture for node ${this.id} - ${this.model.kind}`);
     }
 
-    this.iconSprite.texture = texture;
-    this.iconSprite.anchor.set(0.5);
+    if (frameCoordsKey !== null) {
+      const frameTexture = this.assetStore.getNodeFrameTexture(
+        this.model,
+        frameCoordsKey,
+        this.#zoomLevel,
+      );
+      if (frameTexture === Texture.EMPTY) {
+        console.warn(
+          `No frame texture for node ${this.id} - ${this.model.kind} - ${frameCoordsKey}`,
+        );
+      }
+      this.frameSprite.texture = frameTexture;
+      this.frameSprite.setSize(size);
+    }
+
+    this.iconSprite.texture = iconTexture;
     this.iconSprite.setSize(size);
   }
 
@@ -149,7 +167,6 @@ export class NodeView implements INodeView {
       this.callbacks.onClick?.(this.model.id);
     });
     this.container.on("pointerover", () => {
-      console.log(this.iconSprite.texture);
       this.callbacks.onHover?.(this.model.id);
     });
     this.container.on("pointerout", () => {

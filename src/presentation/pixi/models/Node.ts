@@ -23,6 +23,7 @@ export interface NodeHoverState {
 export interface NodeVisualStyle {
   size: number;
   iconSpriteCategory: SpriteCategoryName;
+  frameCoordsKey: string | null;
 }
 
 export interface NodeViewCallbacks {
