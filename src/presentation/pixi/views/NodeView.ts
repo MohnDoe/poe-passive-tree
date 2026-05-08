@@ -1,7 +1,7 @@
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { ZoomLevel } from "@/domain/graph/PassiveTreeRenderAssets";
 import { makeShallowEqual } from "@/shared/utils/utils";
-import { Container, Sprite } from "pixi.js";
+import { Container, Sprite, Texture } from "pixi.js";
 import type {
   NodeBuildState,
   NodeHoverState,
@@ -125,6 +125,10 @@ export class NodeView implements INodeView {
       iconSpriteCategory,
       this.#zoomLevel,
     );
+
+    if (texture === Texture.EMPTY) {
+      console.warn(`No icon texture for node ${this.id} - ${this.model.kind}`);
+    }
 
     this.iconSprite.texture = texture;
     this.iconSprite.anchor.set(0.5);

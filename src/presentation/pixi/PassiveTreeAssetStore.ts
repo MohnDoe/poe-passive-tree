@@ -35,10 +35,11 @@ export class PassiveTreeAssetStore {
     currentZoom: number,
   ): Texture {
     const spriteCategoryIndex = this.renderAssets.sprites[categoryName] as SpriteCategory;
+    if (!spriteCategoryIndex) return Texture.EMPTY;
 
     const zoomLevel = snapZoomLevel(
       currentZoom,
-      Object.keys(spriteCategoryIndex).map((zoom) => Number(zoom) as ZoomLevel),
+      this.getSpriteCategoryZoomLevels(spriteCategoryIndex),
     );
     const cacheKey = `${model.id}|${categoryName}|${zoomLevel}`;
     const cached = this.textureCache.get(cacheKey);
@@ -59,5 +60,9 @@ export class PassiveTreeAssetStore {
     this.textureCache.set(cacheKey, tex);
 
     return tex;
+  }
+
+  getSpriteCategoryZoomLevels(category: SpriteCategory): ZoomLevel[] {
+    return Object.keys(category).map((zoom) => Number(zoom) as ZoomLevel);
   }
 }
