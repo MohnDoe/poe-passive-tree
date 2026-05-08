@@ -102,3 +102,10 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 </style>
+<style>
+#stats {
+  position: absolute;
+  z-index: 1000;
+  bottom: 0;
+}
+</style>

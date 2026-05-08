@@ -6,6 +6,7 @@
       "name": "poe-passive-tree",
       "dependencies": {
         "pinia": "^3.0.4",
+        "pixi-stats": "^5.1.7",
         "pixi-viewport": "^6.0.3",
         "pixi.js": "^8.18.1",
         "vue": "^3.5.32",
@@ -797,6 +798,8 @@
     "pidtree": ["pidtree@0.6.0", "", { "bin": { "pidtree": "bin/pidtree.js" } }, "sha512-eG2dWTVw5bzqGRztnHExczNxt5VGsE6OwTeCG3fdUf9KBsZzO3R5OIIIzWR+iZA0NtZ+RDVdaoE2dK1cn6jH4g=="],
 
     "pinia": ["pinia@3.0.4", "", { "dependencies": { "@vue/devtools-api": "^7.7.7" }, "peerDependencies": { "typescript": ">=4.5.0", "vue": "^3.5.11" }, "optionalPeers": ["typescript"] }, "sha512-l7pqLUFTI/+ESXn6k3nu30ZIzW5E2WZF/LaHJEpoq6ElcLD+wduZoB2kBN19du6K/4FDpPMazY2wJr+IndBtQw=="],
+
+    "pixi-stats": ["pixi-stats@5.1.7", "", {}, "sha512-h0FQnZfGPuTg5rVKkCbWD1aLni7sVn+ZaRIzoUsNZzK8FyXI2xARBiILOK76KKjhzS9rAJcneUpXOvzo+wIM2Q=="],
 
     "pixi-viewport": ["pixi-viewport@6.0.3", "", { "peerDependencies": { "pixi.js": ">=8" } }, "sha512-2+qPJ0/n+8hQYhWvY+795+x9y3MiUrCOWacK0DY53whowWaGdx9iDocy7z1pBwjkZhC52YvrJQuZKK0sdVLtBw=="],
 

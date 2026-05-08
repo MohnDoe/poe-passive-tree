@@ -9,8 +9,11 @@ import type {
 } from "../models/Render";
 import { PassiveTreeAssetStore, snapZoomLevel } from "../PassiveTreeAssetStore";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
+import { Stats } from "pixi-stats";
+
 const VIEWPORT_ZOOM_MIN = 0.5; // can zoom out a bit from initial fit
 const VIEWPORT_ZOOM_MAX = 10; // can zoom into individual nodes clearly
+
 export interface PassiveTreeStageOptions {
   backgroundColor?: number;
   antialias?: boolean;
@@ -19,6 +22,8 @@ export interface PassiveTreeStageOptions {
 export class PassiveTreeStage {
   private app: Application | null = null;
   private host: HTMLElement | null = null;
+
+  public stats?: Stats;
 
   private world = new Container({
     label: "world",
@@ -38,6 +43,7 @@ export class PassiveTreeStage {
   });
 
   private viewport: Viewport | null = null;
+  private resizeObserver: ResizeObserver | null = null;
   private renderer: PassiveTreeRenderer | null = null;
 
   private zoomLevel: ZoomLevel = 0.1246;
@@ -65,6 +71,8 @@ export class PassiveTreeStage {
 
     this.viewport = new Viewport({
       events: this.app.renderer.events,
+      screenHeight: host.clientHeight,
+      screenWidth: host.clientWidth,
     });
 
     this.viewport.drag().pinch().wheel().decelerate().clampZoom({
@@ -72,15 +80,22 @@ export class PassiveTreeStage {
       maxScale: VIEWPORT_ZOOM_MAX,
     });
 
+    this.resizeObserver = new ResizeObserver(() => {
+      this.viewport?.resize(host.clientWidth, host.clientHeight);
+    });
+
+    this.resizeObserver.observe(host);
+
     this.zoomLevel = snapZoomLevel(this.getEffectiveZoom(this.viewport), renderAssets.zoomLevels);
 
     this.viewport.on("zoomed", ({ viewport }) => {
       const effectiveZoom = this.getEffectiveZoom(viewport);
 
       const next = snapZoomLevel(effectiveZoom, renderAssets.zoomLevels);
-      if (next === this.zoomLevel) return; // still in same band, skip
-      this.zoomLevel = next;
-      this.updateZoomLevel(this.zoomLevel);
+      if (next === this.zoomLevel) {
+        this.zoomLevel = next;
+        this.updateZoomLevel(this.zoomLevel);
+      }
     });
 
     this.host.appendChild(app.canvas);
@@ -102,10 +117,16 @@ export class PassiveTreeStage {
       assetStore,
     });
 
+    this.stats = new Stats(this.app.renderer, this.app.ticker);
+    host.parentElement?.prepend(this.stats.domElement!);
+
     // debug
-    // globalThis.__PIXI_APP__ = this.app;
-    // globalThis.__PIXI_STAGE__ = this.app.stage;
-    // globalThis.__PIXI_RENDERED__ = this.renderer;
+    // @ts-expect-error has to be any
+    globalThis.__PIXI_APP__ = this.app;
+    // @ts-expect-error has to be any
+    globalThis.__PIXI_STAGE__ = this.app.stage;
+    // @ts-expect-error has to be any
+    globalThis.__PIXI_RENDERED__ = this.renderer;
   }
 
   public render(scene: TreeSceneRenderModel): void {
@@ -192,6 +213,9 @@ export class PassiveTreeStage {
   public destroy(): void {
     this.renderer?.destroy();
     this.renderer = null;
+    this.stats?.domElement?.remove();
+
+    this.resizeObserver?.disconnect();
 
     if (this.app) {
       this.app.destroy(true, { children: true });

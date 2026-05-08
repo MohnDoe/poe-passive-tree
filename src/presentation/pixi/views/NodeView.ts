@@ -101,6 +101,12 @@ export class NodeView implements INodeView {
 
     this.#bindEvents();
     this.#draw(this.#style);
+
+    this.container.cacheAsTexture(true);
+    // force cache to update on the next frame after creation
+    requestAnimationFrame(() => {
+      this.container.updateCacheTexture();
+    });
   }
 
   updateBuildState(next: NodeBuildState) {
@@ -139,11 +145,7 @@ export class NodeView implements INodeView {
     }
 
     if (frameCoordsKey !== null) {
-      const frameTexture = this.assetStore.getNodeFrameTexture(
-        this.model,
-        frameCoordsKey,
-        this.#zoomLevel,
-      );
+      const frameTexture = this.assetStore.getNodeFrameTexture(frameCoordsKey, this.#zoomLevel);
       if (frameTexture === Texture.EMPTY) {
         console.warn(
           `No frame texture for node ${this.id} - ${this.model.kind} - ${frameCoordsKey}`,
@@ -166,6 +168,7 @@ export class NodeView implements INodeView {
       this.#draw(nextStyle);
       this.#style = nextStyle;
       this.#zoomLevel = nextZoomLevel;
+      this.container.updateCacheTexture();
     }
   }
 
