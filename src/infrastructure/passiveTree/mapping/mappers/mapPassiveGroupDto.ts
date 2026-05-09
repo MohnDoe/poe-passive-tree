@@ -7,5 +7,11 @@ export function mapPassiveGroupDto(groupId: string, raw: PassiveTreeGroupDto): P
     x: raw.x,
     y: raw.y,
     nodeIds: raw.nodes,
+    background: raw.background
+      ? {
+          image: raw.background.image,
+          isHalfImage: raw.background.isHalfImage ?? false,
+        }
+      : undefined,
   };
 }

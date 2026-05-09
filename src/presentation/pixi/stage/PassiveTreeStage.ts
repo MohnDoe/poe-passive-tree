@@ -39,6 +39,10 @@ export class PassiveTreeStage {
     label: "overlayLayer",
   });
 
+  private groupBackgroundLayer = new Container({
+    label: "groupBackgroundLayer",
+  });
+
   private viewport: Viewport | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private renderer: PassiveTreeRenderer | null = null;
@@ -91,6 +95,7 @@ export class PassiveTreeStage {
       edgeLayer: this.edgeLayer,
       nodeLayer: this.nodeLayer,
       overlayLayer: this.overlayLayer,
+      groupBackgroundLayer: this.groupBackgroundLayer,
       callbacks,
       assetStore,
     });

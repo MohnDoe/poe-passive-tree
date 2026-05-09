@@ -19,6 +19,7 @@ export interface PassiveTreeRendererDeps {
   edgeLayer: Container;
   nodeLayer: Container;
   overlayLayer: Container;
+  groupBackgroundLayer: Container;
   callbacks: TreeRendererCallbacks;
   assetStore: PassiveTreeAssetStore;
 }
@@ -28,6 +29,7 @@ export class PassiveTreeRenderer {
   private readonly edgeLayer: Container;
   private readonly nodeLayer: Container;
   private readonly overlayLayer: Container;
+  private readonly groupBackgroundLayer: Container;
   private readonly callbacks: TreeRendererCallbacks;
   private readonly assetStore: PassiveTreeAssetStore;
 
@@ -40,18 +42,20 @@ export class PassiveTreeRenderer {
     this.edgeLayer = deps.edgeLayer;
     this.nodeLayer = deps.nodeLayer;
     this.overlayLayer = deps.overlayLayer;
+    this.groupBackgroundLayer = deps.groupBackgroundLayer;
+
     this.callbacks = deps.callbacks;
     this.assetStore = deps.assetStore;
   }
 
   public render(scene: TreeSceneRenderModel): void {
-    this.renderBackgrounds(scene.backgrounds);
+    this.renderGroupBackgrounds(scene.groupBackgrounds);
     this.renderEdges(scene.edges);
     this.renderNodes(scene.nodes);
     // this.renderOverlays(scene);
   }
 
-  private renderBackgrounds(backgrounds: GroupBackgroundRenderModel[]): void {
+  private renderGroupBackgrounds(backgrounds: GroupBackgroundRenderModel[]): void {
     for (const graphics of this.backgroundViews.values()) {
       graphics.destroy();
     }
@@ -106,8 +110,8 @@ export class PassiveTreeRenderer {
   private createBackgroundView(background: GroupBackgroundRenderModel): Graphics {
     const graphics = new Graphics();
 
-    graphics.circle(background.x, background.y, background.radius);
-    graphics.fill({ color: background.color, alpha: background.alpha });
+    graphics.circle(background.x, background.y, 100);
+    graphics.fill({ color: 0xffffff, alpha: 0.1 });
 
     return graphics;
   }

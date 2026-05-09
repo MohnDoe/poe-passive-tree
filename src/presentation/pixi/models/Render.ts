@@ -8,13 +8,12 @@ export interface GroupBackgroundRenderModel {
   key: string;
   x: number;
   y: number;
-  radius: number;
-  color: number;
-  alpha: number;
+  image: string; // ie: PSGroupBackground3
+  isHalfImage: boolean;
 }
 
 export interface TreeSceneRenderModel {
-  backgrounds: GroupBackgroundRenderModel[];
+  groupBackgrounds: GroupBackgroundRenderModel[];
   edges: EdgeRenderModel[];
   nodes: NodeRenderModel[];
 }
