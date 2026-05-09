@@ -1,5 +1,4 @@
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import type { ZoomLevel } from "@/domain/graph/PassiveTreeRenderAssets";
 import { makeShallowEqual } from "@/shared/utils/utils";
 import { Container, Graphics, Sprite, Texture } from "pixi.js";
 import type {
@@ -17,7 +16,6 @@ interface INodeView {
   container: Container;
   updateBuildState: (state: NodeBuildState) => void;
   updateHoverState: (state: NodeHoverState) => void;
-  updateZoomLevel: (zoomLevel: ZoomLevel) => void;
   destroy: () => void;
 }
 
@@ -66,7 +64,6 @@ export class NodeView implements INodeView {
   #buildState: NodeBuildState;
   #hoverState: NodeHoverState;
   #style: NodeVisualStyle;
-  #zoomLevel: ZoomLevel = 0.1246;
 
   constructor(
     model: NodeRenderModel,
@@ -112,37 +109,26 @@ export class NodeView implements INodeView {
   updateBuildState(next: NodeBuildState) {
     if (sameBuildState(this.#buildState, next)) return;
     this.#buildState = next;
-    this.#redraw(this.#zoomLevel);
+    this.#redraw();
   }
 
   updateHoverState(next: NodeHoverState) {
     if (sameHoverState(this.#hoverState, next)) return;
     this.#hoverState = next;
-    this.#redraw(this.#zoomLevel);
-  }
-
-  updateZoomLevel(nextZoomLevel: ZoomLevel) {
-    console.log("updateZoomLevel", this.model.id, nextZoomLevel);
-    if (this.#zoomLevel === nextZoomLevel) return;
-    console.log("updateZoomLevel accepted", this.model.id, nextZoomLevel);
-    this.#redraw(nextZoomLevel);
+    this.#redraw();
   }
 
   #draw(style: NodeVisualStyle) {
     const { size, iconSpriteCategory, frameCoordsKey } = style;
 
-    const iconTexture = this.assetStore.getNodeIconTexture(
-      this.model,
-      iconSpriteCategory,
-      this.#zoomLevel,
-    );
+    const iconTexture = this.assetStore.getNodeIconTexture(this.model, iconSpriteCategory);
 
     if (iconTexture === Texture.EMPTY) {
       console.warn(`No icon texture for node ${this.id} - ${this.model.kind}`);
     }
 
     if (frameCoordsKey !== null) {
-      const frameTexture = this.assetStore.getNodeFrameTexture(frameCoordsKey, this.#zoomLevel);
+      const frameTexture = this.assetStore.getNodeFrameTexture(frameCoordsKey);
       if (frameTexture === Texture.EMPTY) {
         console.warn(
           `No frame texture for node ${this.id} - ${this.model.kind} - ${frameCoordsKey}`,
@@ -159,11 +145,10 @@ export class NodeView implements INodeView {
     this.iconSprite.mask = this.iconMask;
   }
 
-  #redraw(nextZoomLevel: ZoomLevel) {
+  #redraw() {
     const nextStyle = resolveNodeStyle(this.model, this.#buildState, this.#hoverState);
-    if (!sameStyle(this.#style, nextStyle) || this.#zoomLevel !== nextZoomLevel) {
+    if (!sameStyle(this.#style, nextStyle)) {
       this.#style = nextStyle;
-      this.#zoomLevel = nextZoomLevel;
       this.#draw(nextStyle);
       this.container.updateCacheTexture();
     }

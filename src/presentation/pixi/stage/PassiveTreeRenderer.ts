@@ -13,7 +13,6 @@ import type {
 import { createEdgeView } from "../views/edge.view";
 import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 import { NodeView } from "../views/NodeView";
-import type { ZoomLevel } from "@/domain/graph/PassiveTreeRenderAssets";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -194,13 +193,5 @@ export class PassiveTreeRenderer {
         isInRefundPath: current.refund.edgeKeys.has(edgeKey),
       });
     }
-  }
-
-  public updateZoomLevel(zoom: ZoomLevel): void {
-    console.log("updateZoomLevel", zoom);
-    for (const view of this.nodeViews.values()) {
-      view.updateZoomLevel(zoom);
-    }
-    // Later: same for edge views, group background views
   }
 }

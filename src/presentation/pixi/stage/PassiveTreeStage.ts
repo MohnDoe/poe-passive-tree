@@ -1,5 +1,6 @@
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
-import type { PassiveTreeRenderAssets, ZoomLevel } from "@/domain/graph/PassiveTreeRenderAssets";
+import type { PassiveTreeRenderAssets } from "@/domain/graph/PassiveTreeRenderAssets";
+import { Stats } from "pixi-stats";
 import { Viewport } from "pixi-viewport";
 import { Application, Container } from "pixi.js";
 import type {
@@ -7,9 +8,8 @@ import type {
   TreeSceneRenderModel,
   TreeVisualStateModel,
 } from "../models/Render";
-import { PassiveTreeAssetStore, snapZoomLevel } from "../PassiveTreeAssetStore";
+import { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 import { PassiveTreeRenderer } from "./PassiveTreeRenderer";
-import { Stats } from "pixi-stats";
 
 export interface PassiveTreeStageOptions {
   backgroundColor?: number;
@@ -43,7 +43,7 @@ export class PassiveTreeStage {
   private resizeObserver: ResizeObserver | null = null;
   private renderer: PassiveTreeRenderer | null = null;
 
-  private zoomLevel: ZoomLevel = 0.1246;
+  private fitScale: number = 1;
 
   public async mount(
     host: HTMLElement,
@@ -72,10 +72,7 @@ export class PassiveTreeStage {
       screenWidth: host.clientWidth,
     });
 
-    this.viewport.drag().pinch().wheel().decelerate().clampZoom({
-      minScale: VIEWPORT_ZOOM_MIN,
-      maxScale: VIEWPORT_ZOOM_MAX,
-    });
+    this.viewport.drag().pinch().wheel().decelerate();
 
     this.resizeObserver = new ResizeObserver(() => {
       this.viewport?.resize(host.clientWidth, host.clientHeight);
@@ -98,25 +95,11 @@ export class PassiveTreeStage {
       assetStore,
     });
 
-    this.zoomLevel = snapZoomLevel(this.getEffectiveZoom(this.viewport), renderAssets.zoomLevels);
-
-    this.viewport.on("zoomed", ({ viewport }) => {
-      const effectiveZoom = this.getEffectiveZoom(viewport);
-
-      const next = snapZoomLevel(effectiveZoom, renderAssets.zoomLevels);
-      if (next !== this.zoomLevel) {
-        this.zoomLevel = next;
-        this.updateZoomLevel(this.zoomLevel);
-      }
-    });
-
     callbacks.onReadyStateChange?.("skeleton");
 
-    await assetStore.preloadZoomLevel(this.zoomLevel);
-    this.updateZoomLevel(this.zoomLevel); // force update NodeView
+    await assetStore.loadHighestResolutionSheets();
 
     callbacks.onReadyStateChange?.("ready");
-    assetStore.preloadRemainingZoomLevels(this.zoomLevel);
 
     this.stats = new Stats(this.app.renderer, this.app.ticker);
     host.parentElement?.prepend(this.stats.domElement!);
@@ -135,11 +118,6 @@ export class PassiveTreeStage {
 
   public renderStaticScene(scene: TreeSceneRenderModel): void {
     this.render(scene);
-  }
-
-  public updateZoomLevel(zl: ZoomLevel): void {
-    if (!this.renderer) return;
-    this.renderer.updateZoomLevel(zl);
   }
 
   public updateVisualStates(state: TreeVisualStateModel): void {
@@ -169,36 +147,50 @@ export class PassiveTreeStage {
     this.renderer.updateHoverState({ current, previous });
   }
 
-  private getEffectiveZoom(viewport?: Viewport): number {
-    const viewportScale = viewport?.scale.x ?? 1;
-    return (viewportScale - VIEWPORT_ZOOM_MIN) / (VIEWPORT_ZOOM_MAX - VIEWPORT_ZOOM_MIN);
-  }
-
   public fitToBounds(bounds: { minX: number; minY: number; maxX: number; maxY: number }): void {
-    if (!this.app) return;
+    if (!this.viewport || !this.app) return;
 
-    const viewWidth = this.app.renderer.width;
-    const viewHeight = this.app.renderer.height;
+    const PADDING = 10;
 
     const treeWidth = bounds.maxX - bounds.minX;
     const treeHeight = bounds.maxY - bounds.minY;
-
     if (treeWidth <= 0 || treeHeight <= 0) return;
 
-    const padding = 10;
-    const scaleX = (viewWidth - padding * 2) / treeWidth;
-    const scaleY = (viewHeight - padding * 2) / treeHeight;
-    const scale = Math.min(scaleX, scaleY);
+    const screenWidth = this.app.renderer.width;
+    const screenHeight = this.app.renderer.height;
 
-    this.world.scale.set(scale);
+    // 1. Compute the scale that fits the tree into the screen with padding
+    const fitScale = Math.min(
+      (screenWidth - PADDING * 2) / treeWidth,
+      (screenHeight - PADDING * 2) / treeHeight,
+    );
 
-    const scaledTreeWidth = treeWidth * scale;
-    const scaledTreeHeight = treeHeight * scale;
+    // 2. set world dimensions on the viewport so clampZoom has a reference.
+    this.viewport.worldWidth = treeWidth;
+    this.viewport.worldHeight = treeHeight;
 
-    const offsetX = (viewWidth - scaledTreeWidth) / 2 - bounds.minX * scale;
-    const offsetY = (viewHeight - scaledTreeHeight) / 2 - bounds.minY * scale;
+    // 3. Update clampZoom bounds relative to the fit scale.
+    this.viewport.clampZoom({
+      minScale: fitScale * 0.9,
+      maxScale: fitScale * 5,
+    });
 
-    this.world.position.set(offsetX, offsetY);
+    this.viewport.scale.set(fitScale);
+
+    // 5. Position viewport so the tree center is in the screen center.
+    const treeCenterX = bounds.minX + treeWidth / 2;
+    const treeCenterY = bounds.minY + treeHeight / 2;
+
+    this.viewport.position.set(
+      screenWidth / 2 - treeCenterX * fitScale,
+      screenHeight / 2 - treeCenterY * fitScale,
+    );
+
+    this.fitScale = fitScale;
+
+    // 6. world stays at scale(1) and position(0,0) — never touch it again
+    this.world.scale.set(1);
+    this.world.position.set(0);
   }
 
   public getCanvas(): HTMLCanvasElement | null {
