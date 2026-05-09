@@ -34,7 +34,8 @@ export class PassiveTreeAssetStore {
 
     await Promise.all([...urls].map((url) => Assets.load(url)));
   }
-  getNodeIconTexture(model: NodeRenderModel, categoryName: SpriteCategoryName): Texture {
+
+  getTexture(categoryName: SpriteCategoryName, coords: string) {
     const categorySpriteSheetIndex = this.renderAssets.sprites[categoryName] as SpriteCategory;
     if (!categorySpriteSheetIndex) return Texture.EMPTY;
 
@@ -43,26 +44,17 @@ export class PassiveTreeAssetStore {
     const sheet = categorySpriteSheetIndex[zoomLevel];
     if (!sheet) return Texture.EMPTY;
 
-    const tex = this.getTextureFromSheet(sheet, model.icon);
+    const tex = this.getTextureFromSheet(sheet, coords);
 
     return tex;
   }
 
+  getNodeIconTexture(model: NodeRenderModel, categoryName: SpriteCategoryName): Texture {
+    return this.getTexture(categoryName, model.icon);
+  }
+
   getNodeFrameTexture(frameCoordsKey: string): Texture {
-    const frameSpriteSheetIndex = this.renderAssets.sprites["frame"];
-    if (!frameSpriteSheetIndex) {
-      console.error("Missing 'frame' spritesheet");
-      return Texture.EMPTY;
-    }
-
-    const zoomLevel = getSpriteSheetIndexHighestZoomLevel(frameSpriteSheetIndex);
-
-    const sheet = frameSpriteSheetIndex[zoomLevel];
-    if (!sheet) return Texture.EMPTY;
-
-    const tex = this.getTextureFromSheet(sheet, frameCoordsKey);
-
-    return tex;
+    return this.getTexture("frame", frameCoordsKey);
   }
 
   getTextureFromSheet(sheet: SpriteSheet, coordsKey: string): Texture {

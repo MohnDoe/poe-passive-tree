@@ -124,14 +124,16 @@ export class NodeView implements INodeView {
     const iconTexture = this.assetStore.getNodeIconTexture(this.model, iconSpriteCategory);
 
     if (iconTexture === Texture.EMPTY) {
-      console.warn(`No icon texture for node ${this.id} - ${this.model.kind}`);
+      console.warn(
+        `No icon texture for node ${this.model.kind}/${iconSpriteCategory}/${this.model.icon}`,
+      );
     }
 
     if (frameCoordsKey !== null) {
       const frameTexture = this.assetStore.getNodeFrameTexture(frameCoordsKey);
       if (frameTexture === Texture.EMPTY) {
         console.warn(
-          `No frame texture for node ${this.id} - ${this.model.kind} - ${frameCoordsKey}`,
+          `No frame texture for node ${this.id} - ${this.model.kind} - ${frameCoordsKey}/`,
         );
       }
       this.frameSprite.texture = frameTexture;
