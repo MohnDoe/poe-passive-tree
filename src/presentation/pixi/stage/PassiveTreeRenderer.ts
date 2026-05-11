@@ -1,7 +1,7 @@
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import { Application, Container } from "pixi.js";
+import { Container } from "pixi.js";
 import type { EdgeRenderModel, EdgeView } from "../models/Edge";
 import type { NodeRenderModel } from "../models/Node";
 import type {
@@ -64,7 +64,6 @@ export class PassiveTreeRenderer {
     this.renderGroupBackgrounds(scene.groupBackgrounds);
     this.renderEdges(scene.edges);
     this.renderNodes(scene.nodes);
-    // this.renderOverlays(scene);
 
     this.#setupCulling(scene);
   }
@@ -146,14 +145,12 @@ export class PassiveTreeRenderer {
     this.culling.cull();
   }
 
-  enableDebug(app: Application) {
+  enableDebug() {
     if (!this.culling) return;
 
     this.debugOverlay = new DebugOverlay(this.viewport, this.culling);
 
     this.overlayLayer.addChild(this.debugOverlay.container);
-
-    app.stage.addChild(this.debugOverlay.getStatsLabel());
 
     // Re-run overlay update every time culling fires
     const originalCull = this.culling.cull.bind(this.culling);
@@ -166,7 +163,6 @@ export class PassiveTreeRenderer {
   disableDebug() {
     this.debugOverlay?.destroy();
     this.debugOverlay = null;
-    // Restore cull() to its original (rebuild culling manager)
   }
 
   public destroy(): void {

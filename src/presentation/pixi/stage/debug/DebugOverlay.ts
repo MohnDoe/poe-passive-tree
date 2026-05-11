@@ -25,6 +25,8 @@ export class DebugOverlay {
       },
     });
 
+    this.container.addChild(this.cullingStatsLabel);
+
     this.#updateCullingStatsLabelPosition();
   }
 

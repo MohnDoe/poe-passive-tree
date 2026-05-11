@@ -90,11 +90,11 @@ export class PassiveTreeStage {
       this.groupBackgroundLayer,
       this.edgeLayer,
       this.nodeLayer,
-      this.overlayLayer,
     );
 
     this.viewport.addChild(this.world);
     this.app.stage.addChild(this.viewport);
+    this.app.stage.addChild(this.overlayLayer);
     this.host.appendChild(app.canvas);
 
     const assetStore = new PassiveTreeAssetStore(renderAssets);
@@ -127,7 +127,7 @@ export class PassiveTreeStage {
 
   enableDebug(): void {
     if (!this.app) return;
-    this.renderer?.enableDebug(this.app);
+    this.renderer?.enableDebug();
   }
 
   disableDebug(): void {

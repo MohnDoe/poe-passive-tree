@@ -61,8 +61,6 @@ onMounted(async () => {
 
   nextStage.fitToBounds(graph.value.bounds);
 
-  nextStage.enableDebug();
-
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "F2") {
       if (debugActive.value) {
