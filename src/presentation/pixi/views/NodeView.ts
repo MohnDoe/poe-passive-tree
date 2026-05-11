@@ -1,6 +1,6 @@
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { makeShallowEqual } from "@/shared/utils/utils";
-import { Container, Graphics, Sprite, Texture } from "pixi.js";
+import { Circle, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type {
   NodeBuildState,
   NodeHoverState,
@@ -78,7 +78,7 @@ export class NodeView implements INodeView {
 
     this.container = new Container({
       position: { x: model.x, y: model.y },
-      eventMode: "none",
+      eventMode: "static",
       cursor: "pointer",
     });
 
@@ -145,6 +145,8 @@ export class NodeView implements INodeView {
 
     this.iconMask.context = this.assetStore.getCircleContext(size);
     this.iconSprite.mask = this.iconMask;
+
+    this.container.hitArea = new Circle(0, 0, (size / 2) * 1.5);
   }
 
   #redraw() {

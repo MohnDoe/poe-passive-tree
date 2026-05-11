@@ -34,6 +34,8 @@ export class PassiveTreeStage {
   });
   private nodeLayer = new Container({
     label: "nodeLayer",
+    eventMode: "passive",
+    interactiveChildren: true,
   });
   private overlayLayer = new Container({
     label: "overlayLayer",
@@ -83,7 +85,13 @@ export class PassiveTreeStage {
     });
     this.resizeObserver.observe(host);
 
-    this.world.addChild(this.backgroundLayer, this.edgeLayer, this.nodeLayer, this.overlayLayer);
+    this.world.addChild(
+      this.backgroundLayer,
+      this.groupBackgroundLayer,
+      this.edgeLayer,
+      this.nodeLayer,
+      this.overlayLayer,
+    );
 
     this.viewport.addChild(this.world);
     this.app.stage.addChild(this.viewport);
