@@ -125,6 +125,15 @@ export class PassiveTreeStage {
     globalThis.__PIXI_RENDERED__ = this.renderer;
   }
 
+  enableDebug(): void {
+    if (!this.app) return;
+    this.renderer?.enableDebug(this.app);
+  }
+
+  disableDebug(): void {
+    this.renderer?.disableDebug();
+  }
+
   public render(scene: TreeSceneRenderModel): void {
     if (!this.renderer) return;
     this.renderer.render(scene);

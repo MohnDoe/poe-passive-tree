@@ -23,6 +23,8 @@ const hostRef = ref<HTMLDivElement | null>(null);
 const stage = shallowRef<PassiveTreeStage | null>(null);
 const readyState = ref<StageReadyState>("mounting");
 
+const debugActive = ref<boolean>(false);
+
 const defaultHoverPreviewState: HoverPreviewState = {
   hoveredNodeId: null,
   highlight: {
@@ -58,6 +60,20 @@ onMounted(async () => {
   nextStage.renderStaticScene(createTreeSceneModel({ graph: graph.value }));
 
   nextStage.fitToBounds(graph.value.bounds);
+
+  nextStage.enableDebug();
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "F2") {
+      if (debugActive.value) {
+        nextStage.disableDebug();
+      } else {
+        nextStage.enableDebug();
+      }
+      debugActive.value = !debugActive.value;
+    }
+  };
+  window.addEventListener("keydown", onKeyDown);
 });
 
 watch(graph, (nextGraph) => {

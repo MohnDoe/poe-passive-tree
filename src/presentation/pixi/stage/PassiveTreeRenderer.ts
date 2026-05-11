@@ -1,7 +1,7 @@
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import { Container } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import type { EdgeRenderModel, EdgeView } from "../models/Edge";
 import type { NodeRenderModel } from "../models/Node";
 import type {
@@ -18,6 +18,7 @@ import type { Viewport } from "pixi-viewport";
 import { passiveTreeTheme } from "../theme/passiveTree.theme";
 import { computeEdgeBounds } from "../utils/edgeBounds";
 import { CullingManager } from "./CullingManager";
+import { DebugOverlay } from "./debug/DebugOverlay";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -31,6 +32,7 @@ export interface PassiveTreeRendererDeps {
 }
 
 export class PassiveTreeRenderer {
+  private debugOverlay: DebugOverlay | null = null;
   private readonly backgroundLayer: Container;
   private readonly edgeLayer: Container;
   private readonly nodeLayer: Container;
@@ -144,6 +146,29 @@ export class PassiveTreeRenderer {
     this.culling.cull();
   }
 
+  enableDebug(app: Application) {
+    if (!this.culling) return;
+
+    this.debugOverlay = new DebugOverlay(this.viewport, this.culling);
+
+    this.overlayLayer.addChild(this.debugOverlay.container);
+
+    app.stage.addChild(this.debugOverlay.getStatsLabel());
+
+    // Re-run overlay update every time culling fires
+    const originalCull = this.culling.cull.bind(this.culling);
+    this.culling.cull = () => {
+      originalCull();
+      this.debugOverlay?.update();
+    };
+  }
+
+  disableDebug() {
+    this.debugOverlay?.destroy();
+    this.debugOverlay = null;
+    // Restore cull() to its original (rebuild culling manager)
+  }
+
   public destroy(): void {
     for (const view of this.nodeViews.values()) {
       view.destroy();
@@ -173,6 +198,8 @@ export class PassiveTreeRenderer {
     this.culling = null;
 
     this.viewport.removeAllListeners();
+
+    this.debugOverlay?.destroy();
   }
 
   public updateNodeStates(state: TreeVisualStateModel): void {

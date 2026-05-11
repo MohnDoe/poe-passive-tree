@@ -78,6 +78,14 @@ export class CullingManager {
     return a.maxX >= b.minX && a.minX <= b.maxX && a.maxY >= b.minY && a.minY <= b.maxY;
   }
 
+  public getNodeViews(): Map<NodeId, NodeView> {
+    return this.nodeViews;
+  }
+
+  public getEdgeViews(): Map<NodeId, EdgeView> {
+    return this.edgeViews;
+  }
+
   /**
    * Runs one full cull pass. Safe to call on every viewport event.
    */
