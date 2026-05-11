@@ -186,7 +186,7 @@ export class PassiveTreeStage {
     // 3. Update clampZoom bounds relative to the fit scale.
     this.viewport.clampZoom({
       minScale: fitScale * 0.9,
-      maxScale: fitScale * 5,
+      maxScale: fitScale * 10,
     });
 
     this.viewport.scale.set(fitScale);

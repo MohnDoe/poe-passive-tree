@@ -66,7 +66,6 @@ export class CullingManager {
    * Returns the current viewport frustum in world-space coordinates.
    */
   private getWorldFrustum(): CullableBounds {
-    // viewport.x/y is the top-left corner in world space
     const left = -this.viewport.x / this.viewport.scale.x;
     const top = -this.viewport.y / this.viewport.scale.y;
     const right = left + this.viewport.screenWidth / this.viewport.scale.x;

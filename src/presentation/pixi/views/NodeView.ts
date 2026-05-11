@@ -1,6 +1,6 @@
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { makeShallowEqual } from "@/shared/utils/utils";
-import { Circle, Container, Graphics, Sprite, Texture } from "pixi.js";
+import { Circle, Container, Sprite, Texture } from "pixi.js";
 import type {
   NodeBuildState,
   NodeHoverState,
@@ -57,7 +57,7 @@ export class NodeView implements INodeView {
   protected readonly iconHolder: Container;
 
   protected readonly iconSprite: Sprite;
-  protected iconMask: Graphics;
+  // protected iconMask: Graphics;
 
   protected readonly frameSprite: Sprite;
 
@@ -89,8 +89,8 @@ export class NodeView implements INodeView {
     this.iconHolder = new Container({});
     this.iconSprite = new Sprite({
       anchor: 0.5,
-      width: this.getSize(),
-      height: this.getSize(),
+      width: this.getSize() / 1.75,
+      height: this.getSize() / 1.75,
     });
     this.frameSprite = new Sprite({
       anchor: 0.5,
@@ -98,10 +98,15 @@ export class NodeView implements INodeView {
       height: this.getSize(),
     });
 
-    this.iconMask = new Graphics({ context: this.assetStore.getCircleContext(this.getSize()) });
-    this.iconSprite.mask = this.iconMask;
+    // this.iconMask = new Graphics({
+    //   context: this.assetStore.getCircleContext(this.iconSprite.getSize().width),
+    // });
+    // this.iconSprite.mask = this.iconMask;
 
-    this.iconHolder.addChild(this.iconMask, this.iconSprite);
+    this.iconHolder.addChild(
+      // this.iconMask,
+      this.iconSprite,
+    );
 
     this.container.addChild(this.iconHolder, this.frameSprite);
     this.container.hitArea = new Circle(0, 0, (this.#style.size / 2) * 1.5);
