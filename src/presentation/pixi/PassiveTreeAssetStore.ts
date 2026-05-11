@@ -57,6 +57,10 @@ export class PassiveTreeAssetStore {
     return this.getTexture("frame", frameCoordsKey);
   }
 
+  getGroupBackgroundTexture(coordsKey: string): Texture {
+    return this.getTexture("groupBackground", coordsKey);
+  }
+
   getTextureFromSheet(sheet: SpriteSheet, coordsKey: string): Texture {
     const cacheKey = `${sheet.filename}|${coordsKey}`;
     const cached = this.getCachedTexture(cacheKey);

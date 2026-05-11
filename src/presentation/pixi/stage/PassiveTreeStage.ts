@@ -106,6 +106,7 @@ export class PassiveTreeStage {
       groupBackgroundLayer: this.groupBackgroundLayer,
       callbacks,
       assetStore,
+      viewport: this.viewport,
     });
 
     callbacks.onReadyStateChange?.("skeleton");

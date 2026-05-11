@@ -1,7 +1,7 @@
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import { Container, Graphics } from "pixi.js";
+import { Container } from "pixi.js";
 import type { EdgeRenderModel, EdgeView } from "../models/Edge";
 import type { NodeRenderModel } from "../models/Node";
 import type {
@@ -10,9 +10,14 @@ import type {
   TreeSceneRenderModel,
   TreeVisualStateModel,
 } from "../models/Render";
-import { createEdgeView } from "../views/edge.view";
 import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
+import { createEdgeView } from "../views/edge.view";
+import { GroupBackgroundView } from "../views/GroupBackgroundView";
 import { NodeView } from "../views/NodeView";
+import type { Viewport } from "pixi-viewport";
+import { passiveTreeTheme } from "../theme/passiveTree.theme";
+import { computeEdgeBounds } from "../utils/edgeBounds";
+import { CullingManager } from "./CullingManager";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -22,6 +27,7 @@ export interface PassiveTreeRendererDeps {
   groupBackgroundLayer: Container;
   callbacks: TreeRendererCallbacks;
   assetStore: PassiveTreeAssetStore;
+  viewport: Viewport;
 }
 
 export class PassiveTreeRenderer {
@@ -35,7 +41,10 @@ export class PassiveTreeRenderer {
 
   private nodeViews = new Map<NodeId, NodeView>();
   private edgeViews = new Map<EdgeKey, EdgeView>();
-  private backgroundViews = new Map<string, Graphics>();
+  private groupBackgroundViews = new Map<string, GroupBackgroundView>();
+
+  private culling: CullingManager | null = null;
+  private readonly viewport: Viewport;
 
   constructor(deps: PassiveTreeRendererDeps) {
     this.backgroundLayer = deps.backgroundLayer;
@@ -46,6 +55,7 @@ export class PassiveTreeRenderer {
 
     this.callbacks = deps.callbacks;
     this.assetStore = deps.assetStore;
+    this.viewport = deps.viewport;
   }
 
   public render(scene: TreeSceneRenderModel): void {
@@ -53,21 +63,23 @@ export class PassiveTreeRenderer {
     this.renderEdges(scene.edges);
     this.renderNodes(scene.nodes);
     // this.renderOverlays(scene);
+
+    this.#setupCulling(scene);
   }
 
   private renderGroupBackgrounds(backgrounds: GroupBackgroundRenderModel[]): void {
-    for (const graphics of this.backgroundViews.values()) {
-      graphics.destroy();
+    for (const view of this.groupBackgroundViews.values()) {
+      view.destroy();
     }
 
-    this.backgroundViews.clear();
-    this.backgroundLayer.removeChildren();
+    this.groupBackgroundViews.clear();
+    this.groupBackgroundLayer.removeChildren();
 
     for (const background of backgrounds) {
-      const view = this.createBackgroundView(background);
+      const view = new GroupBackgroundView(background, this.assetStore);
 
-      this.backgroundViews.set(background.key, view);
-      this.backgroundLayer.addChild(view);
+      this.groupBackgroundViews.set(background.key, view);
+      this.groupBackgroundLayer.addChild(view.container);
     }
   }
 
@@ -107,13 +119,29 @@ export class PassiveTreeRenderer {
     }
   }
 
-  private createBackgroundView(background: GroupBackgroundRenderModel): Graphics {
-    const graphics = new Graphics();
+  #setupCulling(scene: TreeSceneRenderModel) {
+    this.culling?.destroy();
 
-    graphics.circle(background.x, background.y, 100);
-    graphics.fill({ color: 0xffffff, alpha: 0.1 });
+    this.culling = new CullingManager(this.viewport, this.nodeViews, this.edgeViews);
 
-    return graphics;
+    // Build static bounds from scene models
+    const nodeBoundsData = scene.nodes.map((n) => ({
+      id: n.id,
+      x: n.x,
+      y: n.y,
+      size: passiveTreeTheme.nodes.sizeByKind[n.kind] ?? passiveTreeTheme.nodes.sizeByKind.normal,
+    }));
+
+    const edgeBoundsData = scene.edges.map((e) => computeEdgeBounds(e));
+
+    this.culling.build(nodeBoundsData, edgeBoundsData);
+
+    this.viewport.on("moved", () => this.culling?.cullDeferred());
+    this.viewport.on("zoomed", () => this.culling?.cullDeferred());
+    this.viewport.on("moved-end", () => this.culling?.cull());
+    //
+    // Initial cull pass
+    this.culling.cull();
   }
 
   public destroy(): void {
@@ -129,16 +157,22 @@ export class PassiveTreeRenderer {
 
     this.edgeViews.clear();
 
-    for (const graphics of this.backgroundViews.values()) {
+    for (const graphics of this.groupBackgroundViews.values()) {
       graphics.destroy();
     }
 
-    this.backgroundViews.clear();
+    this.groupBackgroundViews.clear();
 
     this.backgroundLayer.removeChildren();
     this.edgeLayer.removeChildren();
     this.nodeLayer.removeChildren();
     this.overlayLayer.removeChildren();
+    this.groupBackgroundLayer.removeChildren();
+
+    this.culling?.destroy();
+    this.culling = null;
+
+    this.viewport.removeAllListeners();
   }
 
   public updateNodeStates(state: TreeVisualStateModel): void {

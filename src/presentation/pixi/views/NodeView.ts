@@ -89,24 +89,22 @@ export class NodeView implements INodeView {
     this.iconHolder = new Container({});
     this.iconSprite = new Sprite({
       anchor: 0.5,
-      width: this.#style.size,
-      height: this.#style.size,
+      width: this.getSize(),
+      height: this.getSize(),
     });
     this.frameSprite = new Sprite({
       anchor: 0.5,
-      width: this.#style.size,
-      height: this.#style.size,
+      width: this.getSize(),
+      height: this.getSize(),
     });
 
-    this.iconMask = new Graphics({ context: this.assetStore.getCircleContext(this.#style.size) });
-
+    this.iconMask = new Graphics({ context: this.assetStore.getCircleContext(this.getSize()) });
     this.iconSprite.mask = this.iconMask;
-
-    this.container.hitArea = new Circle(0, 0, (this.#style.size / 2) * 1.5);
 
     this.iconHolder.addChild(this.iconMask, this.iconSprite);
 
     this.container.addChild(this.iconHolder, this.frameSprite);
+    this.container.hitArea = new Circle(0, 0, (this.#style.size / 2) * 1.5);
 
     this.#bindEvents();
     this.#draw(this.#style);
@@ -128,6 +126,10 @@ export class NodeView implements INodeView {
     if (sameHoverState(this.#hoverState, next)) return;
     this.#hoverState = next;
     this.#redraw();
+  }
+
+  getSize(): number {
+    return this.#style.size;
   }
 
   #draw(style: NodeVisualStyle) {
