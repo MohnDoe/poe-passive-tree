@@ -54,11 +54,7 @@ export class NodeView implements INodeView {
   protected readonly model: NodeRenderModel;
   protected readonly callbacks: NodeViewCallbacks;
 
-  protected readonly iconHolder: Container;
-
   protected readonly iconSprite: Sprite;
-  // protected iconMask: Graphics;
-
   protected readonly frameSprite: Sprite;
 
   #buildState: NodeBuildState;
@@ -86,7 +82,6 @@ export class NodeView implements INodeView {
     this.#hoverState = { ...defaultHoverState };
     this.#style = resolveNodeStyle(model, this.#buildState, this.#hoverState);
 
-    this.iconHolder = new Container({});
     this.iconSprite = new Sprite({
       anchor: 0.5,
       width: this.getSize() / 1.75,
@@ -98,17 +93,7 @@ export class NodeView implements INodeView {
       height: this.getSize(),
     });
 
-    // this.iconMask = new Graphics({
-    //   context: this.assetStore.getCircleContext(this.iconSprite.getSize().width),
-    // });
-    // this.iconSprite.mask = this.iconMask;
-
-    this.iconHolder.addChild(
-      // this.iconMask,
-      this.iconSprite,
-    );
-
-    this.container.addChild(this.iconHolder, this.frameSprite);
+    this.container.addChild(this.iconSprite, this.frameSprite);
     this.container.hitArea = new Circle(0, 0, (this.#style.size / 2) * 1.5);
 
     this.#bindEvents();
@@ -175,6 +160,8 @@ export class NodeView implements INodeView {
     });
     this.container.on("pointerover", () => {
       this.callbacks.onHover?.(this.model.id);
+      console.log(this.model);
+      console.log(this.#style);
     });
     this.container.on("pointerout", () => {
       this.callbacks.onHover?.(null);
