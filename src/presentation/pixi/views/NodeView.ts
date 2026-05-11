@@ -82,19 +82,31 @@ export class NodeView implements INodeView {
       cursor: "pointer",
     });
 
-    this.iconHolder = new Container({});
-    this.iconSprite = new Sprite({ anchor: 0.5 });
+    this.#buildState = { ...defaultBuildState };
+    this.#hoverState = { ...defaultHoverState };
+    this.#style = resolveNodeStyle(model, this.#buildState, this.#hoverState);
 
-    this.frameSprite = new Sprite({ anchor: 0.5 });
-    this.iconMask = new Graphics();
+    this.iconHolder = new Container({});
+    this.iconSprite = new Sprite({
+      anchor: 0.5,
+      width: this.#style.size,
+      height: this.#style.size,
+    });
+    this.frameSprite = new Sprite({
+      anchor: 0.5,
+      width: this.#style.size,
+      height: this.#style.size,
+    });
+
+    this.iconMask = new Graphics({ context: this.assetStore.getCircleContext(this.#style.size) });
+
+    this.iconSprite.mask = this.iconMask;
+
+    this.container.hitArea = new Circle(0, 0, (this.#style.size / 2) * 1.5);
 
     this.iconHolder.addChild(this.iconMask, this.iconSprite);
 
     this.container.addChild(this.iconHolder, this.frameSprite);
-
-    this.#buildState = { ...defaultBuildState };
-    this.#hoverState = { ...defaultHoverState };
-    this.#style = resolveNodeStyle(model, this.#buildState, this.#hoverState);
 
     this.#bindEvents();
     this.#draw(this.#style);
@@ -119,7 +131,7 @@ export class NodeView implements INodeView {
   }
 
   #draw(style: NodeVisualStyle) {
-    const { size, iconSpriteCategory, frameCoordsKey } = style;
+    const { iconSpriteCategory, frameCoordsKey } = style;
 
     const iconTexture = this.assetStore.getNodeIconTexture(this.model, iconSpriteCategory);
 
@@ -137,16 +149,8 @@ export class NodeView implements INodeView {
         );
       }
       this.frameSprite.texture = frameTexture;
-      this.frameSprite.setSize(size);
     }
-
     this.iconSprite.texture = iconTexture;
-    this.iconSprite.setSize(size);
-
-    this.iconMask.context = this.assetStore.getCircleContext(size);
-    this.iconSprite.mask = this.iconMask;
-
-    this.container.hitArea = new Circle(0, 0, (size / 2) * 1.5);
   }
 
   #redraw() {
