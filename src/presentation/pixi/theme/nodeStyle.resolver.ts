@@ -1,4 +1,6 @@
 import type {
+  MasteryNodeRenderModel,
+  MasteryNodeVisualStyle,
   NodeBuildState,
   NodeHoverState,
   NodeRenderModel,
@@ -21,5 +23,25 @@ export function resolveNodeStyle(
     size,
     iconSpriteCategory: categoryName,
     frameCoordsKey,
+  };
+}
+
+export function resolveMasteryNodeStyle(
+  model: MasteryNodeRenderModel,
+  build: NodeBuildState,
+  hover: NodeHoverState,
+): MasteryNodeVisualStyle {
+  const visualStyle = resolveNodeStyle(model, build, hover);
+  let effectImage = null;
+
+  if (build.isAllocated) {
+    effectImage = model.activeEffectImage;
+  }
+
+  return {
+    ...visualStyle,
+    size: visualStyle.size * 2,
+    effectImage,
+    frameCoordsKey: null,
   };
 }

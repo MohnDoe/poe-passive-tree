@@ -50,6 +50,9 @@ onMounted(async () => {
       treeInteraction.toggleNode(nodeId);
     },
     onNodeHover: (nodeId) => {
+      console.log(graph.value?.nodesById.get(nodeId ?? ""));
+      console.log("nodeRegion", graph.value?.regionByNodeId.get(nodeId ?? ""));
+      console.log("nodeSubregion", graph.value?.subregionByNodeId.get(nodeId ?? ""));
       uiStore.setHoveredNodeId(nodeId);
     },
     onReadyStateChange(state) {

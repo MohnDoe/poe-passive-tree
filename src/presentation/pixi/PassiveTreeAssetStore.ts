@@ -6,7 +6,7 @@ import type {
   ZoomLevel,
 } from "@/domain/graph/PassiveTreeRenderAssets";
 import { Assets, GraphicsContext, Rectangle, Texture } from "pixi.js";
-import type { NodeRenderModel } from "./models/Node";
+import type { MasteryNodeRenderModel, NodeRenderModel } from "./models/Node";
 import { passiveTreeTheme } from "./theme/passiveTree.theme";
 
 export function getSpriteSheetIndexHighestZoomLevel(category: SpriteCategory): ZoomLevel {
@@ -59,6 +59,26 @@ export class PassiveTreeAssetStore {
 
   getGroupBackgroundTexture(coordsKey: string): Texture {
     return this.getTexture("groupBackground", coordsKey);
+  }
+
+  getMasteryNodeIconTexture(model: MasteryNodeRenderModel, nodeState: SpriteCategoryName): Texture {
+    let icon: string;
+
+    switch (nodeState) {
+      case "masteryInactive":
+        icon = model.inactiveIcon;
+        break;
+      case "masteryConnected":
+        icon = model.activeIcon;
+        break;
+      case "masteryActiveSelected":
+        icon = model.activeIcon;
+        break;
+      default:
+        icon = model.icon;
+        break;
+    }
+    return this.getTexture(nodeState, icon);
   }
 
   getTextureFromSheet(sheet: SpriteSheet, coordsKey: string): Texture {

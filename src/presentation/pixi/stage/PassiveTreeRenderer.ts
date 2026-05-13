@@ -13,12 +13,14 @@ import type {
 import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 import { createEdgeView } from "../views/edge.view";
 import { GroupBackgroundView } from "../views/GroupBackgroundView";
-import { NodeView } from "../views/NodeView";
+import { BaseNodeView } from "../views/BaseNodeView";
 import type { Viewport } from "pixi-viewport";
 import { passiveTreeTheme } from "../theme/passiveTree.theme";
 import { computeEdgeBounds } from "../utils/edgeBounds";
 import { CullingManager } from "./CullingManager";
 import { DebugOverlay } from "./debug/DebugOverlay";
+import { NodeView } from "../views/NodeView";
+import { MasteryNodeView } from "../views/MasteryNodeView";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
@@ -41,7 +43,7 @@ export class PassiveTreeRenderer {
   private readonly callbacks: TreeRendererCallbacks;
   private readonly assetStore: PassiveTreeAssetStore;
 
-  private nodeViews = new Map<NodeId, NodeView>();
+  private nodeViews = new Map<NodeId, BaseNodeView>();
   private edgeViews = new Map<EdgeKey, EdgeView>();
   private groupBackgroundViews = new Map<string, GroupBackgroundView>();
 
@@ -110,10 +112,19 @@ export class PassiveTreeRenderer {
     this.nodeLayer.removeChildren();
 
     for (const node of nodes) {
-      const view = new NodeView(node, this.assetStore, {
-        onClick: this.callbacks.onNodeClick,
-        onHover: this.callbacks.onNodeHover,
-      });
+      let view: BaseNodeView;
+
+      if (node.kind === "mastery") {
+        view = new MasteryNodeView(node, this.assetStore, {
+          onClick: this.callbacks.onNodeClick,
+          onHover: this.callbacks.onNodeHover,
+        });
+      } else {
+        view = new NodeView(node, this.assetStore, {
+          onClick: this.callbacks.onNodeClick,
+          onHover: this.callbacks.onNodeHover,
+        });
+      }
 
       this.nodeViews.set(node.id, view);
       this.nodeLayer.addChild(view.container);

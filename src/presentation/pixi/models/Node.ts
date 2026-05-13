@@ -1,13 +1,22 @@
 import type { NodeId, PassiveNodeKind } from "@/domain/graph/PassiveNode";
 import type { SpriteCategoryName } from "@/domain/graph/PassiveTreeRenderAssets";
 
-export interface NodeRenderModel {
+export interface BaseRenderModel {
   id: NodeId;
   x: number;
   y: number;
   kind: PassiveNodeKind;
   icon: string;
 }
+
+export type MasteryNodeRenderModel = BaseRenderModel & {
+  kind: "mastery";
+  activeIcon: string;
+  inactiveIcon: string;
+  activeEffectImage: string;
+};
+
+export type NodeRenderModel = BaseRenderModel;
 
 export interface NodeBuildState {
   isAllocated: boolean;
@@ -20,10 +29,16 @@ export interface NodeHoverState {
   isInRefundPath: boolean;
 }
 
-export interface NodeVisualStyle {
+export interface BaseNodeVisualStyle {
   size: number;
   iconSpriteCategory: SpriteCategoryName;
   frameCoordsKey: string | null;
+}
+
+export type NodeVisualStyle = BaseNodeVisualStyle;
+
+export interface MasteryNodeVisualStyle extends BaseNodeVisualStyle {
+  effectImage: string | null;
 }
 
 export interface NodeViewCallbacks {

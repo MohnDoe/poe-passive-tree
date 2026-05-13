@@ -1,5 +1,5 @@
 import type { Viewport } from "pixi-viewport";
-import type { NodeView } from "../views/NodeView";
+import type { BaseNodeView } from "../views/BaseNodeView";
 import type { EdgeView } from "../models/Edge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
@@ -18,7 +18,7 @@ export class CullingManager {
   private edgeBounds = new Map<EdgeKey, CullableBounds>();
 
   private viewport: Viewport;
-  private nodeViews: Map<NodeId, NodeView>;
+  private nodeViews: Map<NodeId, BaseNodeView>;
   private edgeViews: Map<EdgeKey, EdgeView>;
 
   // Padding so nodes at the edge of the frustum don't pop in/out
@@ -28,7 +28,7 @@ export class CullingManager {
 
   constructor(
     viewport: Viewport,
-    nodeViews: Map<NodeId, NodeView>,
+    nodeViews: Map<NodeId, BaseNodeView>,
     edgeViews: Map<EdgeKey, EdgeView>,
   ) {
     this.viewport = viewport;
@@ -78,7 +78,7 @@ export class CullingManager {
     return a.maxX >= b.minX && a.minX <= b.maxX && a.maxY >= b.minY && a.minY <= b.maxY;
   }
 
-  public getNodeViews(): Map<NodeId, NodeView> {
+  public getNodeViews(): Map<NodeId, BaseNodeView> {
     return this.nodeViews;
   }
 

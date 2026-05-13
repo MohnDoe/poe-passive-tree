@@ -18,14 +18,21 @@ export function resolveSpriteCategoryName(
     case "notable":
     case "normal":
       return (kind + (active ? "Active" : "Inactive")) as SpriteCategoryName;
-    case "mastery":
-      //TODO: handle all
-      //   "masteryConnected"
-      // | "masteryActiveSelected"
-      // | "masteryInactive"
-      // | "masteryActiveEffect"
+    case "mastery": {
+      const isAllocated = build.isAllocated;
+      const isHovered = hover.isInPreviewPath || hover.isHovered;
 
-      return active ? "masteryConnected" : "masteryInactive";
+      if (isAllocated) {
+        // Mastery effect visible when allocated
+        return "masteryActiveSelected";
+      } else if (isHovered) {
+        // Selected state on hover/preview
+        return "masteryConnected";
+      } else {
+        // Default unallocated state
+        return "masteryInactive";
+      }
+    }
     case "jewel":
       return "jewel";
     default:
