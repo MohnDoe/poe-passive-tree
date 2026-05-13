@@ -7,6 +7,7 @@ export class GroupBackgroundView {
   readonly container: Container;
 
   protected readonly sprite: Sprite;
+  protected readonly mirroredSprite: Sprite;
 
   protected readonly assetStore: PassiveTreeAssetStore;
   protected readonly model: GroupBackgroundRenderModel;
@@ -22,28 +23,35 @@ export class GroupBackgroundView {
       eventMode: "none",
       scale: 2,
     });
-    this.sprite = new Sprite({ anchor: 0.5 });
 
-    this.container.addChild(this.sprite);
+    this.sprite = new Sprite({ anchor: 0.5 });
+    this.mirroredSprite = new Sprite({ anchor: 0.5, renderable: false });
+
+    this.container.addChild(this.sprite, this.mirroredSprite);
 
     this.#draw();
-
-    // this.container.cacheAsTexture(true);
-    // // force cache to update on the next frame after creation
-    // requestAnimationFrame(() => {
-    //   this.container.updateCacheTexture();
-    // });
   }
 
   #draw() {
     const texture = this.assetStore.getGroupBackgroundTexture(this.model.image);
 
     if (texture === Texture.EMPTY) {
-      console.warn(`No group background texture ${this.model.image}`);
+      console.warn(`[GroupBackgroundView] No group background texture found for key ${this.key} using image ${this.model.image}`);
+      return;
     }
 
     this.sprite.texture = texture;
-    // this.sprite.setSize(texture.source.width, texture.source.height);
+    this.sprite.setSize(texture.width, texture.height);
+
+    if (this.model.isHalfImage) {
+      this.mirroredSprite.texture = texture;
+      this.mirroredSprite.scale.y = -1;
+      this.mirroredSprite.setSize(texture.width, texture.height);
+      this.mirroredSprite.renderable = true;
+
+      this.sprite.position.y = -texture.height / 2;
+      this.mirroredSprite.position.y = texture.height / 2;
+    }
   }
 
   destroy() {
