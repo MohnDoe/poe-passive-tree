@@ -53,7 +53,7 @@ function getStartNodeIdsByClassId(
   const out = new Map<ClassId, Set<NodeId>>();
 
   for (const [nodeId, node] of input.nodesById) {
-    if (node.classStartIndex !== undefined) {
+    if (node.kind === "classStart") {
       const classId = node.classStartIndex;
 
       // only neighbors in the main tree are start node

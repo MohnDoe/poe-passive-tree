@@ -3,10 +3,17 @@ import type { GraphEdge } from "../GraphEdge";
 import type { AscendancyId } from "../PassiveAscendancy";
 import type { ClassId } from "../PassiveClass";
 import type { PassiveGraph } from "../PassiveGraph";
-import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "../PassiveNode";
+import type {
+  NodeId,
+  PassiveNode,
+  PassiveNodeCommon,
+  PassiveNodeKind,
+  PassiveNodeRegion,
+  PassiveNodeSubregion,
+} from "../PassiveNode";
 
 export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): PassiveNode {
-  return {
+  const common: PassiveNodeCommon = {
     id: partial.id,
     name: partial.name ?? `node-${partial.id}`,
     stats: partial.stats ?? [],
@@ -14,14 +21,37 @@ export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): Passiv
     orbitIndex: partial.orbitIndex ?? 0,
     out: partial.out ?? [],
     in: partial.in ?? [],
-    kind: partial.kind ?? "normal",
-    isMultipleChoice: partial.isMultipleChoice ?? false,
-    isMultipleChoiceOption: partial.isMultipleChoiceOption ?? false,
     groupId: partial.groupId,
     position: partial.position,
-    ascendancyName: partial.ascendancyName,
-    classStartIndex: partial.classStartIndex,
+    ascendancyName: partial.ascendancyName ?? undefined,
+    icon: partial.icon ?? "",
   };
+
+  const kind: PassiveNodeKind = partial.kind ?? "normal";
+
+  switch (kind) {
+    case "ascendancyStart":
+      return { ...common, kind, ascendancyName: partial.ascendancyName! };
+    case "classStart":
+      return { ...common, kind, classStartIndex: 0 };
+    case "mastery":
+      return {
+        ...common,
+        kind,
+        activeEffectImage: "",
+        activeIcon: "",
+        inactiveIcon: "",
+      };
+    case "notable":
+    case "jewel":
+    case "normal":
+    case "keystone":
+    case "proxy":
+    case "multipleChoiceOption":
+    case "multipleChoice":
+    default:
+      return { ...common, kind };
+  }
 }
 
 function makeEdge(edge: Partial<GraphEdge> & { source: NodeId; target: NodeId }): GraphEdge {

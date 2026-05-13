@@ -1,6 +1,7 @@
 import type {
   NodeId,
   PassiveNode,
+  PassiveNodeCommon,
   PassiveNodeKind,
   PassiveNodePosition,
 } from "@/domain/graph/PassiveNode";
@@ -12,9 +13,8 @@ export function mapPassiveNodeDto(
   raw: PassiveTreeNodeDto,
   tree: PassiveTreeDto,
 ): PassiveNode {
-  const isClassStart = raw.classStartIndex !== undefined;
-
-  return {
+  const kind = getPassiveNodeKind(raw);
+  const common: PassiveNodeCommon = {
     id: nodeId,
     name: raw.name,
     out: raw.out ?? [],
@@ -23,14 +23,34 @@ export function mapPassiveNodeDto(
     orbitIndex: raw.orbit ?? 0,
     stats: raw.stats,
     icon: raw.icon,
-    kind: getPassiveNodeKind(raw),
     groupId: raw.group?.toString() ?? undefined,
     position: getPassiveNodePosition(nodeId, tree),
-    isMultipleChoice: raw.isMultipleChoice ?? false,
-    isMultipleChoiceOption: raw.isMultipleChoiceOption ?? false,
     ascendancyName: raw.ascendancyName ?? undefined,
-    classStartIndex: isClassStart ? raw.classStartIndex : undefined,
   };
+
+  switch (kind) {
+    case "ascendancyStart":
+      return { ...common, kind, ascendancyName: raw.ascendancyName! };
+    case "classStart":
+      return { ...common, kind, classStartIndex: raw.classStartIndex! };
+    case "mastery":
+      return {
+        ...common,
+        kind,
+        activeEffectImage: raw.activeEffectImage!,
+        activeIcon: raw.activeIcon!,
+        inactiveIcon: raw.inactiveIcon!,
+      };
+    case "notable":
+    case "jewel":
+    case "normal":
+    case "keystone":
+    case "proxy":
+    case "multipleChoiceOption":
+    case "multipleChoice":
+    default:
+      return { ...common, kind };
+  }
 }
 
 function getPassiveNodeKind(raw: PassiveTreeNodeDto): PassiveNodeKind {
@@ -41,6 +61,8 @@ function getPassiveNodeKind(raw: PassiveTreeNodeDto): PassiveNodeKind {
   if (raw.classStartIndex !== undefined) return "classStart";
   if (raw.isKeystone) return "keystone";
   if (raw.isNotable) return "notable";
+  if (raw.isMultipleChoice) return "multipleChoice";
+  if (raw.isMultipleChoiceOption) return "multipleChoiceOption";
   return "normal";
 }
 

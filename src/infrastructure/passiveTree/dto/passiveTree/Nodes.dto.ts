@@ -21,57 +21,54 @@ export interface PassiveTreeNodeDto extends PassiveTreeNodeBaseDto {
    * */
   stats: string[];
 
-  flavourText?: string[];
-  reminderText?: string[];
-
-  isNotable?: boolean;
-  isKeystone?: boolean;
-  isMastery?: boolean;
-  isJewelSocket?: boolean;
-
-  /** Extra metadata for jewel sockets (expansion jewels). */
-  expansionJewel?: PassiveTreeExpansionJewelDto;
-
-  isAscendancyStart?: boolean;
-
-  ascendancyName?: string;
-
   grantedStrength?: number;
-
   grantedDexterity?: number;
-
   grantedIntelligence?: number;
-
   grantedPassivePoints?: number;
 
-  isMultipleChoice?: boolean;
+  isMastery?: true;
+  /** Only when isMastery: true */
+  inactiveIcon?: string;
+  activeIcon?: string;
+  activeEffectImage?: string;
 
-  isMultipleChoiceOption?: boolean;
-
-  isProxy?: boolean;
-
-  isBlighted?: boolean;
+  isNotable?: true;
+  isBlighted?: true;
+  //* Present when isNotable or isBlighted */
+  recipe?: string[];
 
   classStartIndex?: number;
 
-  recipe?: number[];
+  isAscendancyStart?: true;
+  //** present when isAscendancyStart but sometimes present even when isAscendancyStart is false */
+  ascendancyName?: string;
 
-  [key: string]: unknown;
+  isKeystone?: true;
+  //** when isKeystone */
+  flavourText?: string[];
+
+  isMultipleChoice?: true;
+  isMultipleChoiceOption?: true;
+  //** present when isMultipleChoice/isMultipleChoiceOption and isKeystone
+  reminderText?: string[];
+
+  isProxy?: true;
+
+  isJewelSocket?: true;
+  //* present when isJewelSocket */
+  expansionJewel?: PassiveTreeExpansionJewelDto;
 }
 
 export type PassiveTreeRootNodeDto = PassiveTreeNodeBaseDto;
 
 export type PassiveTreeNodeEntryDto = PassiveTreeNodeDto | PassiveTreeRootNodeDto;
 
-export interface PassiveTreeExpansionJewelDto {
+interface PassiveTreeExpansionJewelDto {
   /** Jewel size (0: small, 1: medium, etc. in GGG exports). */
   size: number;
-
   index: number;
-
   proxy: string;
-
-  parent: string;
+  parent?: string;
 }
 
 export const ROOT_NODE_ID = "root" as const;

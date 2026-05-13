@@ -5,10 +5,10 @@ export function isAscendancyTraversalNode(node: PassiveNode) {
   if (node.kind === "jewel") return false;
   return (
     node.kind === "ascendancyStart" ||
-    !!node.ascendancyName ||
-    node.isMultipleChoice ||
-    node.isMultipleChoiceOption ||
-    node.kind == "proxy"
+    node.kind === "multipleChoice" ||
+    node.kind === "multipleChoiceOption" ||
+    node.kind === "proxy" ||
+    !!node.ascendancyName
   );
 }
 
