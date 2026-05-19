@@ -129,10 +129,20 @@ export interface LineGraphFixture {
     sixth: PassiveNode;
     startOtherClass: PassiveNode;
   };
+  edgePairs: [NodeId, NodeId][];
 }
 
 /** Straight line: start(0) -- 1 -- 2 -- 3 -- 4 -- 5 -- 6 */
 export function makeLineGraph(): LineGraphFixture {
+  const edgePairs: [NodeId, NodeId][] = [
+    ["start", "1"],
+    ["1", "2"],
+    ["2", "3"],
+    ["3", "4"],
+    ["4", "5"],
+    ["5", "6"],
+    ["6", "start-2"],
+  ];
   const graph = buildGraph({
     nodes: [
       makeNode({ id: "start", kind: "classStart", classStartIndex: 1 }),
@@ -144,15 +154,7 @@ export function makeLineGraph(): LineGraphFixture {
       makeNode({ id: "6" }),
       makeNode({ id: "start-2", kind: "classStart", classStartIndex: 2 }),
     ],
-    edgePairs: [
-      ["start", "1"],
-      ["1", "2"],
-      ["2", "3"],
-      ["3", "4"],
-      ["4", "5"],
-      ["5", "6"],
-      ["6", "start-2"],
-    ],
+    edgePairs,
   });
 
   return {
@@ -167,6 +169,7 @@ export function makeLineGraph(): LineGraphFixture {
       sixth: graph.nodesById.get("6")!,
       startOtherClass: graph.nodesById.get("start-2")!,
     },
+    edgePairs,
   };
 }
 
