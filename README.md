@@ -2,15 +2,16 @@
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)
 ![Vue.js](https://img.shields.io/badge/Vue.js-4FC08D?logo=vuedotjs&logoColor=fff)
-![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=fff) 
 ![Pixi.js](https://img.shields.io/badge/Pixi.js-8-e91e63)
-![Coverage](https://img.shields.io/badge/Coverage-25%25-red)
-
 
 A faithful, interactive recreation of the **Path of Exile passive skill tree** built as a modern web application. This is a personal deep-dive project combining complex graph data structures, high-performance WebGL rendering, and clean domain-driven architecture.
 
 > [!NOTE]
 > **Core logic is complete, visual rendering is in progress.** Graph traversal, node allocation, hover pathfinding, and the full DDD architecture are implemented and functional. The Pixi.js rendering layer (sprite assets, visual theming, animations) is actively being built on top of this foundation.
+
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=fff)
+![Coverage](https://img.shields.io/badge/Coverage-30%25-orange)
+See coverage progress [here](https://github.com/MohnDoe/poe-passive-tree/milestone/1).
 
 ![Passive tree screenshot](docs/assets/screenshot.png)
 
