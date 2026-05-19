@@ -46,8 +46,12 @@ export function buildGraph(params: {
     makeEdge({ source, target }),
   );
   const nodesById = new Map<NodeId, PassiveNode>(params.nodes.map((n) => [n.id, n]));
-  const classId = 1 as ClassId;
-  const classesById = new Map([[classId, { id: classId, name: "TestClass", ascendancyIds: [] }]]);
+  const firstClassId = 1 as ClassId;
+  const secondClassId = 2 as ClassId;
+  const classesById = new Map([
+    [firstClassId, { id: firstClassId, name: "TestClass", ascendancyIds: [] }],
+    [secondClassId, { id: secondClassId, name: "TestClass2", ascendancyIds: [] }],
+  ]);
 
   const adjacency = new Map<NodeId, Set<NodeId>>();
   for (const n of params.nodes) adjacency.set(n.id, new Set());
@@ -63,7 +67,14 @@ export function buildGraph(params: {
     params.subregionByNodeId ??
     new Map<NodeId, PassiveNodeSubregion>(params.nodes.map((n) => [n.id, null]));
   const startNodes = params.nodes.filter((n) => n.kind === "classStart");
-  const allStartNodeIds = new Set<NodeId>(startNodes.map((n) => n.id));
+
+  const firstClassStartNodes = startNodes.filter((n) => n.classStartIndex === firstClassId);
+  const firstClassStartNodeIds = firstClassStartNodes.map((n) => n.id);
+
+  const secondClassStartNodes = startNodes.filter((n) => n.classStartIndex === secondClassId);
+  const secondClassStartNodeIds = secondClassStartNodes.map((n) => n.id);
+
+  const allStartNodeIds = new Set<NodeId>([...firstClassStartNodeIds, ...secondClassStartNodeIds]);
 
   const ascendancyStartNodes = params.nodes.filter((n) => n.kind === "ascendancyStart");
   const ascendancyStartNodeIds = new Set<NodeId>(ascendancyStartNodes.map((n) => n.id));
@@ -91,11 +102,17 @@ export function buildGraph(params: {
     regionByNodeId,
     subregionByNodeId,
     allStartNodeIds,
-    startNodeIdsByClassId: new Map([[classId, allStartNodeIds]]),
-    classByStartNodeId: new Map(startNodes.map((n) => [n.id, classId])),
+    startNodeIdsByClassId: new Map([
+      [firstClassId, new Set(firstClassStartNodeIds)],
+      [secondClassId, new Set(secondClassStartNodeIds)],
+    ]),
+    classByStartNodeId: new Map(startNodes.map((n) => [n.id, n.classStartIndex as ClassId])),
     ascendancyStartNodeIds,
     ascendancyStartNodeIdsByAscendancyId,
-    ascendancyIdsByClassId: new Map([[classId, new Set()]]),
+    ascendancyIdsByClassId: new Map([
+      [firstClassId, new Set()],
+      [secondClassId, new Set()],
+    ]),
     edges,
   };
 }
@@ -110,6 +127,7 @@ export interface LineGraphFixture {
     fourth: PassiveNode;
     fifth: PassiveNode;
     sixth: PassiveNode;
+    startOtherClass: PassiveNode;
   };
 }
 
@@ -124,6 +142,7 @@ export function makeLineGraph(): LineGraphFixture {
       makeNode({ id: "4" }),
       makeNode({ id: "5" }),
       makeNode({ id: "6" }),
+      makeNode({ id: "start-2", kind: "classStart", classStartIndex: 2 }),
     ],
     edgePairs: [
       ["start", "1"],
@@ -132,6 +151,7 @@ export function makeLineGraph(): LineGraphFixture {
       ["3", "4"],
       ["4", "5"],
       ["5", "6"],
+      ["6", "start-2"],
     ],
   });
 
@@ -145,6 +165,7 @@ export function makeLineGraph(): LineGraphFixture {
       fourth: graph.nodesById.get("4")!,
       fifth: graph.nodesById.get("5")!,
       sixth: graph.nodesById.get("6")!,
+      startOtherClass: graph.nodesById.get("start-2")!,
     },
   };
 }
