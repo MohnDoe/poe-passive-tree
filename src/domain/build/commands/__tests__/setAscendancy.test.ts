@@ -1,14 +1,9 @@
 import { makeBuildState } from "@/domain/build/__tests__/BuildState.fixtures.ts";
 import { makeCustomAscendancyGraph } from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
-import type { ClassId } from "@/domain/graph/PassiveClass.ts";
 import { assert, describe, expect, it } from "vitest";
 import { setAscendancy } from "../setAscendancy.ts";
 
 describe("setAscendancy", () => {
-  const classWithNoAscendancy: ClassId = 1;
-  const classWithOneAscendancy: ClassId = 2; // ascendancyA
-  const classWithTwoAscendancies: ClassId = 3; // ascendancyB + ascendancyC
-
   describe("error cases", () => {
     it("returns NO_ACTIVE_CLASS when no class is active", () => {
       const build = makeBuildState({ activeClassId: null, activeAscendancy: null });
@@ -20,11 +15,11 @@ describe("setAscendancy", () => {
     });
 
     it("returns NO_CHANGE when new ascendancy is the same as the current active ascendancy", () => {
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: "ascendancyA",
       });
-      const { graph } = makeCustomAscendancyGraph();
 
       const result = setAscendancy(build, graph, "ascendancyA");
 
@@ -32,11 +27,11 @@ describe("setAscendancy", () => {
     });
 
     it("returns NO_CHANGE when setting null ascendancy while already null", () => {
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: null,
       });
-      const { graph } = makeCustomAscendancyGraph();
 
       const result = setAscendancy(build, graph, null);
 
@@ -44,11 +39,11 @@ describe("setAscendancy", () => {
     });
 
     it("returns INVALID_ASCENDANCY_FOR_CLASS for any ascendancy for class with no ascendancy", () => {
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithNoAscendancy,
+        activeClassId: classes.noAscendancy,
         activeAscendancy: null,
       });
-      const { graph } = makeCustomAscendancyGraph();
 
       const targetAscendancy = "ascendancyA";
 
@@ -58,11 +53,11 @@ describe("setAscendancy", () => {
     });
 
     it("returns INVALID_ASCENDANCY_FOR_CLASS for wrong ascendancy", () => {
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: null,
       });
-      const { graph } = makeCustomAscendancyGraph();
 
       const result = setAscendancy(build, graph, "ascendancyB");
 
@@ -72,9 +67,9 @@ describe("setAscendancy", () => {
 
   describe("success removing ascendancy", () => {
     it("keeps non-ascendancy allocations when removing ascendancy", () => {
-      const { graph, nodes } = makeCustomAscendancyGraph();
+      const { graph, nodes, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: "ascendancyA",
         allocatedNodeIds: new Set([nodes.main.normal.id]),
       });
@@ -87,9 +82,9 @@ describe("setAscendancy", () => {
     });
 
     it("removes ascendancy allocations when removing ascendancy", () => {
-      const { graph, nodes } = makeCustomAscendancyGraph();
+      const { graph, nodes, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: "ascendancyA",
         allocatedNodeIds: new Set([nodes.main.normal.id, nodes.ascendancyA.normal.id]),
       });
@@ -104,9 +99,9 @@ describe("setAscendancy", () => {
     });
 
     it("updates activeAscendancy to null on success", () => {
-      const { graph } = makeCustomAscendancyGraph();
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: "ascendancyA",
       });
 
@@ -119,9 +114,9 @@ describe("setAscendancy", () => {
 
   describe("success setting new ascendancy", () => {
     it("updates activeAscendancy when setting valid ascendancy", () => {
-      const { graph } = makeCustomAscendancyGraph();
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: null,
       });
 
@@ -132,9 +127,9 @@ describe("setAscendancy", () => {
     });
 
     it("clears ascendancy allocations when setting new ascendancy", () => {
-      const { graph, nodes } = makeCustomAscendancyGraph();
+      const { graph, nodes, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithTwoAscendancies,
+        activeClassId: classes.twoAscendancies,
         activeAscendancy: "ascendancyB",
         allocatedNodeIds: new Set([nodes.ascendancyB.normal.id]),
       });
@@ -147,9 +142,9 @@ describe("setAscendancy", () => {
     });
 
     it("preserves non-ascendancy allocations when setting new ascendancy", () => {
-      const { graph, nodes } = makeCustomAscendancyGraph();
+      const { graph, nodes, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: null,
         allocatedNodeIds: new Set([nodes.main.normal.id]),
       });
@@ -162,9 +157,9 @@ describe("setAscendancy", () => {
     });
 
     it("works when setting ascendancy with no prior allocations", () => {
-      const { graph } = makeCustomAscendancyGraph();
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         allocatedNodeIds: new Set(),
       });
 
@@ -177,9 +172,9 @@ describe("setAscendancy", () => {
 
   describe("edge cases", () => {
     it("handles null ascendancy parameter correctly", () => {
-      const { graph } = makeCustomAscendancyGraph();
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: "ascendancyA",
       });
 
@@ -190,9 +185,9 @@ describe("setAscendancy", () => {
     });
 
     it("preserves point budgets when modifying ascendancy", () => {
-      const { graph } = makeCustomAscendancyGraph();
+      const { graph, classes } = makeCustomAscendancyGraph();
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         passivePointsBudget: 50,
       });
 
@@ -203,10 +198,10 @@ describe("setAscendancy", () => {
     });
 
     it("removes all ascendancy allocations regardless of which ascendancy", () => {
-      const { graph, nodes } = makeCustomAscendancyGraph();
+      const { graph, nodes, classes } = makeCustomAscendancyGraph();
 
       const build = makeBuildState({
-        activeClassId: classWithOneAscendancy,
+        activeClassId: classes.oneAscendancy,
         activeAscendancy: "ascendancyA",
         allocatedNodeIds: new Set([nodes.ascendancyA.normal.id, nodes.ascendancyB.normal.id]),
       });
