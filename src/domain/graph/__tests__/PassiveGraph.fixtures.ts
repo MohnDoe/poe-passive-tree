@@ -152,7 +152,7 @@ export function makeLineGraph(): LineGraphFixture {
       makeNode({ id: "4" }),
       makeNode({ id: "5" }),
       makeNode({ id: "6" }),
-      makeNode({ id: "start-2", kind: "classStart", classStartIndex: 2 }),
+      makeNode({ id: "start-2", kind: "classStart", classStartIndex: 1 }),
     ],
     edgePairs,
   });
@@ -383,14 +383,30 @@ export function makeRegionGraph(): RegionGraphFixture {
   };
 }
 
-export type CustomAscendancyGraphFixture = RegionGraphFixture;
+export interface CustomAscendancyGraphFixture extends RegionGraphFixture {
+  classes: {
+    noAscendancy: ClassId;
+    oneAscendancy: ClassId;
+    twoAscendancies: ClassId;
+  };
+}
 
 export function makeCustomAscendancyGraph(): CustomAscendancyGraphFixture {
   const { graph, nodes } = makeRegionGraph();
+
   graph.ascendancyIdsByClassId = new Map([
     // NOTE: class 1 does not have an ascendancy
     [2 as ClassId, new Set(["ascendancyA"])],
     [3 as ClassId, new Set(["ascendancyB", "ascendancyC"])],
   ]);
-  return { graph, nodes };
+
+  return {
+    graph,
+    nodes,
+    classes: {
+      noAscendancy: 1,
+      oneAscendancy: 2,
+      twoAscendancies: 3,
+    },
+  };
 }
