@@ -29,7 +29,7 @@ describe("getActiveRootNodeIds", () => {
     const { graph, nodes } = makeLineGraph();
     const result = getActiveRootNodeIds(graph, 1, null);
 
-    expect(result).toEqual(new Set([nodes.start.id]));
+    expect(result).toEqual(new Set([nodes.start.id, nodes.startOtherClass.id]));
   });
 
   it("returns only class start nodes when provided ascendancy is unknown", () => {
