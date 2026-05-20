@@ -364,3 +364,27 @@ export function makeRegionGraph(): RegionGraphFixture {
     },
   };
 }
+
+export interface CustomAscendancyGraphFixture {
+  graph: PassiveGraph;
+}
+
+export function makeCustomAscendancyGraph(): CustomAscendancyGraphFixture {
+  const nodes = [
+    makeNode({ id: "class-start", kind: "classStart", classStartIndex: 1 }),
+    makeNode({ id: "normal-0" }),
+  ];
+
+  const graph = buildGraph({
+    nodes,
+    edgePairs: [["class-start", "normal-0"]],
+    regionByNodeId: new Map(),
+    subregionByNodeId: new Map(),
+  });
+  graph.ascendancyIdsByClassId = new Map([
+    // NOTE: class 1 does not have an ascendancy
+    [2 as ClassId, new Set(["class2Ascendancy"])],
+    [3 as ClassId, new Set(["class3AscendancyA", "class3AscendancyB"])],
+  ]);
+  return { graph };
+}
