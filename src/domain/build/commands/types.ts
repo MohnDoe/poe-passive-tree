@@ -12,7 +12,6 @@ export type BuildCommandResult =
 
 export type BuildFailureReason =
   | "NO_ACTIVE_CLASS"
-  | "NODE_NOT_REFUNDABLE"
   | "NODE_NOT_FOUND"
   | "NODE_NOT_ALLOCATABLE"
   | "NODE_NOT_ALLOCATED"

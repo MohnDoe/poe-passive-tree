@@ -1,7 +1,6 @@
 import { computeWeightedPaths, materializePath } from "@/domain/build/algorithms/pathfinding";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
-import { setsEqual } from "@/shared/utils/utils";
 import type { BuildCommandContext, BuildCommandResult } from "./types";
 
 export function planAllocation(
@@ -39,13 +38,6 @@ export function planAllocation(
 
   for (const pathNodeId of path) {
     nextAllocatedNodeIds.add(pathNodeId);
-  }
-
-  if (setsEqual(nextAllocatedNodeIds, build.allocatedNodeIds)) {
-    return {
-      ok: false,
-      reason: "NO_CHANGE",
-    };
   }
 
   return {
