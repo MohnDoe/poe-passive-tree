@@ -3,10 +3,13 @@ import { ok, err } from "neverthrow";
 import { computeDependencies } from "@/domain/build/algorithms/dependencies";
 import { computeRefundClosure } from "@/domain/build/algorithms/refund";
 import { computeWeightedPaths, materializePath } from "@/domain/build/algorithms/pathfinding";
+import type { ClassId } from "@/domain/graph/PassiveClass";
 import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
+import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
+import { isAscendancyValidForClass } from "@/domain/graph/queries/isAscendancyValidForClass";
 
 export type BuildFailureReason =
   | "NO_ACTIVE_CLASS"
@@ -113,6 +116,55 @@ export class Build {
 
     return ok({
       ...build,
+      allocatedNodeIds: nextAllocatedNodeIds,
+    });
+  }
+
+  static setClass(
+    build: BuildState,
+    classId: ClassId,
+  ): Result<BuildState, BuildFailureReason> {
+    if (build.activeClassId === classId) {
+      return err("NO_CHANGE");
+    }
+
+    return ok({
+      ...build,
+      activeClassId: classId,
+      activeAscendancy: null,
+      allocatedNodeIds: new Set(),
+    });
+  }
+
+  static setAscendancy(
+    graph: PassiveGraph,
+    build: BuildState,
+    ascendancyId: AscendancyId | null,
+  ): Result<BuildState, BuildFailureReason> {
+    if (build.activeClassId === null) {
+      return err("NO_ACTIVE_CLASS");
+    }
+
+    if (build.activeAscendancy === ascendancyId) {
+      return err("NO_CHANGE");
+    }
+
+    if (
+      ascendancyId !== null &&
+      !isAscendancyValidForClass(graph, build.activeClassId, ascendancyId)
+    ) {
+      return err("INVALID_ASCENDANCY_FOR_CLASS");
+    }
+
+    const nextAllocatedNodeIds = new Set(
+      [...build.allocatedNodeIds].filter(
+        (nodeId) => graph.regionByNodeId.get(nodeId) !== "ascendancy",
+      ),
+    );
+
+    return ok({
+      ...build,
+      activeAscendancy: ascendancyId,
       allocatedNodeIds: nextAllocatedNodeIds,
     });
   }
