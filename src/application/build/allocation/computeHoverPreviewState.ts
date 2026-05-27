@@ -1,4 +1,4 @@
-import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
+import type { AllocationState } from "@/domain/build/AllocationState";
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import { getRefundAnalysis } from "@/domain/build/selectors/getRefundAnalysis";
 import { makeEdgeKey, makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
