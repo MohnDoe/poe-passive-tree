@@ -1,3 +1,9 @@
+## Toolchain
+
+- Package manager: bun (`bun install`, `bun add`, `bun rm`)
+- Test runner: bun (`bun test`)
+- Build: `bun run build`
+
 ## Agent skills
 
 ### Issue tracker
