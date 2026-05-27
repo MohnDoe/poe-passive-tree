@@ -371,6 +371,41 @@ describe("Build.refund", () => {
   });
 });
 
+describe("Build.toggle", () => {
+  it("returns NODE_NOT_FOUND for non-existent node", () => {
+    const { graph } = makeLineGraph();
+    const build = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
+
+    const result = Build.toggle(graph, build, "nonexistent");
+
+    assert(result.isErr());
+    expect(result.error).toBe("NODE_NOT_FOUND");
+  });
+
+  it("allocated an unallocated node", () => {
+    const { graph, nodes } = makeLineGraph();
+    const build = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
+
+    const result = Build.toggle(graph, build, nodes.first.id);
+
+    assert(result.isOk());
+    expect(result.value.allocatedNodeIds.has(nodes.first.id)).toBe(true);
+  });
+
+  it("refunds an allocated node", () => {
+    const { graph, nodes } = makeLineGraph();
+    const build = makeBuildState({
+      activeClassId: 1,
+      allocatedNodeIds: new Set([nodes.first.id]),
+    });
+
+    const result = Build.toggle(graph, build, nodes.first.id);
+
+    assert(result.isOk());
+    expect(result.value.allocatedNodeIds.has(nodes.first.id)).toBe(false);
+  });
+});
+
 describe("Build.refund errors", () => {
   it("returns NODE_NOT_FOUND when node does not exist", () => {
     const { graph } = makeLineGraph();
