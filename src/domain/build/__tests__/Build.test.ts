@@ -393,4 +393,15 @@ describe("Build.refund errors", () => {
 
     expect(result.error).toBe("NODE_NOT_ALLOCATED");
   });
+
+  it("returns NO_ACTIVE_CLASS when no class is active", () => {
+    const { graph, nodes } = makeLineGraph();
+    const build = makeBuildState({ activeClassId: null, allocatedNodeIds: new Set() });
+
+    const result = Build.refund(graph, build, nodes.first.id);
+
+    assert(result.isErr());
+
+    expect(result.error).toBe("NO_ACTIVE_CLASS");
+  });
 });
