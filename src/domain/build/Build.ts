@@ -17,6 +17,20 @@ export type BuildFailureReason =
   | "NO_CHANGE";
 
 export class Build {
+  static toggle(
+    graph: PassiveGraph,
+    build: BuildState,
+    nodeId: NodeId,
+  ): Result<BuildState, BuildFailureReason> {
+    if (!graph.nodesById.has(nodeId)) {
+      return err("NODE_NOT_FOUND");
+    }
+
+    return build.allocatedNodeIds.has(nodeId)
+      ? Build.refund(graph, build, nodeId)
+      : Build.allocate(graph, build, nodeId);
+  }
+
   static allocate(
     graph: PassiveGraph,
     build: BuildState,
