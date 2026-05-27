@@ -1,13 +1,11 @@
 import type { ClassId } from "@/domain/graph/PassiveClass";
 import type { BuildState } from "../models/BuildState";
+import { Build } from "../Build";
 
 export function setClass(build: BuildState, classId: ClassId): BuildState {
-  if (build.activeClassId === classId) return build;
-
-  return {
-    ...build,
-    activeClassId: classId,
-    activeAscendancy: null,
-    allocatedNodeIds: new Set(),
-  };
+  const result = Build.setClass(build, classId);
+  if (result.isErr()) {
+    return build;
+  }
+  return result.value;
 }
