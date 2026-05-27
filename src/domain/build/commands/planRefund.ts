@@ -2,15 +2,17 @@ import { computeDependencies } from "@/domain/build/algorithms/dependencies";
 import { computeRefundClosure } from "@/domain/build/algorithms/refund";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
-import { setsEqual } from "@/shared/utils/utils";
 import type { BuildCommandContext, BuildCommandResult } from "./types";
 
 export function planRefund(
   { graph, build }: BuildCommandContext,
   nodeId: NodeId,
 ): BuildCommandResult {
-  const nodeState = build.allocatedNodeIds.has(nodeId);
-  if (!nodeState) return { ok: false, reason: "NODE_NOT_ALLOCATED" };
+  if (!graph.nodesById.has(nodeId)) return { ok: false, reason: "NODE_NOT_FOUND" };
+
+  if (!build.allocatedNodeIds.has(nodeId)) {
+    return { ok: false, reason: "NODE_NOT_ALLOCATED" };
+  }
 
   const rootNodeIds = new Set(
     getActiveRootNodeIds(graph, build.activeClassId, build.activeAscendancy),
@@ -24,23 +26,9 @@ export function planRefund(
 
   const refundedIds = computeRefundClosure(nodeId, build.allocatedNodeIds, requiredByNodeId);
 
-  if (refundedIds.size === 0) {
-    return {
-      ok: false,
-      reason: "NODE_NOT_REFUNDABLE",
-    };
-  }
-
   const nextAllocatedNodeIds = new Set(build.allocatedNodeIds);
   for (const refundedNodeId of refundedIds) {
     nextAllocatedNodeIds.delete(refundedNodeId);
-  }
-
-  if (setsEqual(nextAllocatedNodeIds, build.allocatedNodeIds)) {
-    return {
-      ok: false,
-      reason: "NO_CHANGE",
-    };
   }
 
   return {

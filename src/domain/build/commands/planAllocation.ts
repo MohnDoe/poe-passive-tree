@@ -1,16 +1,27 @@
 import { computeWeightedPaths, materializePath } from "@/domain/build/algorithms/pathfinding";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
-import { setsEqual } from "@/shared/utils/utils";
 import type { BuildCommandContext, BuildCommandResult } from "./types";
 
 export function planAllocation(
   { graph, build }: BuildCommandContext,
   nodeId: NodeId,
 ): BuildCommandResult {
+  if (build.activeClassId === null) {
+    return { ok: false, reason: "NO_ACTIVE_CLASS" };
+  }
+
   const rootNodeIds = new Set(
     getActiveRootNodeIds(graph, build.activeClassId, build.activeAscendancy),
   );
+
+  if (rootNodeIds.size === 0) {
+    return { ok: false, reason: "NODE_NOT_ALLOCATABLE" };
+  }
+
+  if (build.allocatedNodeIds.has(nodeId) || rootNodeIds.has(nodeId)) {
+    return { ok: false, reason: "NODE_NOT_ALLOCATABLE" };
+  }
 
   const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
     graph,
@@ -27,13 +38,6 @@ export function planAllocation(
 
   for (const pathNodeId of path) {
     nextAllocatedNodeIds.add(pathNodeId);
-  }
-
-  if (setsEqual(nextAllocatedNodeIds, build.allocatedNodeIds)) {
-    return {
-      ok: false,
-      reason: "NO_CHANGE",
-    };
   }
 
   return {

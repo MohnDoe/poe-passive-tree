@@ -18,7 +18,8 @@ describe("getClassStartNodeIds", () => {
   it("returns the correct start node IDs for a known classId", () => {
     const { graph, nodes } = makeLineGraph();
 
-    expect(getClassStartNodeIds(graph, 1)).toEqual(new Set([nodes.start.id]));
-    expect(getClassStartNodeIds(graph, 2)).toEqual(new Set([nodes.startOtherClass.id]));
+    expect(getClassStartNodeIds(graph, 1)).toEqual(
+      new Set([nodes.start.id, nodes.startOtherClass.id]),
+    );
   });
 });

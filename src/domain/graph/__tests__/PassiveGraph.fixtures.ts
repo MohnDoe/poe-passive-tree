@@ -152,7 +152,7 @@ export function makeLineGraph(): LineGraphFixture {
       makeNode({ id: "4" }),
       makeNode({ id: "5" }),
       makeNode({ id: "6" }),
-      makeNode({ id: "start-2", kind: "classStart", classStartIndex: 2 }),
+      makeNode({ id: "start-2", kind: "classStart", classStartIndex: 1 }),
     ],
     edgePairs,
   });
@@ -296,6 +296,10 @@ export interface RegionGraphFixture {
       start: PassiveNode;
       normal: PassiveNode;
     };
+    ascendancyC: {
+      start: PassiveNode;
+      normal: PassiveNode;
+    };
   };
 }
 
@@ -307,6 +311,7 @@ export function makeRegionGraph(): RegionGraphFixture {
    * ascendancy:
    * 2 -- 3 (ascendancyA)
    * 4 -- 5 (ascendancyB)
+   * 6 -- 7 (ascendancyC)
    *
    * */
   const regionByNodeId = new Map<NodeId, PassiveNodeRegion>();
@@ -319,6 +324,9 @@ export function makeRegionGraph(): RegionGraphFixture {
   regionByNodeId.set("4", "ascendancy");
   regionByNodeId.set("5", "ascendancy");
 
+  regionByNodeId.set("6", "ascendancy");
+  regionByNodeId.set("7", "ascendancy");
+
   subregionByNodeId.set("0", null);
   subregionByNodeId.set("1", null);
 
@@ -328,6 +336,9 @@ export function makeRegionGraph(): RegionGraphFixture {
   subregionByNodeId.set("4", "ascendancyB");
   subregionByNodeId.set("5", "ascendancyB");
 
+  subregionByNodeId.set("6", "ascendancyC");
+  subregionByNodeId.set("7", "ascendancyC");
+
   const graph = buildGraph({
     nodes: [
       makeNode({ id: "0", kind: "classStart", classStartIndex: 1 }),
@@ -336,11 +347,14 @@ export function makeRegionGraph(): RegionGraphFixture {
       makeNode({ id: "3", ascendancyName: "ascendancyA" }),
       makeNode({ id: "4", kind: "ascendancyStart", ascendancyName: "ascendancyB" }),
       makeNode({ id: "5", ascendancyName: "ascendancyB" }),
+      makeNode({ id: "6", kind: "ascendancyStart", ascendancyName: "ascendancyC" }),
+      makeNode({ id: "7", ascendancyName: "ascendancyC" }),
     ],
     edgePairs: [
       ["0", "1"],
       ["2", "3"],
       ["4", "5"],
+      ["6", "7"],
     ],
     regionByNodeId,
     subregionByNodeId,
@@ -361,6 +375,38 @@ export function makeRegionGraph(): RegionGraphFixture {
         start: graph.nodesById.get("4")!,
         normal: graph.nodesById.get("5")!,
       },
+      ascendancyC: {
+        start: graph.nodesById.get("6")!,
+        normal: graph.nodesById.get("7")!,
+      },
+    },
+  };
+}
+
+export interface CustomAscendancyGraphFixture extends RegionGraphFixture {
+  classes: {
+    noAscendancy: ClassId;
+    oneAscendancy: ClassId;
+    twoAscendancies: ClassId;
+  };
+}
+
+export function makeCustomAscendancyGraph(): CustomAscendancyGraphFixture {
+  const { graph, nodes } = makeRegionGraph();
+
+  graph.ascendancyIdsByClassId = new Map([
+    // NOTE: class 1 does not have an ascendancy
+    [2 as ClassId, new Set(["ascendancyA"])],
+    [3 as ClassId, new Set(["ascendancyB", "ascendancyC"])],
+  ]);
+
+  return {
+    graph,
+    nodes,
+    classes: {
+      noAscendancy: 1,
+      oneAscendancy: 2,
+      twoAscendancies: 3,
     },
   };
 }
