@@ -1,4 +1,4 @@
-import { computeAllocationState } from "@/application/build/allocation/computeAllocationState";
+import { AllocationStateEngine } from "@/domain/build/AllocationState";
 import { computeHoverPreviewState } from "@/application/build/allocation/computeHoverPreviewState";
 import { defineStore } from "pinia";
 import { computed } from "vue";
@@ -16,7 +16,7 @@ export const useAllocationStore = defineStore("allocation", () => {
     const { build } = buildStore;
 
     if (!graph || build.activeClassId === null) return null;
-    return computeAllocationState({ graph: graph, buildState: build });
+    return AllocationStateEngine.compute(graph, build);
   });
 
   const hoverPreviewState = computed(() => {

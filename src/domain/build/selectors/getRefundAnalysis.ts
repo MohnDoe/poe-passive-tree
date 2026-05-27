@@ -2,7 +2,7 @@ import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { computeRefundClosure, computeRefundEdgeKeys } from "../algorithms/refund";
-import type { AllocationState } from "../models/allocation/Allocation";
+import type { AllocationState } from "../AllocationState";
 
 export interface RefundAnalysis {
   canRefund: boolean;
