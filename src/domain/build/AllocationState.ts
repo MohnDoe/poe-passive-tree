@@ -169,10 +169,11 @@ export class AllocationStateEngine {
             ? pointBudgetSummary.remaining.ascendancy >= cost
             : pointBudgetSummary.remaining.passive >= cost;
 
+        const hasZeroCost = nodeState.cheapestPathCost === 0;
         nodeState.allocatable =
           !nodeState.allocated &&
           nodeState.reachable &&
-          ((costsSomething && hasBudget) || true) &&
+          (hasZeroCost || hasBudget) &&
           node.kind !== "classStart" &&
           node.kind !== "ascendancyStart";
       }
