@@ -84,6 +84,10 @@ _Avoid_: Connected, accessible, available
 A node is allocatable when it is reachable AND its allocation would not exceed the point budget AND it passes all allocation rules (e.g., traversal constraints). A node can be reachable but not allocatable if the player is out of points.
 _Avoid_: Available, eligible, unlockable
 
+**AllocationNodeState**:
+The per-node state computed during allocation analysis. Contains: `reachable` (valid path from a root), `allocatable` (reachable and fits budget), `allocated` (owned by the build), `cheapestPath` and `cheapestPathCost` (cheapest route from any root), `dependsOn` and `requiredBy` (dependency edges). This is the domain's internal representation of what each node's status is given the current build — it is not a user-facing concept, but it is the unit of computation for `AllocationStateEngine`.
+_Avoid_: Node state (too generic), per-node status (vague), node info
+
 **Dependency**:
 Node A depends on node B if and only if removing B from the build would make A unreachable from any root node. A node depends on itself trivially. In a diamond-shaped graph where node D has two parents B and C, D depends on neither B nor C — removing either one still leaves a path to D.
 _Avoid_: Prerequisite, requirement, parent
@@ -91,6 +95,10 @@ _Avoid_: Prerequisite, requirement, parent
 **Refund closure**:
 The complete set of nodes that must be refunded when a single node is refunded. It includes the refunded node, all nodes that depend on it, and all nodes that depend on those nodes (transitively). Computed by following dependency edges from the refunded node.
 _Avoid_: Refund chain, cascade, ripple
+
+**AllocationState**:
+The full computed state of the passive tree given a build. Contains: `nodeStateById` (an `AllocationNodeState` for every node), `allocatableNodeIds` (derived set of nodes the player can click), `rootNodeIds` (BFS sources for pathfinding), `activeEdgeKeys` (edges connected to allocated nodes), and `activeClassId`. This is the domain's derived view — it is recomputed from `BuildState` + `PassiveGraph` whenever the build changes. It is not the same as `BuildState`, which is the user's input configuration.
+_Avoid_: Allocation state (ambiguous — could mean BuildState), analysis result (vague)
 
 ## Budget
 
