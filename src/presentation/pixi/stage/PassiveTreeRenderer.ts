@@ -1,65 +1,88 @@
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import { Container, Graphics } from "pixi.js";
+import { Container } from "pixi.js";
 import type { EdgeRenderModel, EdgeView } from "../models/Edge";
-import type { NodeRenderModel, NodeView } from "../models/Node";
+import type { NodeRenderModel } from "../models/Node";
 import type {
   GroupBackgroundRenderModel,
   TreeRendererCallbacks,
   TreeSceneRenderModel,
   TreeVisualStateModel,
 } from "../models/Render";
+import type { PassiveTreeAssetStore } from "../PassiveTreeAssetStore";
 import { createEdgeView } from "../views/edge.view";
-import { createNodeView } from "../views/node.view";
+import { GroupBackgroundView } from "../views/GroupBackgroundView";
+import { BaseNodeView } from "../views/BaseNodeView";
+import type { Viewport } from "pixi-viewport";
+import { passiveTreeTheme } from "../theme/passiveTree.theme";
+import { computeEdgeBounds } from "../utils/edgeBounds";
+import { CullingManager } from "./CullingManager";
+import { DebugOverlay } from "./debug/DebugOverlay";
+import { NodeView } from "../views/NodeView";
+import { MasteryNodeView } from "../views/MasteryNodeView";
 
 export interface PassiveTreeRendererDeps {
   backgroundLayer: Container;
   edgeLayer: Container;
   nodeLayer: Container;
   overlayLayer: Container;
+  groupBackgroundLayer: Container;
   callbacks: TreeRendererCallbacks;
+  assetStore: PassiveTreeAssetStore;
+  viewport: Viewport;
 }
 
 export class PassiveTreeRenderer {
+  private debugOverlay: DebugOverlay | null = null;
   private readonly backgroundLayer: Container;
   private readonly edgeLayer: Container;
   private readonly nodeLayer: Container;
   private readonly overlayLayer: Container;
+  private readonly groupBackgroundLayer: Container;
   private readonly callbacks: TreeRendererCallbacks;
+  private readonly assetStore: PassiveTreeAssetStore;
 
-  private nodeViews = new Map<NodeId, NodeView>();
+  private nodeViews = new Map<NodeId, BaseNodeView>();
   private edgeViews = new Map<EdgeKey, EdgeView>();
-  private backgroundViews = new Map<string, Graphics>();
+  private groupBackgroundViews = new Map<string, GroupBackgroundView>();
+
+  private culling: CullingManager | null = null;
+  private readonly viewport: Viewport;
 
   constructor(deps: PassiveTreeRendererDeps) {
     this.backgroundLayer = deps.backgroundLayer;
     this.edgeLayer = deps.edgeLayer;
     this.nodeLayer = deps.nodeLayer;
     this.overlayLayer = deps.overlayLayer;
+    this.groupBackgroundLayer = deps.groupBackgroundLayer;
+
     this.callbacks = deps.callbacks;
+    this.assetStore = deps.assetStore;
+    this.viewport = deps.viewport;
   }
 
   public render(scene: TreeSceneRenderModel): void {
-    this.renderBackgrounds(scene.backgrounds);
+    this.renderGroupBackgrounds(scene.groupBackgrounds);
     this.renderEdges(scene.edges);
     this.renderNodes(scene.nodes);
-    // this.renderOverlays(scene);
+
+    this.#setupCulling(scene);
   }
 
-  private renderBackgrounds(backgrounds: GroupBackgroundRenderModel[]): void {
-    for (const graphics of this.backgroundViews.values()) {
-      graphics.destroy();
+  private renderGroupBackgrounds(backgrounds: GroupBackgroundRenderModel[]): void {
+    for (const view of this.groupBackgroundViews.values()) {
+      view.destroy();
     }
 
-    this.backgroundViews.clear();
-    this.backgroundLayer.removeChildren();
+    this.groupBackgroundViews.clear();
+    this.groupBackgroundLayer.removeChildren();
 
     for (const background of backgrounds) {
-      const view = this.createBackgroundView(background);
+      const view = new GroupBackgroundView(background, this.assetStore);
 
-      this.backgroundViews.set(background.key, view);
-      this.backgroundLayer.addChild(view);
+      this.groupBackgroundViews.set(background.key, view);
+      this.groupBackgroundLayer.addChild(view.container);
     }
   }
 
@@ -89,42 +112,68 @@ export class PassiveTreeRenderer {
     this.nodeLayer.removeChildren();
 
     for (const node of nodes) {
-      const view = createNodeView(node, {
-        onClick: this.callbacks.onNodeClick,
-        onHover: this.callbacks.onNodeHover,
-      });
+      let view: BaseNodeView;
+
+      if (node.kind === "mastery") {
+        view = new MasteryNodeView(node, this.assetStore, {
+          onClick: this.callbacks.onNodeClick,
+          onHover: this.callbacks.onNodeHover,
+        });
+      } else {
+        view = new NodeView(node, this.assetStore, {
+          onClick: this.callbacks.onNodeClick,
+          onHover: this.callbacks.onNodeHover,
+        });
+      }
 
       this.nodeViews.set(node.id, view);
       this.nodeLayer.addChild(view.container);
     }
   }
 
-  // private renderOverlays(scene: TreeSceneRenderModel): void {
-  //   this.overlayLayer.removeChildren();
-  //
-  //   if (!scene.highlightedPath.length) return;
-  //
-  //   const graphics = new Graphics();
-  //
-  //   graphics.moveTo(scene.highlightedPath[0]!.x, scene.highlightedPath[0]!.y);
-  //
-  //   for (let i = 1; i < scene.highlightedPath.length; i += 1) {
-  //     const point = scene.highlightedPath[i]!;
-  //     graphics.lineTo(point.x, point.y);
-  //   }
-  //
-  //   graphics.stroke({ color: 0xffd166, width: 6, alpha: 0.85 });
-  //
-  //   this.overlayLayer.addChild(graphics);
-  // }
+  #setupCulling(scene: TreeSceneRenderModel) {
+    this.culling?.destroy();
 
-  private createBackgroundView(background: GroupBackgroundRenderModel): Graphics {
-    const graphics = new Graphics();
+    this.culling = new CullingManager(this.viewport, this.nodeViews, this.edgeViews);
 
-    graphics.circle(background.x, background.y, background.radius);
-    graphics.fill({ color: background.color, alpha: background.alpha });
+    // Build static bounds from scene models
+    const nodeBoundsData = scene.nodes.map((n) => ({
+      id: n.id,
+      x: n.x,
+      y: n.y,
+      size: passiveTreeTheme.nodes.sizeByKind[n.kind] ?? passiveTreeTheme.nodes.sizeByKind.normal,
+    }));
 
-    return graphics;
+    const edgeBoundsData = scene.edges.map((e) => computeEdgeBounds(e));
+
+    this.culling.build(nodeBoundsData, edgeBoundsData);
+
+    this.viewport.on("moved", () => this.culling?.cullDeferred());
+    this.viewport.on("zoomed", () => this.culling?.cullDeferred());
+    this.viewport.on("moved-end", () => this.culling?.cull());
+    //
+    // Initial cull pass
+    this.culling.cull();
+  }
+
+  enableDebug() {
+    if (!this.culling) return;
+
+    this.debugOverlay = new DebugOverlay(this.viewport, this.culling);
+
+    this.overlayLayer.addChild(this.debugOverlay.container);
+
+    // Re-run overlay update every time culling fires
+    const originalCull = this.culling.cull.bind(this.culling);
+    this.culling.cull = () => {
+      originalCull();
+      this.debugOverlay?.update();
+    };
+  }
+
+  disableDebug() {
+    this.debugOverlay?.destroy();
+    this.debugOverlay = null;
   }
 
   public destroy(): void {
@@ -140,16 +189,24 @@ export class PassiveTreeRenderer {
 
     this.edgeViews.clear();
 
-    for (const graphics of this.backgroundViews.values()) {
+    for (const graphics of this.groupBackgroundViews.values()) {
       graphics.destroy();
     }
 
-    this.backgroundViews.clear();
+    this.groupBackgroundViews.clear();
 
     this.backgroundLayer.removeChildren();
     this.edgeLayer.removeChildren();
     this.nodeLayer.removeChildren();
     this.overlayLayer.removeChildren();
+    this.groupBackgroundLayer.removeChildren();
+
+    this.culling?.destroy();
+    this.culling = null;
+
+    this.viewport.removeAllListeners();
+
+    this.debugOverlay?.destroy();
   }
 
   public updateNodeStates(state: TreeVisualStateModel): void {

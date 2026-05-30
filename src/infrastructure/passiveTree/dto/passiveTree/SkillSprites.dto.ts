@@ -7,23 +7,48 @@ export interface PassiveTreeSpriteCoordDto {
 
 export interface PassiveTreeSpriteSheetDto {
   filename: string;
-
-  /**
-   * Map from icon path (same as `PassiveTreeNode.icon`) to sprite coordinates.
-   */
   coords: Record<string, PassiveTreeSpriteCoordDto>;
 }
 
-export type PassiveTreeSkillSpriteCategoryDto = PassiveTreeSpriteSheetDto[];
-
-export interface PassiveTreeSkillSpritesDto {
-  keystoneActive?: PassiveTreeSkillSpriteCategoryDto;
-  keystoneInactive?: PassiveTreeSkillSpriteCategoryDto;
-  mastery?: PassiveTreeSkillSpriteCategoryDto;
-  normalActive?: PassiveTreeSkillSpriteCategoryDto;
-  normalInactive?: PassiveTreeSkillSpriteCategoryDto;
-  notableActive?: PassiveTreeSkillSpriteCategoryDto;
-  notableInactive?: PassiveTreeSkillSpriteCategoryDto;
-
-  [key: string]: PassiveTreeSkillSpriteCategoryDto | undefined;
+export interface PassiveTreeSkillSpriteCategoryDto {
+  [zoom: number]: PassiveTreeSpriteSheetDto;
 }
+
+export type PassiveTreeSkillSpriteCategoryName =
+  | "background"
+  | "normalActive"
+  | "notableActive"
+  | "keystoneActive"
+  | "normalInactive"
+  | "notableInactive"
+  | "keystoneInactive"
+  | "mastery"
+  | "masteryConnected"
+  | "masteryActiveSelected"
+  | "masteryInactive"
+  | "masteryActiveEffect"
+  | "tattooActiveEffect"
+  | "ascendancy"
+  | "azmeriBloodline"
+  | "trialmasterBloodline"
+  | "oshabiBloodline"
+  | "olrothBloodline"
+  | "necromanticBloodline"
+  | "lyciaBloodline"
+  | "kingInTheMistsBloodline"
+  | "farrulBloodline"
+  | "deliriousBloodline"
+  | "catarinaBloodline"
+  | "breachlordBloodline"
+  | "aulBloodline"
+  | "startNode"
+  | "groupBackground"
+  | "frame"
+  | "jewel"
+  | "line"
+  | "jewelRadius";
+
+export type PassiveTreeSkillSpritesDto = Record<
+  PassiveTreeSkillSpriteCategoryName,
+  PassiveTreeSkillSpriteCategoryDto
+>;

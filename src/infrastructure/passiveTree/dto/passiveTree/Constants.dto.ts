@@ -13,6 +13,4 @@ export interface PassiveTreeConstantsDto {
 
   /** Radii per orbit index (0..4). */
   orbitRadii: number[];
-
-  [key: string]: unknown;
 }

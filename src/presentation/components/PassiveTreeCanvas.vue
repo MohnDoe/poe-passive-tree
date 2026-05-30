@@ -9,17 +9,21 @@ import { PassiveTreeStage } from "../pixi/stage/PassiveTreeStage";
 import { useAllocationStore } from "../stores/allocation.store";
 import { useRuntimeStore } from "../stores/runtime.store";
 import { useUiStore } from "../stores/ui.store";
+import type { StageReadyState } from "../pixi/models/Render";
 
 const uiStore = useUiStore();
 const runtimeStore = useRuntimeStore();
 const treeInteraction = useTreeInteraction();
 
-const { graph } = storeToRefs(runtimeStore);
+const { graph, assets } = storeToRefs(runtimeStore);
 const { treeVisualState } = usePassiveTreeVisualState();
 const { hoverPreviewState } = storeToRefs(useAllocationStore());
 
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = shallowRef<PassiveTreeStage | null>(null);
+const readyState = ref<StageReadyState>("mounting");
+
+const debugActive = ref<boolean>(false);
 
 const defaultHoverPreviewState: HoverPreviewState = {
   hoveredNodeId: null,
@@ -34,25 +38,43 @@ const defaultHoverPreviewState: HoverPreviewState = {
 };
 
 onMounted(async () => {
-  if (!hostRef.value || !graph.value) return;
+  if (!hostRef.value || !graph.value || !assets.value) return;
 
   const nextStage = new PassiveTreeStage();
 
   stage.value = nextStage;
 
-  await nextStage.mount(hostRef.value, {
+  await nextStage.mount(hostRef.value, assets.value, {
     onNodeClick: (nodeId) => {
       console.log("Click node", nodeId);
       treeInteraction.toggleNode(nodeId);
     },
     onNodeHover: (nodeId) => {
+      console.log(graph.value?.nodesById.get(nodeId ?? ""));
+      console.log("nodeRegion", graph.value?.regionByNodeId.get(nodeId ?? ""));
+      console.log("nodeSubregion", graph.value?.subregionByNodeId.get(nodeId ?? ""));
       uiStore.setHoveredNodeId(nodeId);
+    },
+    onReadyStateChange(state) {
+      readyState.value = state;
     },
   });
 
   nextStage.renderStaticScene(createTreeSceneModel({ graph: graph.value }));
 
   nextStage.fitToBounds(graph.value.bounds);
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "F2") {
+      if (debugActive.value) {
+        nextStage.disableDebug();
+      } else {
+        nextStage.enableDebug();
+      }
+      debugActive.value = !debugActive.value;
+    }
+  };
+  window.addEventListener("keydown", onKeyDown);
 });
 
 watch(graph, (nextGraph) => {
@@ -93,12 +115,40 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
+  <Transition name="fade">
+    <div v-if="readyState !== 'ready'" class="loading-overlay">
+      <span v-if="readyState === 'mounting'">Initializing…</span>
+      <span v-else-if="readyState === 'skeleton'">Loading sprites…</span>
+    </div>
+  </Transition>
   <div ref="hostRef" class="the-tree"></div>
 </template>
 <style scoped>
+.loading-overlay {
+  background: black;
+  color: white;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .the-tree {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+}
+</style>
+<style>
+#stats {
+  position: absolute;
+  z-index: 1000;
+  bottom: 0;
 }
 </style>

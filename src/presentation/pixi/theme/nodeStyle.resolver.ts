@@ -1,62 +1,47 @@
 import type {
-  NodeRenderModel,
+  MasteryNodeRenderModel,
+  MasteryNodeVisualStyle,
   NodeBuildState,
-  NodeVisualStyle,
   NodeHoverState,
+  NodeRenderModel,
+  NodeVisualStyle,
 } from "../models/Node";
 import { passiveTreeTheme } from "./passiveTree.theme";
+import { resolveFrameCoordsKey, resolveSpriteCategoryName } from "./sprite.resolver";
 
 export function resolveNodeStyle(
   model: NodeRenderModel,
-  buildState: NodeBuildState,
-  hoverState: NodeHoverState,
+  build: NodeBuildState,
+  hover: NodeHoverState,
 ): NodeVisualStyle {
   const { nodes: nodesTheme } = passiveTreeTheme;
-  const radius = nodesTheme.radiusByKind[model.kind] ?? nodesTheme.radiusByKind.normal;
+  const size = nodesTheme.sizeByKind[model.kind] ?? nodesTheme.sizeByKind.normal;
+  const categoryName = resolveSpriteCategoryName(model.kind, build, hover);
+  const frameCoordsKey = resolveFrameCoordsKey(model.kind, build, hover);
 
-  let fill = nodesTheme.colors.normal;
+  return {
+    size,
+    iconSpriteCategory: categoryName,
+    frameCoordsKey,
+  };
+}
 
-  if (hoverState.isInRefundPath) {
-    fill = nodesTheme.colors.refund;
-  } else if (buildState.isAllocated) {
-    fill = nodesTheme.colors.allocated;
-  } else if (buildState.isActiveClassStart) {
-    fill = nodesTheme.colors.activeClassStart;
-  } else if (hoverState.isInPreviewPath) {
-    fill = nodesTheme.colors.previewPath;
-  } else {
-    switch (model.kind) {
-      case "ascendancyStart":
-        fill = nodesTheme.colors.ascendancyStart;
-        break;
-      case "keystone":
-        fill = nodesTheme.colors.keystone;
-        break;
-      case "notable":
-        fill = nodesTheme.colors.notable;
-        break;
-      case "jewel":
-        fill = nodesTheme.colors.jewel;
-        break;
-      case "mastery":
-        fill = nodesTheme.colors.mastery;
-        break;
-      case "proxy":
-        fill = nodesTheme.colors.proxy;
-        break;
-      case "normal":
-      case "classStart":
-      default:
-        fill = nodesTheme.colors.normal;
-        break;
-    }
+export function resolveMasteryNodeStyle(
+  model: MasteryNodeRenderModel,
+  build: NodeBuildState,
+  hover: NodeHoverState,
+): MasteryNodeVisualStyle {
+  const visualStyle = resolveNodeStyle(model, build, hover);
+  let effectImage = null;
+
+  if (build.isAllocated) {
+    effectImage = model.activeEffectImage;
   }
 
   return {
-    radius,
-    fill,
-    alpha: 1,
-    //TODO: this should only be true if it's reachable/allocatable
-    scale: hoverState.isHovered ? 1.06 : 1,
+    ...visualStyle,
+    size: visualStyle.size * 2,
+    effectImage,
+    frameCoordsKey: null,
   };
 }

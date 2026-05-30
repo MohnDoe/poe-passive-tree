@@ -8,13 +8,12 @@ export interface GroupBackgroundRenderModel {
   key: string;
   x: number;
   y: number;
-  radius: number;
-  color: number;
-  alpha: number;
+  image: string; // ie: PSGroupBackground3
+  isHalfImage: boolean;
 }
 
 export interface TreeSceneRenderModel {
-  backgrounds: GroupBackgroundRenderModel[];
+  groupBackgrounds: GroupBackgroundRenderModel[];
   edges: EdgeRenderModel[];
   nodes: NodeRenderModel[];
 }
@@ -42,7 +41,10 @@ export interface HoverVisualDelta extends HoverPreviewState {
   previous: HoverPreviewState;
 }
 
+export type StageReadyState = "mounting" | "skeleton" | "ready";
+
 export interface TreeRendererCallbacks {
   onNodeClick?: (nodeId: NodeId) => void;
   onNodeHover?: (nodeId: NodeId | null) => void;
+  onReadyStateChange?: (state: StageReadyState) => void;
 }

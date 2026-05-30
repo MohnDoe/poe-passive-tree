@@ -14,6 +14,6 @@ export function resolveEdgeStyle(
   return {
     strokeWidth: passiveTreeTheme.edges.stroke,
     strokeAlpha: passiveTreeTheme.edges.alpha,
-    strokeColor: color,
+    strokeColor: color!,
   };
 }

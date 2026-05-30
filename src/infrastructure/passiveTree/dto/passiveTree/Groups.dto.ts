@@ -13,6 +13,13 @@ export interface PassiveTreeGroupDto {
    * In your JSON these are stored as strings (e.g. '5865').
    */
   nodes: string[];
+
+  background?: PassiveTreeGroupBackgroundDto;
 }
 
 export type PassiveTreeJewelSlotsDto = number[];
+
+export interface PassiveTreeGroupBackgroundDto {
+  image: string;
+  isHalfImage?: true;
+}

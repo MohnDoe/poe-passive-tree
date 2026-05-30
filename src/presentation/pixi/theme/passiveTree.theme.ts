@@ -1,14 +1,31 @@
-export const passiveTreeTheme = {
+import type { PassiveNodeKind } from "@/domain/graph/PassiveNode";
+
+const NORMAL_BASE = 100;
+
+type PassiveTreeTheme = {
   nodes: {
-    radiusByKind: {
-      normal: 40,
-      notable: 55,
-      mastery: 70,
-      keystone: 85,
-      jewel: 55,
+    sizeByKind: Record<PassiveNodeKind, number>;
+    colors: Record<string, number>;
+  };
+  edges: {
+    colors: Record<string, number>;
+    stroke: number;
+    alpha: number;
+  };
+};
+export const passiveTreeTheme: PassiveTreeTheme = {
+  nodes: {
+    sizeByKind: {
+      normal: NORMAL_BASE,
+      notable: NORMAL_BASE * 1.5,
+      mastery: NORMAL_BASE * 1.5,
+      keystone: Math.ceil(NORMAL_BASE * 2.3),
+      jewel: NORMAL_BASE * 1.3,
       proxy: 25,
-      ascendancyStart: 20,
+      ascendancyStart: NORMAL_BASE,
       classStart: 200,
+      multipleChoice: NORMAL_BASE,
+      multipleChoiceOption: NORMAL_BASE,
     },
     colors: {
       normal: 0xcfcfcf,
