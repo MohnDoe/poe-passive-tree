@@ -111,13 +111,13 @@ describe("AllocationStateEngine.compute", () => {
       expect(result.activeEdgeKeys.size).toBeGreaterThan(0);
     });
 
-    it("records rootNodeIds for the active class", () => {
+    it("records startNodeIds for the active class", () => {
       const { graph } = makeLineGraph();
       const buildState = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
 
       const result = AllocationStateEngine.compute(graph, buildState);
 
-      expect(result.rootNodeIds.size).toBeGreaterThan(0);
+      expect(result.startNodeIds.size).toBeGreaterThan(0);
     });
 
     it("forwards activeClassId from buildState", () => {

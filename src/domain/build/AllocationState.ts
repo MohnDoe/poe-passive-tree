@@ -30,7 +30,7 @@ interface AllocationNodeState {
 export interface AllocationState {
   activeClassId: ClassId | null;
 
-  rootNodeIds: ReadonlySet<NodeId>;
+  startNodeIds: ReadonlySet<NodeId>;
 
   allocatedNodeIds: ReadonlySet<NodeId>;
   allocatableNodeIds: ReadonlySet<NodeId>;
@@ -44,7 +44,7 @@ export class AllocationStateEngine {
   nodeStateById: Map<NodeId, AllocationNodeState>;
   allocatableNodeIds: ReadonlySet<NodeId>;
   allocatedNodeIds: ReadonlySet<NodeId>;
-  rootNodeIds: ReadonlySet<NodeId>;
+  startNodeIds: ReadonlySet<NodeId>;
   activeClassId: ClassId | null;
   activeEdgeKeys: ReadonlySet<EdgeKey>;
 
@@ -52,14 +52,14 @@ export class AllocationStateEngine {
     nodeStateById: Map<NodeId, AllocationNodeState>,
     allocatableNodeIds: Set<NodeId>,
     allocatedNodeIds: ReadonlySet<NodeId>,
-    rootNodeIds: ReadonlySet<NodeId>,
+    startNodeIds: ReadonlySet<NodeId>,
     activeClassId: ClassId | null,
     activeEdgeKeys: ReadonlySet<EdgeKey>,
   ) {
     this.nodeStateById = nodeStateById;
     this.allocatableNodeIds = allocatableNodeIds;
     this.allocatedNodeIds = allocatedNodeIds;
-    this.rootNodeIds = rootNodeIds;
+    this.startNodeIds = startNodeIds;
     this.activeClassId = activeClassId;
     this.activeEdgeKeys = activeEdgeKeys;
   }
@@ -80,7 +80,7 @@ export class AllocationStateEngine {
       this.mergeDependencies(graph, buildState);
 
       const allocatedNodeIds = new Set(buildState.allocatedNodeIds);
-      const buildRootNodeIds = graph.getBuildRootNodeIds(
+      const buildStartNodeIds = graph.getBuildStartNodeIds(
         buildState.activeClassId,
         buildState.activeAscendancy,
       );
@@ -95,7 +95,7 @@ export class AllocationStateEngine {
         this.nodeStateById,
         allocatableNodeIds,
         allocatedNodeIds,
-        buildRootNodeIds,
+        buildStartNodeIds,
         buildState.activeClassId,
         activeEdgeKeys,
       );

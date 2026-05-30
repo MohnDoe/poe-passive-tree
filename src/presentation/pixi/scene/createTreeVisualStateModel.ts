@@ -21,7 +21,7 @@ export function createTreeVisualState({
     };
 
   return {
-    activeStartNodeIds: allocationState.rootNodeIds,
+    activeStartNodeIds: allocationState.startNodeIds,
     allocated: {
       nodeIds: allocationState.allocatedNodeIds,
       edgeKeys: allocationState.activeEdgeKeys,
