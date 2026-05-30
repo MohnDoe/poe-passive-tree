@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { makeDiamondGraph, makeForkGraph, makeLineGraph, makeNode, buildGraph } from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
+import {
+  makeDiamondGraph,
+  makeForkGraph,
+  makeLineGraph,
+  makeNode,
+  buildGraph,
+} from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
 import { makeBuildState } from "@/domain/build/__tests__/BuildState.fixtures.ts";
 import { AllocationStateEngine } from "../AllocationState";
 
@@ -17,15 +23,14 @@ describe("AllocationStateEngine.compute", () => {
       }
     });
 
-    it("marks the start node as non-allocatable (forbidden kind)", () => {
+    it("marks the start node as non-allocatable and non-reachable (forbidden kind)", () => {
       const { graph, nodes } = makeLineGraph();
       const buildState = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
 
       const result = AllocationStateEngine.compute(graph, buildState);
 
       expect(result.nodeStateById.get(nodes.start.id)!.allocatable).toBe(false);
-      // Start node is a BFS root so it is reachable, but forbidden to allocate
-      expect(result.nodeStateById.get(nodes.start.id)!.reachable).toBe(true);
+      expect(result.nodeStateById.get(nodes.start.id)!.reachable).toBe(false);
     });
 
     it("marks reachable nodes as non-allocatable when budget is exhausted", () => {
@@ -39,7 +44,6 @@ describe("AllocationStateEngine.compute", () => {
       const result = AllocationStateEngine.compute(graph, buildState);
 
       // Start node is reachable but forbidden (classStart)
-      expect(result.nodeStateById.get(nodes.start.id)!.reachable).toBe(true);
       expect(result.nodeStateById.get(nodes.start.id)!.allocatable).toBe(false);
       // Reachable nodes with cost > 0 are NOT allocatable when budget is 0
       expect(result.nodeStateById.get(nodes.first.id)!.reachable).toBe(true);
@@ -82,9 +86,7 @@ describe("AllocationStateEngine.compute", () => {
 
       const graph = buildGraph({
         nodes: [rootA, connected, island],
-        edgePairs: [
-          [rootA.id, connected.id],
-        ],
+        edgePairs: [[rootA.id, connected.id]],
       });
 
       const buildState = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
@@ -126,7 +128,6 @@ describe("AllocationStateEngine.compute", () => {
 
       expect(result.activeClassId).toBe(1);
     });
-
   });
 
   describe("diamond graph", () => {
@@ -137,10 +138,10 @@ describe("AllocationStateEngine.compute", () => {
       const result = AllocationStateEngine.compute(graph, buildState);
       const endNode = result.nodeStateById.get(nodes.end.id)!;
 
-      // Shorter path: start → left-1 → end (cost = 2)
-      // Longer path: start → right-1 → right-2 → end (cost = 3)
+      // Shorter path:  left-1 → end (cost = 2)
+      // Longer path: right-1 → right-2 → end (cost = 3)
       expect(endNode.cheapestPathCost).toBe(2);
-      expect(endNode.cheapestPath).toEqual(["start", nodes.left.first.id, nodes.end.id]);
+      expect(endNode.cheapestPath).toEqual([nodes.start.id, nodes.left.first.id, nodes.end.id]);
     });
 
     it("prefers path through allocated nodes even if longer in hops", () => {
@@ -178,7 +179,13 @@ describe("AllocationStateEngine.compute", () => {
       const { graph, nodes } = makeForkGraph();
       const buildState = makeBuildState({
         activeClassId: 1,
-        allocatedNodeIds: new Set([nodes.first.id, nodes.left.first.id, nodes.left.second.id, nodes.right.first.id, nodes.right.second.id]),
+        allocatedNodeIds: new Set([
+          nodes.first.id,
+          nodes.left.first.id,
+          nodes.left.second.id,
+          nodes.right.first.id,
+          nodes.right.second.id,
+        ]),
       });
 
       const result = AllocationStateEngine.compute(graph, buildState);
@@ -193,7 +200,13 @@ describe("AllocationStateEngine.compute", () => {
       const { graph, nodes } = makeForkGraph();
       const buildState = makeBuildState({
         activeClassId: 1,
-        allocatedNodeIds: new Set([nodes.first.id, nodes.left.first.id, nodes.left.second.id, nodes.right.first.id, nodes.right.second.id]),
+        allocatedNodeIds: new Set([
+          nodes.first.id,
+          nodes.left.first.id,
+          nodes.left.second.id,
+          nodes.right.first.id,
+          nodes.right.second.id,
+        ]),
       });
 
       const result = AllocationStateEngine.compute(graph, buildState);

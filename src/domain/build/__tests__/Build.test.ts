@@ -87,20 +87,22 @@ describe("Build.allocate", () => {
       assert(result.isOk());
 
       const allocated = result.value.allocatedNodeIds;
+
       expect(allocated.has(nodes.end.id)).toBe(true);
       expect(allocated.has(nodes.right.first.id)).toBe(true);
       expect(allocated.has(nodes.right.second.id)).toBe(true);
 
       expect(allocated.has(nodes.left.first.id)).toBe(false);
     });
+
     it("prefers shorter path in a diamond when both paths are unallocated", () => {
       const { graph, nodes } = makeDiamondGraph();
       const build = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
 
       const result = Build.allocate(graph, build, nodes.end.id);
 
-      expect(result.isOk()).toBe(true);
       assert(result.isOk());
+
       const allocated = result.value.allocatedNodeIds;
       expect(allocated.has(nodes.end.id)).toBe(true);
       expect(allocated.has(nodes.left.first.id)).toBe(true);
@@ -175,7 +177,7 @@ describe("Build.allocate errors", () => {
     expect(result.error).toBe("NODE_NOT_ALLOCATABLE");
   });
 
-  it("returns NODE_NOT_ALLOCATABLE when target is root", () => {
+  it("returns NODE_NOT_ALLOCATABLE when target is start node", () => {
     const { graph, nodes } = makeLineGraph();
     const build = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
 
@@ -187,12 +189,12 @@ describe("Build.allocate errors", () => {
   });
 
   it("returns NODE_NOT_ALLOCATABLE when no classStart root node for class", () => {
-    const rootA = makeNode({ id: "root-a", kind: "classStart", classStartIndex: 2 });
+    const startA = makeNode({ id: "start-a", kind: "classStart", classStartIndex: 2 });
     const middle = makeNode({ id: "middle" });
 
     const graph = buildGraph({
-      nodes: [rootA, middle],
-      edgePairs: [[rootA.id, middle.id]],
+      nodes: [startA, middle],
+      edgePairs: [[startA.id, middle.id]],
     });
 
     const build = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
