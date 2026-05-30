@@ -80,13 +80,13 @@ describe("AllocationStateEngine.compute", () => {
     });
 
     it("marks unreachable nodes as not reachable with null path", () => {
-      const rootA = makeNode({ id: "root-a", kind: "classStart", classStartIndex: 1 });
+      const startA = makeNode({ id: "start-a", kind: "classStart", classStartIndex: 1 });
       const connected = makeNode({ id: "connected" });
       const island = makeNode({ id: "island" });
 
       const graph = buildGraph({
-        nodes: [rootA, connected, island],
-        edgePairs: [[rootA.id, connected.id]],
+        nodes: [startA, connected, island],
+        edgePairs: [[startA.id, connected.id]],
       });
 
       const buildState = makeBuildState({ activeClassId: 1, allocatedNodeIds: new Set() });
@@ -138,8 +138,8 @@ describe("AllocationStateEngine.compute", () => {
       const result = AllocationStateEngine.compute(graph, buildState);
       const endNode = result.nodeStateById.get(nodes.end.id)!;
 
-      // Shorter path:  left-1 → end (cost = 2)
-      // Longer path: right-1 → right-2 → end (cost = 3)
+      // Shorter path: start → left-1 → end (cost = 2)
+      // Longer path: start → right-1 → right-2 → end (cost = 3)
       expect(endNode.cheapestPathCost).toBe(2);
       expect(endNode.cheapestPath).toEqual([nodes.start.id, nodes.left.first.id, nodes.end.id]);
     });
