@@ -181,8 +181,4 @@ describe("PassiveGraph", () => {
       );
     });
   });
-  // TODO: write tests for other queries
-  // getAscendancyStartNodeIds
-  // getBuildRootNodeIds
-  // getClassStartNodeIds
 });
