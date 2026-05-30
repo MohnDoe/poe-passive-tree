@@ -19,6 +19,7 @@
     "sync:assets:force": "bun run scripts/sync-tree-assets.ts --force"
   },
   "dependencies": {
+    "neverthrow": "^8.2.0",
     "pinia": "^3.0.4",
     "pixi-stats": "^5.1.7",
     "pixi-viewport": "^6.0.3",

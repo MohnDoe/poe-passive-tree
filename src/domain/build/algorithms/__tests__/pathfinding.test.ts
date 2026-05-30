@@ -14,7 +14,7 @@ describe("computeWeightedPaths", () => {
 
     const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set(),
     });
 
@@ -27,7 +27,7 @@ describe("computeWeightedPaths", () => {
 
     const { distanceByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id, nodes.sixth.id]),
+      startNodeIds: new Set([nodes.start.id, nodes.sixth.id]),
       allocatedNodeIds: new Set(),
     });
 
@@ -40,7 +40,7 @@ describe("computeWeightedPaths", () => {
 
     const { distanceByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set(),
     });
 
@@ -55,7 +55,7 @@ describe("computeWeightedPaths", () => {
     // first and second are already allocated — they cost 0 to traverse
     const { distanceByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set([nodes.first.id, nodes.second.id]),
     });
 
@@ -72,7 +72,7 @@ describe("computeWeightedPaths", () => {
     // fith(unalloc) -- sixth(unalloc )
     const { distanceByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set([nodes.first.id, nodes.fourth.id]),
     });
 
@@ -93,7 +93,7 @@ describe("computeWeightedPaths", () => {
     // start(root) -- first(alloc) -- second(unalloc) -- third(unalloc) -- fourth(unalloc) -- fifth (alloc) -- sixth (root)
     const { distanceByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id, nodes.sixth.id]),
+      startNodeIds: new Set([nodes.start.id, nodes.sixth.id]),
       allocatedNodeIds: new Set([nodes.first.id, nodes.fifth.id]),
     });
 
@@ -118,7 +118,7 @@ describe("computeWeightedPaths", () => {
     // BFS should prefer left path to end
     const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set(),
     });
 
@@ -138,7 +138,7 @@ describe("computeWeightedPaths", () => {
     // right path is cheaper despite more hops
     const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set([nodes.right.first.id, nodes.right.second.id]),
     });
 
@@ -163,7 +163,7 @@ describe("computeWeightedPaths", () => {
 
     const { distanceByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds: new Set([root.id]),
+      startNodeIds: new Set([root.id]),
       allocatedNodeIds: new Set(),
     });
 

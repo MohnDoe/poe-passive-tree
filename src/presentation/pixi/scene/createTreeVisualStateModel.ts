@@ -1,4 +1,4 @@
-import type { AllocationState } from "@/domain/build/models/allocation/Allocation";
+import type { AllocationState } from "@/domain/build/AllocationState";
 import type { TreeVisualStateModel } from "../models/Render";
 
 export interface CreateTreeVisualStateParams {
@@ -21,7 +21,7 @@ export function createTreeVisualState({
     };
 
   return {
-    activeStartNodeIds: allocationState.rootNodeIds,
+    activeStartNodeIds: allocationState.startNodeIds,
     allocated: {
       nodeIds: allocationState.allocatedNodeIds,
       edgeKeys: allocationState.activeEdgeKeys,

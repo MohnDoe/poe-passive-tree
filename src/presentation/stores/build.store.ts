@@ -1,15 +1,11 @@
+import type { Result } from "neverthrow";
 import type { BuildState } from "@/domain/build/models/BuildState";
 import type { ClassId } from "@/domain/graph/PassiveClass";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import type { BuildCommandResult } from "@/domain/build/commands/types";
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
-
-import { createBuildCommandContext } from "@/domain/build/commands/createBuildCommandContext";
-import { planToggleAllocation } from "@/domain/build/commands/planToggleAllocation";
-import { setAscendancy } from "@/domain/build/commands/setAscendancy";
-import { setClass } from "@/domain/build/commands/setClass";
-import { defineStore } from "pinia";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
+import { Build, type BuildFailureReason } from "@/domain/build/Build";
+import { defineStore } from "pinia";
 
 export interface BuildStoreState {
   build: BuildState;
@@ -49,21 +45,19 @@ export const useBuildStore = defineStore("build", {
     resetBuild() {
       this.build = createEmptyBuild();
     },
-    setClass(classId: ClassId) {
-      this.build = setClass(this.build, classId);
-    },
-    setAscendancy(graph: PassiveGraph, ascendancyId: AscendancyId | null): BuildCommandResult {
-      const result = setAscendancy(this.build, graph, ascendancyId);
-
-      if (result.ok) this.build = result.build;
-
+    setClass(classId: ClassId): Result<BuildState, BuildFailureReason> {
+      const result = Build.setClass(this.build, classId);
+      if (result.isOk()) this.build = result.value;
       return result;
     },
-    toggleNode(graph: PassiveGraph, nodeId: NodeId): BuildCommandResult {
-      const result = planToggleAllocation(createBuildCommandContext(graph, this.build), nodeId);
-
-      if (result.ok) this.build = result.build;
-
+    setAscendancy(graph: PassiveGraph, ascendancyId: AscendancyId | null): Result<BuildState, BuildFailureReason> {
+      const result = Build.setAscendancy(graph, this.build, ascendancyId);
+      if (result.isOk()) this.build = result.value;
+      return result;
+    },
+    toggleNode(graph: PassiveGraph, nodeId: NodeId): Result<BuildState, BuildFailureReason> {
+      const result = Build.toggle(graph, this.build, nodeId);
+      if (result.isOk()) this.build = result.value;
       return result;
     },
   },

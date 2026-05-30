@@ -1,8 +1,9 @@
-import type { UiState } from "@/domain/build/models/UiState";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import { defineStore } from "pinia";
 
-export type UiStoreState = UiState;
+export interface UiStoreState {
+  hoveredNodeId: NodeId | null;
+}
 
 export const useUiStore = defineStore("ui", {
   state: (): UiStoreState => ({
