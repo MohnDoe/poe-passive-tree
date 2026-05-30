@@ -29,6 +29,10 @@ The parameter name `rootNodeIds` was renamed to `startNodeIds` throughout the al
 - **Query methods on PassiveGraph** (chosen) — all queries as methods on the graph object. Pros: single seam for callers, no separate modules to maintain, the graph already has all data, methods can share internal state. Cons: the interface grows, harder to isolate a single query for testing.
 - **Query object / query service** — a separate class or object that receives the graph. Dismissed: adds unnecessary indirection when the graph already encapsulates all needed data.
 
+## Start node reachability
+
+In `AllocationState`, start node IDs (returned by `getBuildStartNodeIds`) are **not** marked as reachable. The allocation algorithm explicitly excludes them from reachability (`!buildStartNodeIds.has(nodeId)` in `applyWeightedPaths`), because start nodes are traversal origins, not destinations. They are also excluded from allocation (node kinds `classStart` and `ascendancyStart` are filtered in `applyAllocationFlags`). Downstream consumers should not treat start nodes as reachable allocatable targets.
+
 ## Consequences
 
 - **Positive**: Callers interact with one seam (`graph.someQueryMethod()`) instead of importing multiple query modules. The graph object is self-contained — it has the data and the queries that operate on it.
