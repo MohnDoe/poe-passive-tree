@@ -8,7 +8,7 @@ import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
-import { isAscendancyValidForClass } from "@/domain/graph/queries/isAscendancyValidForClass";
+
 
 export type BuildFailureReason =
   | "NO_ACTIVE_CLASS"
@@ -141,7 +141,7 @@ export class Build {
 
     if (
       ascendancyId !== null &&
-      !isAscendancyValidForClass(graph, build.activeClassId, ascendancyId)
+      !graph.isValidAscendancyForClass(build.activeClassId, ascendancyId)
     ) {
       return err("INVALID_ASCENDANCY_FOR_CLASS");
     }

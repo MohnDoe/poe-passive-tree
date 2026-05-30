@@ -4,7 +4,7 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 import { computeDependencies } from "./algorithms/dependencies";
 import { computeWeightedPaths, materializePath } from "./algorithms/pathfinding";
 import { getPointBudgetSummary } from "./selectors/getPointBudgetSummary";
-import { computeEdgeKeysFromNodeIds } from "@/domain/graph/queries/computeEdgeKeysFromNodeIds";
+
 import type { BuildState } from "./models/BuildState";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 
@@ -89,7 +89,7 @@ export class AllocationStateEngine {
           .filter(([_, nodeState]) => nodeState.allocatable)
           .map(([nodeId]) => nodeId),
       );
-      const activeEdgeKeys = computeEdgeKeysFromNodeIds(graph, allocatedNodeIds);
+      const activeEdgeKeys = graph.computeEdgeKeysFromNodeIds(allocatedNodeIds);
 
       return new AllocationStateEngine(
         this.nodeStateById,
