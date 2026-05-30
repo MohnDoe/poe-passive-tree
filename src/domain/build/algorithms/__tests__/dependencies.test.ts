@@ -15,7 +15,7 @@ describe("computeConnectivity", () => {
     const whitelistedNodeIds = new Set([nodes.start.id, nodes.first.id, nodes.second.id]);
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       whitelistedNodeIds,
     });
 
@@ -27,24 +27,24 @@ describe("computeConnectivity", () => {
     }
   });
 
-  it("always includes root node(s) regardless of whitelist", () => {
+  it("always includes start node(s) regardless of whitelist", () => {
     const { graph, nodes } = makeLineGraph();
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       whitelistedNodeIds: new Set([nodes.first.id]),
     });
 
     expect(connectedNodeIds.has(nodes.start.id)).toBe(true);
   });
 
-  it("returns root node(s) when whitelist is empty", () => {
+  it("returns start node(s) when whitelist is empty", () => {
     const { graph, nodes } = makeLineGraph();
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       whitelistedNodeIds: new Set(),
     });
 
@@ -57,7 +57,7 @@ describe("computeConnectivity", () => {
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       whitelistedNodeIds: new Set([nodes.first.id, nodes.third.id]),
     });
 
@@ -78,7 +78,7 @@ describe("computeConnectivity", () => {
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds: new Set([nodes.start.id]),
+      startNodeIds: new Set([nodes.start.id]),
       whitelistedNodeIds,
     });
 
@@ -89,11 +89,11 @@ describe("computeConnectivity", () => {
     }
   });
 
-  it("spreads from root nodes in a disconnected graph", () => {
+  it("spreads from start nodes in a disconnected graph", () => {
     const { graph, nodes } = makeLineGraph();
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds: new Set([nodes.start.id, nodes.sixth.id]),
+      startNodeIds: new Set([nodes.start.id, nodes.sixth.id]),
       // 0 -- 1 || 5 -- 6
       whitelistedNodeIds: new Set([nodes.first.id, nodes.fifth.id]),
     });
@@ -112,7 +112,7 @@ describe("computeConnectivity", () => {
 
   it("reaches all paths of a diamond graph", () => {
     const { graph, nodes } = makeDiamondGraph();
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
     const whitelistedNodeIds = new Set([
       nodes.left.first.id,
       nodes.right.first.id,
@@ -122,11 +122,11 @@ describe("computeConnectivity", () => {
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds,
+      startNodeIds: startNodeIds,
       whitelistedNodeIds,
     });
 
-    const expectedNodeIds = new Set([...rootNodeIds, ...whitelistedNodeIds]);
+    const expectedNodeIds = new Set([...startNodeIds, ...whitelistedNodeIds]);
 
     expect(connectedNodeIds.size).toBe(expectedNodeIds.size);
 
@@ -137,16 +137,16 @@ describe("computeConnectivity", () => {
 
   it("still reaches convergence node of diamond graph when one path is complete", () => {
     const { graph, nodes } = makeDiamondGraph();
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
     const whitelistedNodeIds = new Set([nodes.left.first.id, nodes.right.first.id, nodes.end.id]);
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds,
+      startNodeIds: startNodeIds,
       whitelistedNodeIds,
     });
 
-    const expectedNodeIds = new Set([...rootNodeIds, ...whitelistedNodeIds]);
+    const expectedNodeIds = new Set([...startNodeIds, ...whitelistedNodeIds]);
 
     expect(connectedNodeIds.size).toBe(expectedNodeIds.size);
 
@@ -157,16 +157,16 @@ describe("computeConnectivity", () => {
 
   it("does not reach convergence node of diamond graph if all path are incomplete", () => {
     const { graph, nodes } = makeDiamondGraph();
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
     const whitelistedNodeIds = new Set([nodes.right.first.id, nodes.end.id]);
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds,
+      startNodeIds: startNodeIds,
       whitelistedNodeIds,
     });
 
-    const expectedNodeIds = new Set([...rootNodeIds, nodes.right.first.id]);
+    const expectedNodeIds = new Set([...startNodeIds, nodes.right.first.id]);
 
     expect(connectedNodeIds.size).toBe(expectedNodeIds.size);
 
@@ -176,44 +176,44 @@ describe("computeConnectivity", () => {
   });
 
   it("does not reach a disconnected island", () => {
-    const root = makeNode({ id: "0", kind: "classStart" });
+    const start = makeNode({ id: "0", kind: "classStart" });
     const node1 = makeNode({ id: "1" });
     const islandNode1 = makeNode({ id: "5" });
     const islandNode2 = makeNode({ id: "6" });
     const graph = buildGraph({
-      nodes: [root, node1, islandNode1, islandNode2],
+      nodes: [start, node1, islandNode1, islandNode2],
       edgePairs: [
-        [root.id, node1.id],
+        [start.id, node1.id],
         [islandNode1.id, islandNode2.id],
       ],
     });
 
     const connectedNodeIds = computeConnectivity({
       graph,
-      rootNodeIds: new Set([root.id]),
+      startNodeIds: new Set([start.id]),
       whitelistedNodeIds: new Set([node1.id, islandNode1.id, islandNode2.id]),
     });
-    expect(connectedNodeIds).toEqual(new Set([root.id, node1.id]));
+    expect(connectedNodeIds).toEqual(new Set([start.id, node1.id]));
   });
 });
 
 describe("computeDependencies", () => {
-  it("ignores root nodes", () => {
+  it("ignores start nodes", () => {
     const { graph, nodes } = makeLineGraph();
 
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
     const allocatedNodeIds = new Set([nodes.first.id, nodes.second.id, nodes.third.id]);
 
     const { dependsOnByNodeId, requiredByNodeId } = computeDependencies({
       graph,
       allocatedNodeIds,
-      rootNodeIds,
+      startNodeIds,
     });
 
-    // root is not tracked as a candidate — no entry in either map
+    // start is not tracked as a candidate — no entry in either map
     expect(requiredByNodeId.has(nodes.start.id)).toBe(false);
 
-    // no allocated node lists the root as something it depends on
+    // no allocated node lists the start as something it depends on
     for (const allocatedNodeId of allocatedNodeIds) {
       expect(dependsOnByNodeId.get(allocatedNodeId)!.has(nodes.start.id)).toBe(false);
     }
@@ -224,13 +224,13 @@ describe("computeDependencies", () => {
   it("connects allocated nodes in a line graph", () => {
     const { graph, nodes } = makeLineGraph();
 
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
     const allocatedNodeIds = new Set([nodes.first.id, nodes.second.id, nodes.third.id]);
 
     const { dependsOnByNodeId, requiredByNodeId } = computeDependencies({
       graph,
       allocatedNodeIds,
-      rootNodeIds,
+      startNodeIds,
     });
 
     expect(dependsOnByNodeId.get(nodes.third.id)).toStrictEqual(
@@ -257,12 +257,12 @@ describe("computeDependencies", () => {
       nodes.right.second.id,
       nodes.end.id,
     ]);
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
 
     const { requiredByNodeId } = computeDependencies({
       graph,
       allocatedNodeIds,
-      rootNodeIds,
+      startNodeIds,
     });
 
     // removing left-1 still leaves end reachable via right path — so end does NOT require left-1
@@ -279,13 +279,13 @@ describe("computeDependencies", () => {
     const { graph, nodes } = makeDiamondGraph();
     // Only left path allocated — right path absent
     // start -- left-1 -- end
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
     const allocatedNodeIds = new Set([nodes.left.first.id, nodes.end.id]);
 
     const { requiredByNodeId } = computeDependencies({
       graph,
       allocatedNodeIds,
-      rootNodeIds,
+      startNodeIds,
     });
 
     // Now left-1 is the only path to end — "end" IS dependent on left-1
@@ -303,12 +303,12 @@ describe("computeDependencies", () => {
       nodes.right.first.id,
       nodes.right.second.id,
     ]);
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
 
     const { requiredByNodeId } = computeDependencies({
       graph,
       allocatedNodeIds,
-      rootNodeIds,
+      startNodeIds,
     });
 
     // removing first (the fork node) disconnects all four branch nodes
@@ -331,48 +331,48 @@ describe("computeDependencies", () => {
       nodes.right.first.id,
       nodes.right.second.id,
     ]);
-    const rootNodeIds = new Set([nodes.start.id]);
+    const startNodeIds = new Set([nodes.start.id]);
 
     const { requiredByNodeId } = computeDependencies({
       graph,
       allocatedNodeIds,
-      rootNodeIds,
+      startNodeIds,
     });
 
     // removing left-second (a leaf) disconnects nobody else
     expect(requiredByNodeId.get(nodes.left.second.id)?.size).toBe(0);
   });
 
-  // multi roots
-  it("node reachable from two roots has no single dependency", () => {
-    // Two separate roots both connected to a shared middle node
-    // root-a -- middle -- leaf
-    // root-b -
-    const rootA = makeNode({ id: "root-a", kind: "classStart" });
-    const rootB = makeNode({ id: "root-b", kind: "classStart" });
+  // multi start nodes
+  it("node reachable from two start nodes has no single dependency", () => {
+    // Two separate start nodes both connected to a shared middle node
+    // start-a -- middle -- leaf
+    // start-b -
+    const startA = makeNode({ id: "start-a", kind: "classStart" });
+    const startB = makeNode({ id: "start-b", kind: "classStart" });
     const middle = makeNode({ id: "middle" });
     const leaf = makeNode({ id: "leaf" });
 
     const graph = buildGraph({
-      nodes: [rootA, rootB, middle, leaf],
+      nodes: [startA, startB, middle, leaf],
       edgePairs: [
-        [rootA.id, middle.id],
-        [rootB.id, middle.id],
+        [startA.id, middle.id],
+        [startB.id, middle.id],
         [middle.id, leaf.id],
       ],
     });
 
-    // roots are excluded from allocatedNodeIds — computeDependencies handles them separately
+    // starts are excluded from allocatedNodeIds — computeDependencies handles them separately
     const allocatedNodeIds = new Set([middle.id, leaf.id]);
-    const rootNodeIds = new Set([rootA.id, rootB.id]);
+    const startNodeIds = new Set([startA.id, startB.id]);
 
     const { dependsOnByNodeId, requiredByNodeId } = computeDependencies({
       graph,
       allocatedNodeIds,
-      rootNodeIds,
+      startNodeIds,
     });
 
-    // middle is reachable from both roots — it depends on nothing
+    // middle is reachable from both starts — it depends on nothing
     expect(dependsOnByNodeId.get(middle.id)?.size).toBe(0);
 
     // removing middle disconnects leaf — leaf requires middle

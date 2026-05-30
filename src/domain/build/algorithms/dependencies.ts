@@ -4,22 +4,22 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 
 export interface ComputeConnectivityParams {
   graph: PassiveGraph;
-  rootNodeIds: ReadonlySet<NodeId>;
+  startNodeIds: ReadonlySet<NodeId>;
   whitelistedNodeIds: ReadonlySet<NodeId>;
 }
 
 /**
- * Returns a list of all nodes that are connected to the roots (rootNodeIds)
+ * Returns a list of all nodes that are connected to the roots (startNodeIds)
  * and are in nodeIdsWhitelist
  *
  */
 export function computeConnectivity({
   graph,
-  rootNodeIds,
+  startNodeIds,
   whitelistedNodeIds,
 }: ComputeConnectivityParams): Set<NodeId> {
   const connectedNodeIds = new Set<NodeId>();
-  const queue: NodeId[] = [...rootNodeIds];
+  const queue: NodeId[] = [...startNodeIds];
 
   while (queue.length > 0) {
     const nodeId = queue.shift()!;
@@ -28,7 +28,7 @@ export function computeConnectivity({
     const node = graph.nodesById.get(nodeId);
     if (!node) continue;
 
-    if (!whitelistedNodeIds.has(nodeId) && !rootNodeIds.has(nodeId)) continue;
+    if (!whitelistedNodeIds.has(nodeId) && !startNodeIds.has(nodeId)) continue;
 
     connectedNodeIds.add(nodeId);
 
@@ -49,7 +49,7 @@ export function computeConnectivity({
 export interface ComputeDependenciesParams {
   graph: PassiveGraph;
   allocatedNodeIds: ReadonlySet<NodeId>;
-  rootNodeIds: ReadonlySet<NodeId>;
+  startNodeIds: ReadonlySet<NodeId>;
 }
 
 export interface ComputeDependenciesResult {
@@ -60,7 +60,7 @@ export interface ComputeDependenciesResult {
 export function computeDependencies({
   graph,
   allocatedNodeIds,
-  rootNodeIds,
+  startNodeIds,
 }: ComputeDependenciesParams): ComputeDependenciesResult {
   const dependsOnByNodeId = new Map<NodeId, Set<NodeId>>();
   const requiredByNodeId = new Map<NodeId, Set<NodeId>>();
@@ -71,15 +71,15 @@ export function computeDependencies({
   }
 
   for (const candidateId of allocatedNodeIds) {
-    // roots can't be removed
-    if (rootNodeIds.has(candidateId)) continue;
+    // startNodeIds can't be removed
+    if (startNodeIds.has(candidateId)) continue;
 
     const hypothetical = new Set(allocatedNodeIds);
     hypothetical.delete(candidateId);
 
     const stillReachableIds = computeConnectivity({
       graph,
-      rootNodeIds,
+      startNodeIds,
       whitelistedNodeIds: hypothetical,
     });
 

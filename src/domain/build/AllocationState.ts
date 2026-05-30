@@ -4,8 +4,7 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 import { computeDependencies } from "./algorithms/dependencies";
 import { computeWeightedPaths, materializePath } from "./algorithms/pathfinding";
 import { getPointBudgetSummary } from "./selectors/getPointBudgetSummary";
-import { computeEdgeKeysFromNodeIds } from "@/domain/graph/queries/computeEdgeKeysFromNodeIds";
-import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
+
 import type { BuildState } from "./models/BuildState";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 
@@ -31,7 +30,7 @@ interface AllocationNodeState {
 export interface AllocationState {
   activeClassId: ClassId | null;
 
-  rootNodeIds: Set<NodeId>;
+  startNodeIds: ReadonlySet<NodeId>;
 
   allocatedNodeIds: ReadonlySet<NodeId>;
   allocatableNodeIds: ReadonlySet<NodeId>;
@@ -45,7 +44,7 @@ export class AllocationStateEngine {
   nodeStateById: Map<NodeId, AllocationNodeState>;
   allocatableNodeIds: ReadonlySet<NodeId>;
   allocatedNodeIds: ReadonlySet<NodeId>;
-  rootNodeIds: Set<NodeId>;
+  startNodeIds: ReadonlySet<NodeId>;
   activeClassId: ClassId | null;
   activeEdgeKeys: ReadonlySet<EdgeKey>;
 
@@ -53,14 +52,14 @@ export class AllocationStateEngine {
     nodeStateById: Map<NodeId, AllocationNodeState>,
     allocatableNodeIds: Set<NodeId>,
     allocatedNodeIds: ReadonlySet<NodeId>,
-    rootNodeIds: Set<NodeId>,
+    startNodeIds: ReadonlySet<NodeId>,
     activeClassId: ClassId | null,
     activeEdgeKeys: ReadonlySet<EdgeKey>,
   ) {
     this.nodeStateById = nodeStateById;
     this.allocatableNodeIds = allocatableNodeIds;
     this.allocatedNodeIds = allocatedNodeIds;
-    this.rootNodeIds = rootNodeIds;
+    this.startNodeIds = startNodeIds;
     this.activeClassId = activeClassId;
     this.activeEdgeKeys = activeEdgeKeys;
   }
@@ -81,21 +80,22 @@ export class AllocationStateEngine {
       this.mergeDependencies(graph, buildState);
 
       const allocatedNodeIds = new Set(buildState.allocatedNodeIds);
-      const rootNodeIds = new Set(
-        getActiveRootNodeIds(graph, buildState.activeClassId, buildState.activeAscendancy),
+      const buildStartNodeIds = graph.getBuildStartNodeIds(
+        buildState.activeClassId,
+        buildState.activeAscendancy,
       );
       const allocatableNodeIds = new Set<NodeId>(
         [...this.nodeStateById]
           .filter(([_, nodeState]) => nodeState.allocatable)
           .map(([nodeId]) => nodeId),
       );
-      const activeEdgeKeys = computeEdgeKeysFromNodeIds(graph, allocatedNodeIds);
+      const activeEdgeKeys = graph.computeEdgeKeysFromNodeIds(allocatedNodeIds);
 
       return new AllocationStateEngine(
         this.nodeStateById,
         allocatableNodeIds,
         allocatedNodeIds,
-        rootNodeIds,
+        buildStartNodeIds,
         buildState.activeClassId,
         activeEdgeKeys,
       );
@@ -120,30 +120,31 @@ export class AllocationStateEngine {
 
     private static applyWeightedPaths(graph: PassiveGraph, buildState: BuildState): void {
       const allocatedNodeIds = new Set(buildState.allocatedNodeIds);
-      const rootNodeIds = new Set(
-        getActiveRootNodeIds(graph, buildState.activeClassId, buildState.activeAscendancy),
+      const buildStartNodeIds = graph.getBuildStartNodeIds(
+        buildState.activeClassId,
+        buildState.activeAscendancy,
       );
 
       const weightedPaths = computeWeightedPaths({
         graph,
-        rootNodeIds,
+        startNodeIds: buildStartNodeIds,
         allocatedNodeIds,
       });
 
       for (const [nodeId, nodeState] of this.nodeStateById) {
-        const pathCost = weightedPaths.distanceByNodeId.get(nodeId) ?? null;
-
-        if (pathCost === null) {
+        if (!weightedPaths.distanceByNodeId.has(nodeId)) {
           nodeState.cheapestPathCost = null;
           nodeState.cheapestPath = null;
           nodeState.reachable = false;
           continue;
         }
 
+        const pathCost = weightedPaths.distanceByNodeId.get(nodeId)!;
+
         nodeState.cheapestPathCost = pathCost;
         nodeState.cheapestPath = materializePath(nodeId, weightedPaths.predecessorByNodeId);
 
-        if (nodeState.cheapestPath.length > 0) {
+        if (nodeState.cheapestPath.length > 0 && !buildStartNodeIds.has(nodeId)) {
           nodeState.reachable = true;
         }
       }
@@ -159,21 +160,19 @@ export class AllocationStateEngine {
           continue;
         }
 
-        const costsSomething = nodeState.cheapestPathCost !== null && nodeState.cheapestPathCost > 0;
-        const cost = nodeState.cheapestPathCost ?? 0;
+        const pathCost = nodeState.cheapestPathCost ?? 0;
 
         const region = graph.regionByNodeId.get(nodeId);
 
-        const hasBudget =
+        const buildHasEnoughBudget =
           region === "ascendancy"
-            ? pointBudgetSummary.remaining.ascendancy >= cost
-            : pointBudgetSummary.remaining.passive >= cost;
+            ? pointBudgetSummary.remaining.ascendancy >= pathCost
+            : pointBudgetSummary.remaining.passive >= pathCost;
 
-        const hasZeroCost = nodeState.cheapestPathCost === 0;
         nodeState.allocatable =
           !nodeState.allocated &&
           nodeState.reachable &&
-          (hasZeroCost || hasBudget) &&
+          buildHasEnoughBudget &&
           node.kind !== "classStart" &&
           node.kind !== "ascendancyStart";
       }
@@ -181,13 +180,13 @@ export class AllocationStateEngine {
 
     private static mergeDependencies(graph: PassiveGraph, buildState: BuildState): void {
       const allocatedNodeIds = new Set(buildState.allocatedNodeIds);
-      const rootNodeIds = new Set(
-        getActiveRootNodeIds(graph, buildState.activeClassId, buildState.activeAscendancy),
-      );
 
       const dependencies = computeDependencies({
         graph,
-        rootNodeIds,
+        startNodeIds: graph.getBuildStartNodeIds(
+          buildState.activeClassId,
+          buildState.activeAscendancy,
+        ),
         allocatedNodeIds,
       });
 

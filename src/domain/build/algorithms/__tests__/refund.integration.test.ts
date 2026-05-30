@@ -7,14 +7,14 @@ it("refunds a leaf node after dependency computation", () => {
   const { graph, nodes } = makeLineGraph();
 
   const allocatedNodeIds = new Set([nodes.first.id, nodes.second.id]);
-  const rootNodeIds = new Set([nodes.start.id]);
+  const startNodeIds = new Set([nodes.start.id]);
 
   const refundTargetId = nodes.second.id;
 
   const { requiredByNodeId } = computeDependencies({
     graph,
     allocatedNodeIds,
-    rootNodeIds,
+    startNodeIds,
   });
 
   const refunded = computeRefundClosure(refundTargetId, allocatedNodeIds, requiredByNodeId);
@@ -28,12 +28,12 @@ it("refunds a middle node and cascades to its dependants after dependency comput
   const { graph, nodes } = makeLineGraph();
 
   const allocatedNodeIds = new Set([nodes.first.id, nodes.second.id, nodes.third.id]);
-  const rootNodeIds = new Set([nodes.start.id]);
+  const startNodeIds = new Set([nodes.start.id]);
 
   const { requiredByNodeId } = computeDependencies({
     graph,
     allocatedNodeIds,
-    rootNodeIds,
+    startNodeIds,
   });
 
   const refundTargetId = nodes.first.id;
