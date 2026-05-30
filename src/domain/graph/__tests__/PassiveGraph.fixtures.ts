@@ -1,5 +1,5 @@
 import { makeEdgeKey } from "../edgeKeys";
-import type { GraphEdge } from "../GraphEdge";
+import type { EdgeKey, GraphEdge } from "../GraphEdge";
 import type { AscendancyId } from "../PassiveAscendancy";
 import type { ClassId } from "../PassiveClass";
 import type { PassiveGraph } from "../PassiveGraph";
@@ -68,11 +68,16 @@ export function buildGraph(params: {
     new Map<NodeId, PassiveNodeSubregion>(params.nodes.map((n) => [n.id, null]));
   const startNodes = params.nodes.filter((n) => n.kind === "classStart");
 
+  const startNodeIdsByClassId = new Map<ClassId, Set<NodeId>>();
+  const ascendancyIdsByClassId = new Map<ClassId, Set<AscendancyId>>();
+
   const firstClassStartNodes = startNodes.filter((n) => n.classStartIndex === firstClassId);
   const firstClassStartNodeIds = firstClassStartNodes.map((n) => n.id);
+  startNodeIdsByClassId.set(firstClassId, new Set(firstClassStartNodeIds));
 
   const secondClassStartNodes = startNodes.filter((n) => n.classStartIndex === secondClassId);
   const secondClassStartNodeIds = secondClassStartNodes.map((n) => n.id);
+  startNodeIdsByClassId.set(secondClassId, new Set(secondClassStartNodeIds));
 
   const allStartNodeIds = new Set<NodeId>([...firstClassStartNodeIds, ...secondClassStartNodeIds]);
 
@@ -109,11 +114,51 @@ export function buildGraph(params: {
     classByStartNodeId: new Map(startNodes.map((n) => [n.id, n.classStartIndex as ClassId])),
     ascendancyStartNodeIds,
     ascendancyStartNodeIdsByAscendancyId,
-    ascendancyIdsByClassId: new Map([
-      [firstClassId, new Set()],
-      [secondClassId, new Set()],
-    ]),
+    ascendancyIdsByClassId: new Map(ascendancyIdsByClassId),
     edges,
+    getBuildRootNodeIds(classId: ClassId | null, ascendancyId: AscendancyId | null) {
+      const startNodeIds = this.getBuildStartNodeIds(classId, ascendancyId);
+
+      const rootNodeIds = new Set<NodeId>();
+      for (const startNodeId of startNodeIds) {
+        const neighbors = adjacency.get(startNodeId);
+        if (!neighbors) continue;
+        for (const neighborId of neighbors) {
+          const neighbor = nodesById.get(neighborId);
+          if (neighbor && neighbor.kind !== "classStart" && neighbor.kind !== "ascendancyStart") {
+            rootNodeIds.add(neighborId);
+          }
+        }
+      }
+
+      return rootNodeIds;
+    },
+    getBuildStartNodeIds(classId: ClassId | null, ascendancyId: AscendancyId | null) {
+      const classStartNodeIds = this.getClassStartNodeIds(classId);
+      const ascendancyStartNodeIds = this.getAscendancyStartNodeIds(ascendancyId);
+
+      return new Set([...classStartNodeIds, ...ascendancyStartNodeIds]);
+    },
+    getClassStartNodeIds(classId: ClassId | null) {
+      if (classId === null) return new Set();
+      return startNodeIdsByClassId.get(classId) ?? new Set();
+    },
+    getAscendancyStartNodeIds(ascendancyId: AscendancyId | null) {
+      if (ascendancyId === null) return new Set();
+      return ascendancyStartNodeIdsByAscendancyId.get(ascendancyId) ?? new Set();
+    },
+    isValidAscendancyForClass(classId: ClassId, ascendancyId: AscendancyId) {
+      return this.ascendancyIdsByClassId.get(classId)?.has(ascendancyId) ?? false;
+    },
+    computeEdgeKeysFromNodeIds(nodeIds: ReadonlySet<NodeId>): Set<EdgeKey> {
+      const edgeKeys = new Set<EdgeKey>();
+      for (const edge of edges) {
+        if (!nodeIds.has(edge.source)) continue;
+        if (!nodeIds.has(edge.target)) continue;
+        edgeKeys.add(edge.key);
+      }
+      return edgeKeys;
+    },
   };
 }
 

@@ -5,7 +5,7 @@ import { Deque } from "@/shared/collections/Deque";
 
 export interface ComputeWeightedPathsParams {
   graph: PassiveGraph;
-  rootNodeIds: ReadonlySet<NodeId>;
+  startNodeIds: ReadonlySet<NodeId>;
   // Allocated nodes are treated as free to traverse (cost = 0)
   allocatedNodeIds: ReadonlySet<NodeId>;
 }
@@ -37,7 +37,7 @@ export interface WeightedPathsResult {
  *
  */
 export function computeWeightedPaths({
-  rootNodeIds,
+  startNodeIds,
   allocatedNodeIds,
   graph,
 }: ComputeWeightedPathsParams): WeightedPathsResult {
@@ -46,10 +46,10 @@ export function computeWeightedPaths({
 
   const deque = new Deque<NodeId>();
 
-  for (const rootId of rootNodeIds) {
-    distanceByNodeId.set(rootId, 0);
-    predecessorByNodeId.set(rootId, null);
-    deque.pushBack(rootId);
+  for (const startNodeId of startNodeIds) {
+    distanceByNodeId.set(startNodeId, 0);
+    predecessorByNodeId.set(startNodeId, null);
+    deque.pushBack(startNodeId);
   }
 
   while (!deque.isEmpty()) {

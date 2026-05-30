@@ -1,4 +1,4 @@
-import type { GraphEdge } from "./GraphEdge";
+import type { EdgeKey, GraphEdge } from "./GraphEdge";
 import type { AscendancyId } from "./PassiveAscendancy";
 import type { ClassId } from "./PassiveClass";
 import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "./PassiveNode";
@@ -14,6 +14,7 @@ export interface PassiveGraph extends PassiveTreeData {
   regionByNodeId: ReadonlyMap<NodeId, PassiveNodeRegion>;
   subregionByNodeId: ReadonlyMap<NodeId, PassiveNodeSubregion>;
 
+  //TODO: remove this as it's useless
   allStartNodeIds: ReadonlySet<NodeId>;
 
   startNodeIdsByClassId: ReadonlyMap<ClassId, ReadonlySet<NodeId>>;
@@ -30,4 +31,17 @@ export interface PassiveGraph extends PassiveTreeData {
 
   edges: readonly GraphEdge[];
   // edgeIdsByNodeId: ReadonlyMap<NodeId, string>;
+
+  getBuildRootNodeIds(
+    classId: ClassId | null,
+    ascendancyId: AscendancyId | null,
+  ): ReadonlySet<NodeId>;
+  getBuildStartNodeIds(
+    classId: ClassId | null,
+    ascendancyId: AscendancyId | null,
+  ): ReadonlySet<NodeId>;
+  getClassStartNodeIds(classId: ClassId | null): ReadonlySet<NodeId>;
+  getAscendancyStartNodeIds(ascendancyId: AscendancyId | null): ReadonlySet<NodeId>;
+  isValidAscendancyForClass(classId: ClassId, ascendancyId: AscendancyId): boolean;
+  computeEdgeKeysFromNodeIds(nodeIds: ReadonlySet<NodeId>): Set<EdgeKey>;
 }

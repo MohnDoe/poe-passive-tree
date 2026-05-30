@@ -8,7 +8,6 @@ import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
-import { getActiveRootNodeIds } from "@/domain/graph/queries/getActiveRootNodeIds";
 import { isAscendancyValidForClass } from "@/domain/graph/queries/isAscendancyValidForClass";
 
 export type BuildFailureReason =
@@ -43,21 +42,19 @@ export class Build {
       return err("NO_ACTIVE_CLASS");
     }
 
-    const rootNodeIds = new Set(
-      getActiveRootNodeIds(graph, build.activeClassId, build.activeAscendancy),
-    );
+    const startNodeIds = graph.getBuildStartNodeIds(build.activeClassId, build.activeAscendancy);
 
-    if (rootNodeIds.size === 0) {
+    if (startNodeIds.size === 0 || startNodeIds.has(nodeId)) {
       return err("NODE_NOT_ALLOCATABLE");
     }
 
-    if (build.allocatedNodeIds.has(nodeId) || rootNodeIds.has(nodeId)) {
+    if (build.allocatedNodeIds.has(nodeId)) {
       return err("NODE_NOT_ALLOCATABLE");
     }
 
     const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
       graph,
-      rootNodeIds,
+      startNodeIds,
       allocatedNodeIds: build.allocatedNodeIds,
     });
 
@@ -97,13 +94,9 @@ export class Build {
       return err("NODE_NOT_ALLOCATED");
     }
 
-    const rootNodeIds = new Set(
-      getActiveRootNodeIds(graph, build.activeClassId, build.activeAscendancy),
-    );
-
     const { requiredByNodeId } = computeDependencies({
       graph,
-      rootNodeIds,
+      startNodeIds: graph.getBuildStartNodeIds(build.activeClassId, build.activeAscendancy),
       allocatedNodeIds: build.allocatedNodeIds,
     });
 
@@ -120,10 +113,7 @@ export class Build {
     });
   }
 
-  static setClass(
-    build: BuildState,
-    classId: ClassId,
-  ): Result<BuildState, BuildFailureReason> {
+  static setClass(build: BuildState, classId: ClassId): Result<BuildState, BuildFailureReason> {
     if (build.activeClassId === classId) {
       return err("NO_CHANGE");
     }
