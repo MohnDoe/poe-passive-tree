@@ -3,6 +3,7 @@ import { ok, err } from "neverthrow";
 import {
   computeDependencies,
   computeRefundClosure,
+  computeRefundEdgeKeys,
   computeWeightedPaths,
   materializePath,
 } from "@/domain/build/internal";
@@ -11,6 +12,13 @@ import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
+import type { EdgeKey } from "@/domain/graph/GraphEdge";
+
+export interface RefundAnalysis {
+  canRefund: boolean;
+  refundedNodeIds: ReadonlySet<NodeId>;
+  refundedEdgeKeys: ReadonlySet<EdgeKey>;
+}
 
 
 export type BuildFailureReason =
@@ -127,6 +135,43 @@ export class Build {
       activeAscendancy: null,
       allocatedNodeIds: new Set(),
     });
+  }
+
+  static computeRefundAnalysis(
+    graph: PassiveGraph,
+    build: BuildState,
+    nodeId: NodeId,
+  ): RefundAnalysis {
+    if (!graph.nodesById.has(nodeId)) {
+      return {
+        canRefund: false,
+        refundedNodeIds: new Set(),
+        refundedEdgeKeys: new Set(),
+      };
+    }
+
+    if (!build.allocatedNodeIds.has(nodeId)) {
+      return {
+        canRefund: false,
+        refundedNodeIds: new Set(),
+        refundedEdgeKeys: new Set(),
+      };
+    }
+
+    const { requiredByNodeId } = computeDependencies({
+      graph,
+      startNodeIds: graph.getBuildStartNodeIds(build.activeClassId!, build.activeAscendancy),
+      allocatedNodeIds: build.allocatedNodeIds,
+    });
+
+    const refundedNodeIds = computeRefundClosure(nodeId, build.allocatedNodeIds, requiredByNodeId);
+    const refundedEdgeKeys = computeRefundEdgeKeys(refundedNodeIds, build.allocatedNodeIds, graph);
+
+    return {
+      canRefund: refundedNodeIds.size > 0,
+      refundedNodeIds,
+      refundedEdgeKeys,
+    };
   }
 
   static setAscendancy(
