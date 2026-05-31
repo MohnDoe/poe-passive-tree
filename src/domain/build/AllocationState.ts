@@ -1,8 +1,11 @@
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { ClassId } from "@/domain/graph/PassiveClass";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import { computeDependencies } from "./algorithms/dependencies";
-import { computeWeightedPaths, materializePath } from "./algorithms/pathfinding";
+import {
+  computeDependencies,
+  computeWeightedPaths,
+  materializePath,
+} from "./internal";
 import { getPointBudgetSummary } from "./selectors/getPointBudgetSummary";
 
 import type { BuildState } from "./models/BuildState";

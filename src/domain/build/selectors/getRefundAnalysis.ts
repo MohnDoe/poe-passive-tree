@@ -1,7 +1,7 @@
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
-import { computeRefundClosure, computeRefundEdgeKeys } from "../algorithms/refund";
+import { computeRefundClosure, computeRefundEdgeKeys } from "../internal";
 import type { AllocationState } from "../AllocationState";
 
 export interface RefundAnalysis {
