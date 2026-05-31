@@ -1,8 +1,11 @@
 import type { Result } from "neverthrow";
 import { ok, err } from "neverthrow";
-import { computeDependencies } from "@/domain/build/algorithms/dependencies";
-import { computeRefundClosure } from "@/domain/build/algorithms/refund";
-import { computeWeightedPaths, materializePath } from "@/domain/build/algorithms/pathfinding";
+import {
+  computeDependencies,
+  computeRefundClosure,
+  computeWeightedPaths,
+  materializePath,
+} from "@/domain/build/internal";
 import type { ClassId } from "@/domain/graph/PassiveClass";
 import type { BuildState } from "@/domain/build/models/BuildState";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
