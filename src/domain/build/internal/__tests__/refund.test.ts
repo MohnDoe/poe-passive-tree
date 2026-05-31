@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { makeEdgeKey } from "@/domain/graph/edgeKeys.ts";
 import { makeLineGraph, makeForkGraph, makeDiamondGraph } from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
 import { computeRefundClosure, computeRefundEdgeKeys } from "../refund.ts";
 import { computeDependencies } from "../dependencies.ts";
@@ -75,7 +76,7 @@ describe("computeRefundEdgeKeys", () => {
     const edgeKeys = computeRefundEdgeKeys(refundedNodeIds, allocatedNodeIds, graph);
 
     // third is connected to second (allocated, not refunded)
-    expect(edgeKeys.size).toBeGreaterThan(0);
+    expect(edgeKeys).toEqual(new Set([makeEdgeKey("3", "2")]));
   });
 
   it("includes internal edges within refund cluster", () => {
@@ -93,7 +94,14 @@ describe("computeRefundEdgeKeys", () => {
 
     const edgeKeys = computeRefundEdgeKeys(refundedNodeIds, allocatedNodeIds, graph);
 
-    // All three nodes are refunded, so internal edges between them should be included
-    expect(edgeKeys.size).toBeGreaterThan(0);
+    // Internal edges between refunded nodes in both directions
+    expect(edgeKeys).toEqual(
+      new Set([
+        makeEdgeKey("1", "left-1"),
+        makeEdgeKey("left-1", "1"),
+        makeEdgeKey("left-1", "left-2"),
+        makeEdgeKey("left-2", "left-1"),
+      ]),
+    );
   });
 });
