@@ -14,13 +14,11 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 
-// NOTE: RefundAnalysis is re-exported from Build.ts for convenience.
 export interface RefundAnalysis {
   canRefund: boolean;
   refundedNodeIds: ReadonlySet<NodeId>;
   refundedEdgeKeys: ReadonlySet<EdgeKey>;
 }
-
 
 export type BuildFailureReason =
   | "NO_ACTIVE_CLASS"
