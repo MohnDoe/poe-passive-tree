@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { makeLineGraph, makeForkGraph } from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
 import { makeBuildState } from "@/domain/build/__tests__/BuildState.fixtures.ts";
-import { Build } from "../../Build.ts";
+import { Build } from "../../Build";
 
 describe("Build.computeRefundAnalysis", () => {
   it("returns canRefund false for non-existent node", () => {
