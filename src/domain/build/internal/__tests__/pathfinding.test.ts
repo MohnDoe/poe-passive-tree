@@ -39,7 +39,7 @@ describe("computeWeightedPaths", () => {
     expect(distanceByNodeId.get(nodes.sixth.id)).toBe(0);
   });
 
-  it("finds shortest path in a line graph", () => {
+  it("costs 1 per unallocated hop", () => {
     const { graph, nodes } = makeLineGraph();
 
     const result = computeWeightedPaths({
