@@ -1,6 +1,7 @@
 import type { AllocationState } from "@/domain/build/AllocationState";
+import type { BuildState } from "@/domain/build/models/BuildState";
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
-import { getRefundAnalysis } from "@/domain/build/selectors/getRefundAnalysis";
+import { Build } from "@/domain/build/Build";
 import { makeEdgeKey, makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
@@ -10,6 +11,7 @@ export interface ComputeHoverPreviewStateParams {
   allocationState: AllocationState | null;
   hoveredNodeId: NodeId | null;
   graph: PassiveGraph | null;
+  build: BuildState;
 }
 
 const emptyHighlight = {
@@ -21,6 +23,7 @@ export function computeHoverPreviewState({
   allocationState,
   hoveredNodeId,
   graph,
+  build,
 }: ComputeHoverPreviewStateParams): HoverPreviewState {
   const defaultPreviewState: HoverPreviewState = {
     hoveredNodeId,
@@ -37,7 +40,7 @@ export function computeHoverPreviewState({
   if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) return defaultPreviewState;
 
   if (hoveredNodeState.allocated) {
-    const refundAnalysis = getRefundAnalysis(hoveredNodeId, allocationState.nodeStateById, graph);
+    const refundAnalysis = Build.computeRefundAnalysis(graph, build, hoveredNodeId);
     return {
       ...defaultPreviewState,
       refund: {

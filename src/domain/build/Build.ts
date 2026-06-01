@@ -14,9 +14,7 @@ import type { NodeId } from "@/domain/graph/PassiveNode";
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 
-// NOTE: RefundAnalysis is also re-exported from
-// src/domain/build/selectors/getRefundAnalysis.ts. The type is identical in both
-// locations; importing from Build.ts is the conventional source.
+// NOTE: RefundAnalysis is re-exported from Build.ts for convenience.
 export interface RefundAnalysis {
   canRefund: boolean;
   refundedNodeIds: ReadonlySet<NodeId>;
