@@ -1,4 +1,4 @@
-import { isAscendancyTraversalNode } from "@/domain/build/algorithms/rules/traversal";
+import { isAscendancyTraversalNode } from "@/domain/build/internal/traversal";
 import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
 import type {
   NodeId,

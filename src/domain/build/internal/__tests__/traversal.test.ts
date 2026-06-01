@@ -4,7 +4,7 @@ import {
   makeLineGraph,
   makeNode,
   makeRegionGraph,
-} from "@/domain/graph/__tests__/PassiveGraph.fixtures";
+} from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
 import { isTraversableEdge, canExpandTo, isAscendancyTraversalNode } from "../traversal";
 import type { NodeId, PassiveNodeRegion, PassiveNodeSubregion } from "@/domain/graph/PassiveNode";
 

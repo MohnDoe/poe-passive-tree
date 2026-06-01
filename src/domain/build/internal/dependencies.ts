@@ -1,4 +1,4 @@
-import { canExpandTo } from "@/domain/build/algorithms/rules/traversal";
+import { canExpandTo } from "@/domain/build/internal/traversal";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { NodeId } from "@/domain/graph/PassiveNode";
 
