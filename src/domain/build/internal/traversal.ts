@@ -1,15 +1,19 @@
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
 import type { PassiveNode } from "@/domain/graph/PassiveNode";
 
-export function isAscendancyTraversalNode(node: PassiveNode) {
+export function isAscendancyTraversalNode(node: PassiveNode): boolean {
   if (node.kind === "jewel") return false;
-  return (
-    node.kind === "ascendancyStart" ||
-    !!node.ascendancyName ||
-    node.isMultipleChoice ||
-    node.isMultipleChoiceOption ||
-    node.kind == "proxy"
-  );
+  if (node.kind === "ascendancyStart") return true;
+  if (node.kind === "proxy") return true;
+  // ascendancyName is on: notable, normal, jewel, ascendancyStart
+  // jewel/ascendancyStart already handled above, so check notable/normal
+  if (node.kind === "notable" && node.ascendancyName) return true;
+  if (node.kind === "normal" && node.ascendancyName) return true;
+  // isMultipleChoice is on notable
+  if (node.kind === "notable" && node.isMultipleChoice) return true;
+  // isMultipleChoiceOption is on normal
+  if (node.kind === "normal" && node.isMultipleChoiceOption) return true;
+  return false;
 }
 
 export function canExpandTo(graph: PassiveGraph, from: PassiveNode, to: PassiveNode): boolean {

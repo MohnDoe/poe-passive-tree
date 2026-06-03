@@ -177,7 +177,7 @@ describe("isAscendancyTraversalNode", () => {
   });
 
   it("returns true for multiple choice node", () => {
-    const node = makeNode({ id: "0", isMultipleChoice: true });
+    const node = makeNode({ id: "0", kind: "notable", isMultipleChoice: true });
     expect(isAscendancyTraversalNode(node)).toBe(true);
   });
 

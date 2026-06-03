@@ -31,6 +31,7 @@ export function buildRegionIndexes(
     const seedNode = input.nodesById.get(seedId);
     if (!seedNode) continue;
 
+    if (seedNode.kind !== "ascendancyStart") continue;
     const subregion = seedNode.ascendancyName;
     if (!subregion) continue;
 

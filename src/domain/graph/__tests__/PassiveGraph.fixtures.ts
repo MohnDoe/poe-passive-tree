@@ -6,7 +6,8 @@ import type { PassiveGraph } from "../PassiveGraph";
 import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "../PassiveNode";
 
 export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): PassiveNode {
-  return {
+  const kind = partial.kind ?? "normal";
+  const base = {
     id: partial.id,
     name: partial.name ?? `node-${partial.id}`,
     stats: partial.stats ?? [],
@@ -14,14 +15,54 @@ export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): Passiv
     orbitIndex: partial.orbitIndex ?? 0,
     out: partial.out ?? [],
     in: partial.in ?? [],
-    kind: partial.kind ?? "normal",
-    isMultipleChoice: partial.isMultipleChoice ?? false,
-    isMultipleChoiceOption: partial.isMultipleChoiceOption ?? false,
+    kind,
     groupId: partial.groupId,
     position: partial.position,
-    ascendancyName: partial.ascendancyName,
-    classStartIndex: partial.classStartIndex,
   };
+
+  switch (kind) {
+    case "normal": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+        isMultipleChoiceOption: partial.isMultipleChoiceOption,
+      };
+    }
+    case "notable": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+        isMultipleChoice: partial.isMultipleChoice,
+      };
+    }
+    case "keystone": {
+      return base;
+    }
+    case "jewel": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+      };
+    }
+    case "mastery": {
+      return base;
+    }
+    case "proxy": {
+      return base;
+    }
+    case "classStart": {
+      return {
+        ...base,
+        classStartIndex: partial.classStartIndex as ClassId,
+      };
+    }
+    case "ascendancyStart": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+      };
+    }
+  }
 }
 
 function makeEdge(edge: Partial<GraphEdge> & { source: NodeId; target: NodeId }): GraphEdge {
