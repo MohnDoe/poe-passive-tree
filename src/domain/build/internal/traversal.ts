@@ -6,13 +6,9 @@ export function isAscendancyTraversalNode(node: PassiveNode): boolean {
   if (node.kind === "ascendancyStart") return true;
   if (node.kind === "proxy") return true;
   // ascendancyName is on: notable, normal, jewel, ascendancyStart
-  // jewel/ascendancyStart already handled above, so check notable/normal
-  if (node.kind === "notable" && node.ascendancyName) return true;
-  if (node.kind === "normal" && node.ascendancyName) return true;
-  // isMultipleChoice is on notable
-  if (node.kind === "notable" && node.isMultipleChoice) return true;
-  // isMultipleChoiceOption is on normal
-  if (node.kind === "normal" && node.isMultipleChoiceOption) return true;
+  if ("ascendancyName" in node && node.ascendancyName) return true;
+  if ("isMultipleChoice" in node && node.isMultipleChoice) return true;
+  if ("isMultipleChoiceOption" in node && node.isMultipleChoiceOption) return true;
   return false;
 }
 
