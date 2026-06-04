@@ -25,6 +25,11 @@ export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): Passiv
       return {
         ...base,
         ascendancyName: partial.ascendancyName,
+        reminderText: partial.reminderText,
+        grantedStrength: partial.grantedStrength,
+        grantedDexterity: partial.grantedDexterity,
+        grantedIntelligence: partial.grantedIntelligence,
+        grantedPassivePoints: partial.grantedPassivePoints,
         isMultipleChoiceOption: partial.isMultipleChoiceOption,
       };
     }
@@ -32,20 +37,40 @@ export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): Passiv
       return {
         ...base,
         ascendancyName: partial.ascendancyName,
+        reminderText: partial.reminderText,
+        isBlighted: partial.isBlighted,
+        recipe: partial.recipe,
+        grantedStrength: partial.grantedStrength,
+        grantedDexterity: partial.grantedDexterity,
+        grantedIntelligence: partial.grantedIntelligence,
+        grantedPassivePoints: partial.grantedPassivePoints,
         isMultipleChoice: partial.isMultipleChoice,
       };
     }
     case "keystone": {
-      return base;
+      return {
+        ...base,
+        isBlighted: partial.isBlighted,
+        recipe: partial.recipe,
+        flavourText: partial.flavourText,
+        reminderText: partial.reminderText,
+      };
     }
     case "jewel": {
       return {
         ...base,
         ascendancyName: partial.ascendancyName,
+        expansionJewel: partial.expansionJewel,
       };
     }
     case "mastery": {
-      return base;
+      return {
+        ...base,
+        activeIcon: partial.activeIcon,
+        inactiveIcon: partial.inactiveIcon,
+        activeEffectImage: partial.activeEffectImage,
+        masteryEffects: partial.masteryEffects,
+      };
     }
     case "proxy": {
       return base;
