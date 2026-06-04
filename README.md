@@ -10,7 +10,7 @@ A faithful, interactive recreation of the **Path of Exile passive skill tree** b
 > **Core logic is complete, visual rendering is in progress.** Graph traversal, node allocation, hover pathfinding, and the full DDD architecture are implemented and functional. The Pixi.js rendering layer (sprite assets, visual theming, animations) is actively being built on top of this foundation.
 
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=fff)
-![Coverage](https://img.shields.io/badge/Coverage-40%25-orange)
+![Coverage](https://img.shields.io/badge/Coverage-45%25-orange)
 See coverage progress [here](https://github.com/MohnDoe/poe-passive-tree/milestone/1).
 
 ![Passive tree screenshot](docs/assets/screenshot.png)

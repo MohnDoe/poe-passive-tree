@@ -41,10 +41,17 @@ function isMasteryLink(sourceNode: PassiveNode, targetNode: PassiveNode): boolea
 }
 
 function isAscendancyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
-  return (
-    (!!sourceNode.ascendancyName && !targetNode.ascendancyName) ||
-    (!sourceNode.ascendancyName && !!targetNode.ascendancyName)
-  );
+  const sourceHasAscendancy = hasAscendancyName(sourceNode);
+  const targetHasAscendancy = hasAscendancyName(targetNode);
+  return (sourceHasAscendancy && !targetHasAscendancy) ||
+    (!sourceHasAscendancy && targetHasAscendancy);
+}
+
+function hasAscendancyName(node: PassiveNode): boolean {
+  if (node.kind === "notable" || node.kind === "normal" || node.kind === "jewel" || node.kind === "ascendancyStart") {
+    return !!node.ascendancyName;
+  }
+  return false;
 }
 
 function isProxyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {

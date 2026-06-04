@@ -12,24 +12,98 @@ export function mapPassiveNodeDto(
   raw: PassiveTreeNodeDto,
   tree: PassiveTreeDto,
 ): PassiveNode {
-  const isClassStart = raw.classStartIndex !== undefined;
-
-  return {
+  const kind = getPassiveNodeKind(raw);
+  const base = {
     id: nodeId,
     name: raw.name,
     out: raw.out ?? [],
     in: raw.in ?? [],
     orbit: raw.orbit ?? 0,
-    orbitIndex: raw.orbit ?? 0,
+    orbitIndex: raw.orbitIndex ?? 0,
     stats: raw.stats,
-    kind: getPassiveNodeKind(raw),
+    kind,
     groupId: raw.group?.toString() ?? undefined,
     position: getPassiveNodePosition(nodeId, tree),
-    isMultipleChoice: raw.isMultipleChoice ?? false,
-    isMultipleChoiceOption: raw.isMultipleChoiceOption ?? false,
-    ascendancyName: raw.ascendancyName ?? undefined,
-    classStartIndex: isClassStart ? raw.classStartIndex : undefined,
   };
+
+  switch (kind) {
+    case "normal": {
+      return {
+        ...base,
+        kind: "normal" as const,
+        ascendancyName: raw.ascendancyName,
+        reminderText: raw.reminderText,
+        grantedStrength: raw.grantedStrength,
+        grantedDexterity: raw.grantedDexterity,
+        grantedIntelligence: raw.grantedIntelligence,
+        grantedPassivePoints: raw.grantedPassivePoints,
+        isMultipleChoiceOption: raw.isMultipleChoiceOption,
+      };
+    }
+    case "notable": {
+      return {
+        ...base,
+        kind: "notable" as const,
+        ascendancyName: raw.ascendancyName,
+        reminderText: raw.reminderText,
+        isBlighted: raw.isBlighted,
+        recipe: raw.recipe,
+        grantedStrength: raw.grantedStrength,
+        grantedDexterity: raw.grantedDexterity,
+        grantedIntelligence: raw.grantedIntelligence,
+        grantedPassivePoints: raw.grantedPassivePoints,
+        isMultipleChoice: raw.isMultipleChoice,
+      };
+    }
+    case "keystone": {
+      return {
+        ...base,
+        kind: "keystone" as const,
+        isBlighted: raw.isBlighted,
+        recipe: raw.recipe,
+        flavourText: raw.flavourText,
+        reminderText: raw.reminderText,
+      };
+    }
+    case "jewel": {
+      return {
+        ...base,
+        kind: "jewel" as const,
+        ascendancyName: raw.ascendancyName,
+        expansionJewel: raw.expansionJewel,
+      };
+    }
+    case "mastery": {
+      return {
+        ...base,
+        kind: "mastery" as const,
+        activeIcon: raw.activeIcon as string | undefined,
+        inactiveIcon: raw.inactiveIcon as string | undefined,
+        activeEffectImage: raw.activeEffectImage as string | undefined,
+        masteryEffects: raw.masteryEffects,
+      };
+    }
+    case "proxy": {
+      return {
+        ...base,
+        kind: "proxy" as const,
+      };
+    }
+    case "classStart": {
+      return {
+        ...base,
+        kind: "classStart" as const,
+        classStartIndex: raw.classStartIndex as number,
+      };
+    }
+    case "ascendancyStart": {
+      return {
+        ...base,
+        kind: "ascendancyStart" as const,
+        ascendancyName: raw.ascendancyName,
+      };
+    }
+  }
 }
 
 function getPassiveNodeKind(raw: PassiveTreeNodeDto): PassiveNodeKind {
