@@ -5,7 +5,7 @@ import { Build } from "@/domain/build/Build";
 import { makeEdgeKey, makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
-import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
 
 export interface ComputeHoverPreviewStateParams {
   allocationState: AllocationState | null;
@@ -71,7 +71,10 @@ export function computeHoverPreviewState({
   if (!cheapestPath) return { ...defaultPreviewState, tooltip: makeTooltip(null, null) };
 
   const highlightedNodeIds = new Set<NodeId>(
-    cheapestPath.filter((id) => !allocationState.allocatedNodeIds.has(id)),
+    cheapestPath.filter(
+      (id) =>
+        !allocationState.allocatedNodeIds.has(id) && allocationState.allocatableNodeIds.has(id),
+    ),
   );
   highlightedNodeIds.add(hoveredNodeId);
 
