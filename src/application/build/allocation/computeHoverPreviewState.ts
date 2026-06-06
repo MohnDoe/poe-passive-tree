@@ -5,7 +5,7 @@ import { Build } from "@/domain/build/Build";
 import { makeEdgeKey, makeEdgeKeysFromPath } from "@/domain/graph/edgeKeys";
 import type { EdgeKey } from "@/domain/graph/GraphEdge";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
-import type { NodeId } from "@/domain/graph/PassiveNode";
+import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
 
 export interface ComputeHoverPreviewStateParams {
   allocationState: AllocationState | null;
@@ -29,15 +29,30 @@ export function computeHoverPreviewState({
     hoveredNodeId,
     highlight: emptyHighlight,
     refund: emptyHighlight,
+    tooltip: null,
   };
 
   if (!allocationState || !hoveredNodeId || !graph) {
     return defaultPreviewState;
   }
 
+  const hoveredNode = graph.nodesById.get(hoveredNodeId);
+  if (!hoveredNode) return defaultPreviewState;
+
+  const makeTooltip = (budgetCost: number | null, budgetRefundCount: number | null) => ({
+    name: hoveredNode.name,
+    kind: hoveredNode.kind,
+    stats: hoveredNode.stats,
+    budget: { cost: budgetCost, refundCount: budgetRefundCount },
+  });
+
   const hoveredNodeState = allocationState.nodeStateById.get(hoveredNodeId);
-  if (!hoveredNodeState) return defaultPreviewState;
-  if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) return defaultPreviewState;
+  if (!hoveredNodeState) {
+    return { ...defaultPreviewState, tooltip: makeTooltip(null, null) };
+  }
+  if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) {
+    return { ...defaultPreviewState, tooltip: makeTooltip(null, null) };
+  }
 
   if (hoveredNodeState.allocated) {
     const refundAnalysis = Build.computeRefundAnalysis(graph, build, hoveredNodeId);
@@ -47,12 +62,13 @@ export function computeHoverPreviewState({
         nodeIds: refundAnalysis.refundedNodeIds,
         edgeKeys: refundAnalysis.refundedEdgeKeys,
       },
+      tooltip: makeTooltip(null, refundAnalysis.refundedNodeIds.size),
     };
   }
 
   // Unallocated node
   const cheapestPath = hoveredNodeState.cheapestPath;
-  if (!cheapestPath) return defaultPreviewState;
+  if (!cheapestPath) return { ...defaultPreviewState, tooltip: makeTooltip(null, null) };
 
   const highlightedNodeIds = new Set<NodeId>(
     cheapestPath.filter((id) => !allocationState.allocatedNodeIds.has(id)),
@@ -78,5 +94,6 @@ export function computeHoverPreviewState({
       nodeIds: highlightedNodeIds,
       edgeKeys: highlightedEdgeKeys,
     },
+    tooltip: makeTooltip(highlightedNodeIds.size, null),
   };
 }
