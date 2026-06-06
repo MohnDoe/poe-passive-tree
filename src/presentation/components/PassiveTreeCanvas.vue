@@ -31,6 +31,7 @@ const defaultHoverPreviewState: HoverPreviewState = {
     edgeKeys: new Set(),
     nodeIds: new Set(),
   },
+  tooltip: null,
 };
 
 onMounted(async () => {
