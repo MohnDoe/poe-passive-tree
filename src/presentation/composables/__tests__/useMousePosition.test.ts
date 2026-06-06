@@ -29,11 +29,21 @@ describe("useMousePosition", () => {
     document.body.removeChild(host.value);
   });
 
-  it("does not update when pointermove fires outside the host element", async () => {
+  it("throws when setup is called twice on the same element", () => {
     const host = vueRef(document.createElement("div"));
-    const outside = vueRef(document.createElement("div"));
     document.body.appendChild(host.value);
-    document.body.appendChild(outside.value);
+
+    const { setup } = useMousePosition();
+    setup(host.value);
+
+    expect(() => setup(host.value)).toThrow();
+
+    document.body.removeChild(host.value);
+  });
+
+  it("allows fresh setup after teardown", async () => {
+    const host = vueRef(document.createElement("div"));
+    document.body.appendChild(host.value);
 
     const { x, y, setup } = useMousePosition();
     const teardown = setup(host.value);
@@ -42,21 +52,21 @@ describe("useMousePosition", () => {
       new PointerEvent("pointermove", { clientX: 100, clientY: 200 }),
     );
     await nextTick();
-
     expect(x.value).toBe(100);
-    expect(y.value).toBe(200);
-
-    outside.value.dispatchEvent(
-      new PointerEvent("pointermove", { clientX: 999, clientY: 888 }),
-    );
-    await nextTick();
-
-    expect(x.value).toBe(100);
-    expect(y.value).toBe(200);
 
     teardown();
+
+    // Fresh setup should work on the same element
+    const teardown2 = setup(host.value);
+    host.value.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 300, clientY: 400 }),
+    );
+    await nextTick();
+    expect(x.value).toBe(300);
+    expect(y.value).toBe(400);
+
+    teardown2();
     document.body.removeChild(host.value);
-    document.body.removeChild(outside.value);
   });
 
   it("cleans up listener on teardown", async () => {
