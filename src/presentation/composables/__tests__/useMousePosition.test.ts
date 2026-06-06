@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextTick, ref as vueRef } from "vue";
+import { ref as vueRef } from "vue";
 import { useMousePosition } from "../useMousePosition";
 
 describe("useMousePosition", () => {
@@ -20,7 +20,6 @@ describe("useMousePosition", () => {
     host.value.dispatchEvent(
       new PointerEvent("pointermove", { clientX: 100, clientY: 200 }),
     );
-    await nextTick();
 
     expect(x.value).toBe(100);
     expect(y.value).toBe(200);
@@ -34,10 +33,11 @@ describe("useMousePosition", () => {
     document.body.appendChild(host.value);
 
     const { setup } = useMousePosition();
-    setup(host.value);
+    const teardown = setup(host.value);
 
-    expect(() => setup(host.value)).toThrow();
+    expect(() => setup(host.value)).toThrow(/called twice/);
 
+    teardown();
     document.body.removeChild(host.value);
   });
 
@@ -51,7 +51,6 @@ describe("useMousePosition", () => {
     host.value.dispatchEvent(
       new PointerEvent("pointermove", { clientX: 100, clientY: 200 }),
     );
-    await nextTick();
     expect(x.value).toBe(100);
 
     teardown();
@@ -61,7 +60,6 @@ describe("useMousePosition", () => {
     host.value.dispatchEvent(
       new PointerEvent("pointermove", { clientX: 300, clientY: 400 }),
     );
-    await nextTick();
     expect(x.value).toBe(300);
     expect(y.value).toBe(400);
 
@@ -79,7 +77,6 @@ describe("useMousePosition", () => {
     host.value.dispatchEvent(
       new PointerEvent("pointermove", { clientX: 100, clientY: 200 }),
     );
-    await nextTick();
     expect(x.value).toBe(100);
 
     teardown();
@@ -87,7 +84,6 @@ describe("useMousePosition", () => {
     host.value.dispatchEvent(
       new PointerEvent("pointermove", { clientX: 999, clientY: 888 }),
     );
-    await nextTick();
 
     // Position should remain unchanged after teardown
     expect(x.value).toBe(100);
