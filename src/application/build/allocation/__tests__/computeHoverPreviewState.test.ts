@@ -225,6 +225,24 @@ describe("computeHoverPreviewState", () => {
       expect(result.tooltip.stats).toEqual(node.stats);
     });
 
+    it("shows up when allocationState is null", () => {
+      const { graph, nodes } = makeLineGraph();
+      const node = nodes.first;
+      const build = makeBuildState({ activeClassId: null, allocatedNodeIds: new Set() });
+
+      const result = computeHoverPreviewState({
+        allocationState: null,
+        hoveredNodeId: node.id,
+        graph,
+        build,
+      });
+
+      assert(result.tooltip);
+      expect(result.tooltip.name).toBe(node.name);
+      expect(result.tooltip.kind).toBe(node.kind);
+      expect(result.tooltip.stats).toEqual(node.stats);
+    });
+
     it("shows allocation cost for an unallocated reachable node", () => {
       const { graph, nodes } = makeLineGraph();
       const build = makeBuildState({
