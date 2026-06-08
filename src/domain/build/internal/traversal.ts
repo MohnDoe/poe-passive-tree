@@ -1,10 +1,10 @@
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
-import type { PassiveNode } from "@/domain/graph/PassiveNode";
+import { PassiveNode } from "@/domain/graph/PassiveNode";
 
 export function isAscendancyTraversalNode(node: PassiveNode): boolean {
-  if (node.kind === "jewel") return false;
-  if (node.kind === "ascendancyStart") return true;
-  if (node.kind === "proxy") return true;
+  if (PassiveNode.isJewelSocket(node)) return false;
+  if (PassiveNode.isAscendancyStart(node)) return true;
+  if (PassiveNode.isProxy(node)) return true;
   // ascendancyName is on: notable, normal, jewel, ascendancyStart
   if ("ascendancyName" in node && node.ascendancyName) return true;
   if ("isMultipleChoice" in node && node.isMultipleChoice) return true;
@@ -22,8 +22,8 @@ export function isTraversableEdge(
   from: PassiveNode,
   to: PassiveNode,
 ): boolean {
-  if (from.kind === "mastery") return false;
-  if (to.kind === "classStart" || to.kind === "ascendancyStart") return false;
+  if (PassiveNode.isMastery(from)) return false;
+  if (PassiveNode.isClassStart(to) || PassiveNode.isAscendancyStart(to)) return false;
 
   const fromRegion = graph.regionByNodeId.get(from.id);
   const toRegion = graph.regionByNodeId.get(to.id);

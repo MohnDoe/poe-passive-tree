@@ -1,7 +1,8 @@
 import type { MappedPassiveTree } from "@/infrastructure/passiveTree/mapping/MappedPassiveTree";
 import { makeEdgeKey } from "@/domain/graph/edgeKeys";
 import type { GraphEdge } from "@/domain/graph/GraphEdge";
-import type { NodeId, PassiveNode } from "@/domain/graph/PassiveNode";
+import type { NodeId } from "@/domain/graph/PassiveNode";
+import { PassiveNode } from "@/domain/graph/PassiveNode";
 
 export function buildEdges(nodes: MappedPassiveTree["nodesById"]): GraphEdge[] {
   const edges: GraphEdge[] = [];
@@ -37,7 +38,7 @@ export function buildEdges(nodes: MappedPassiveTree["nodesById"]): GraphEdge[] {
 }
 
 function isMasteryLink(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
-  return sourceNode.kind === "mastery" || targetNode.kind === "mastery";
+  return PassiveNode.isMastery(sourceNode) || PassiveNode.isMastery(targetNode);
 }
 
 function isAscendancyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
@@ -56,5 +57,5 @@ function hasAscendancyName(node: PassiveNode): node is PassiveNodeWithAscendancy
 
 function isProxyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {
   //FIX: this is wrong
-  return sourceNode.kind === "proxy" || targetNode.kind === "proxy";
+  return PassiveNode.isProxy(sourceNode) || PassiveNode.isProxy(targetNode);
 }

@@ -2,7 +2,7 @@ import type { MappedPassiveTree } from "@/infrastructure/passiveTree/mapping/Map
 import type { AscendancyId } from "@/domain/graph/PassiveAscendancy";
 import type { ClassId } from "@/domain/graph/PassiveClass";
 import type { PassiveGraph } from "@/domain/graph/PassiveGraph";
-import type { NodeId } from "@/domain/graph/PassiveNode";
+import { PassiveNode, type NodeId } from "@/domain/graph/PassiveNode";
 
 interface StartNodeIndexes {
   startNodeIdsByClassId: PassiveGraph["startNodeIdsByClassId"];
@@ -53,7 +53,7 @@ function getStartNodeIdsByClassId(
   const out = new Map<ClassId, Set<NodeId>>();
 
   for (const [nodeId, node] of input.nodesById) {
-    if (node.kind === "classStart" && node.classStartIndex !== undefined) {
+    if (PassiveNode.isClassStart(node) && node.classStartIndex !== undefined) {
       const classId = node.classStartIndex;
 
       // only neighbors in the main tree are start node
@@ -79,7 +79,7 @@ export function buildAscendancyStartNodeIds(input: MappedPassiveTree): Ascendanc
   const ascendancyStartNodeIdsByAscendancyId = new Map<AscendancyId, Set<NodeId>>();
 
   for (const [nodeId, node] of input.nodesById) {
-    if (node.kind === "ascendancyStart") {
+    if (PassiveNode.isAscendancyStart(node)) {
       ascendancyStartNodeIds.add(nodeId);
 
       if (node.ascendancyName) {

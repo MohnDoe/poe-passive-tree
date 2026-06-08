@@ -142,48 +142,47 @@ export type PassiveNode =
   | PassiveClassStartNode
   | PassiveAscendancyStartNode;
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace PassiveNode {
+export const PassiveNode = {
   /** Type guard for normal nodes. */
-  export function isNormal(node: PassiveNode): node is PassiveNormalNode {
+  isNormal(node: PassiveNode): node is PassiveNormalNode {
     return node.kind === "normal";
-  }
+  },
 
   /** Type guard for notable nodes. */
-  export function isNotable(node: PassiveNode): node is PassiveNotableNode {
+  isNotable(node: PassiveNode): node is PassiveNotableNode {
     return node.kind === "notable";
-  }
+  },
 
   /** Type guard for keystone nodes. */
-  export function isKeystone(node: PassiveNode): node is PassiveKeystoneNode {
+  isKeystone(node: PassiveNode): node is PassiveKeystoneNode {
     return node.kind === "keystone";
-  }
+  },
 
   /** Type guard for jewel socket nodes. */
-  export function isJewelSocket(node: PassiveNode): node is PassiveJewelSocketNode {
+  isJewelSocket(node: PassiveNode): node is PassiveJewelSocketNode {
     return node.kind === "jewel";
-  }
+  },
 
   /** Type guard for mastery nodes. */
-  export function isMastery(node: PassiveNode): node is PassiveMasteryNode {
+  isMastery(node: PassiveNode): node is PassiveMasteryNode {
     return node.kind === "mastery";
-  }
+  },
 
   /** Type guard for proxy nodes. */
-  export function isProxy(node: PassiveNode): node is PassiveProxyNode {
+  isProxy(node: PassiveNode): node is PassiveProxyNode {
     return node.kind === "proxy";
-  }
+  },
 
   /** Type guard for class start nodes. */
-  export function isClassStart(node: PassiveNode): node is PassiveClassStartNode {
+  isClassStart(node: PassiveNode): node is PassiveClassStartNode {
     return node.kind === "classStart";
-  }
+  },
 
   /** Type guard for ascendancy start nodes. */
-  export function isAscendancyStart(node: PassiveNode): node is PassiveAscendancyStartNode {
+  isAscendancyStart(node: PassiveNode): node is PassiveAscendancyStartNode {
     return node.kind === "ascendancyStart";
-  }
-}
+  },
+} as const;
 
 
 

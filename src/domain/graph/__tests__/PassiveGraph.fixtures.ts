@@ -3,7 +3,7 @@ import type { EdgeKey, GraphEdge } from "../GraphEdge";
 import type { AscendancyId } from "../PassiveAscendancy";
 import type { ClassId } from "../PassiveClass";
 import type { PassiveGraph } from "../PassiveGraph";
-import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "../PassiveNode";
+import { PassiveNode, type NodeId, type PassiveNodeRegion, type PassiveNodeSubregion } from "../PassiveNode";
 
 export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): PassiveNode {
   const kind = partial.kind ?? "normal";
@@ -132,7 +132,7 @@ export function buildGraph(params: {
   const subregionByNodeId =
     params.subregionByNodeId ??
     new Map<NodeId, PassiveNodeSubregion>(params.nodes.map((n) => [n.id, null]));
-  const startNodes = params.nodes.filter((n) => n.kind === "classStart");
+  const startNodes = params.nodes.filter((n) => PassiveNode.isClassStart(n));
 
   const startNodeIdsByClassId = new Map<ClassId, Set<NodeId>>();
   const ascendancyIdsByClassId = new Map<ClassId, Set<AscendancyId>>();
@@ -147,7 +147,7 @@ export function buildGraph(params: {
 
   const allStartNodeIds = new Set<NodeId>([...firstClassStartNodeIds, ...secondClassStartNodeIds]);
 
-  const ascendancyStartNodes = params.nodes.filter((n) => n.kind === "ascendancyStart");
+  const ascendancyStartNodes = params.nodes.filter((n) => PassiveNode.isAscendancyStart(n));
   const ascendancyStartNodeIds = new Set<NodeId>(ascendancyStartNodes.map((n) => n.id));
 
   const ascendancyStartNodeIdsByAscendancyId = new Map<AscendancyId, ReadonlySet<NodeId>>();
