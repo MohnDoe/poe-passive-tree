@@ -1,16 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { mapPassiveNodeDto } from "../mapPassiveNodeDto";
-import type { PassiveTreeNodeDto } from "../../dto/passiveTree/Nodes.dto";
-import type { PassiveTreeDto } from "../../dto/passiveTree/PassiveSkillTree.dto";
+import type { PassiveTreeNodeDto } from "../../../dto/passiveTree/Nodes.dto";
+import type { PassiveTreeDto } from "../../../dto/passiveTree/PassiveSkillTree.dto";
 
 function makeTreeDto(): PassiveTreeDto {
   return {
-    skills: {},
+    skillSprites: {},
     nodes: {},
     groups: {},
-    constants: { orbitRadii: {}, skillsPerOrbit: {} },
+    constants: {
+      classes: {},
+      characterAttributes: {},
+      PSSCentreInnerRadius: 0,
+      orbitRadii: [],
+      skillsPerOrbit: [],
+    },
     classes: [],
-    ascensions: [],
+    extraImages: {},
+    jewelSlots: [],
+    min_x: 0,
+    min_y: 0,
+    max_x: 0,
+    max_y: 0,
+    assets: {},
+    imageZoomLevels: [],
   };
 }
 
