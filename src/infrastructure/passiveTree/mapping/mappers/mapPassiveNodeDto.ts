@@ -3,6 +3,7 @@ import type {
   PassiveNode,
   PassiveNodeKind,
   PassiveNodePosition,
+  MasteryEffect,
 } from "@/domain/graph/PassiveNode";
 import { type PassiveTreeNodeDto } from "../../dto/passiveTree/Nodes.dto";
 import type { PassiveTreeDto } from "../../dto/passiveTree/PassiveSkillTree.dto";
@@ -80,7 +81,7 @@ export function mapPassiveNodeDto(
         activeIcon: raw.activeIcon as string | undefined,
         inactiveIcon: raw.inactiveIcon as string | undefined,
         activeEffectImage: raw.activeEffectImage as string | undefined,
-        masteryEffects: raw.masteryEffects,
+        masteryEffects: raw.masteryEffects as MasteryEffect[] | undefined,
       };
     }
     case "proxy": {

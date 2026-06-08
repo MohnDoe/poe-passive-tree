@@ -2,6 +2,16 @@ import type { AscendancyId } from "./PassiveAscendancy";
 import type { ClassId } from "./PassiveClass";
 import type { GroupId } from "./PassiveGroup";
 
+/** A single mastery effect option selectable on a mastery node. */
+export interface MasteryEffect {
+  /** Numeric effect ID (GGG internal identifier). */
+  effect: number;
+  /** Stat lines describing what the effect does. */
+  stats: string[];
+  /** Optional reminder text (e.g., keyword explanations). */
+  reminderText?: string[];
+}
+
 //TODO: change to number
 export type NodeId = string;
 
@@ -104,7 +114,7 @@ export interface PassiveMasteryNode extends PassiveNodeBase {
   activeIcon?: string;
   inactiveIcon?: string;
   activeEffectImage?: string;
-  masteryEffects?: unknown;
+  masteryEffects?: MasteryEffect[];
 }
 
 export interface PassiveProxyNode extends PassiveNodeBase {
