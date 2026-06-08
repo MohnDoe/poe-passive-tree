@@ -101,8 +101,6 @@ describe("NodeTooltip", () => {
       },
     });
 
-    const tooltip = wrapper.find(".node-tooltip");
-    expect(tooltip.text()).not.toContain("Allocate");
-    expect(tooltip.text()).not.toContain("Refund");
+    expect(wrapper.find(".tooltip-budget").exists()).toBe(false);
   });
 });
