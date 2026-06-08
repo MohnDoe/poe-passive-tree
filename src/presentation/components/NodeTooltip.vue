@@ -17,10 +17,6 @@ export interface NodeTooltipProps {
 
 const props = defineProps<NodeTooltipProps>();
 
-function formatKind(kind: PassiveNodeKind): string {
-  return kind.charAt(0).toUpperCase() + kind.slice(1);
-}
-
 const hasBudgetLine = computed(
   () =>
     props.hoverInfo !== null &&
@@ -30,8 +26,8 @@ const hasBudgetLine = computed(
 const budgetLineText = computed(() => {
   if (props.hoverInfo === null) return "";
   const { cost, refundCount } = props.hoverInfo.budget;
-  if (cost !== null) return `Allocate ${cost} points`;
-  if (refundCount !== null) return `Refund ${refundCount} nodes`;
+  if (cost !== null) return `+${cost} nodes`;
+  if (refundCount !== null) return `-${refundCount} nodes`;
   return "";
 });
 
@@ -46,7 +42,6 @@ const tooltipStyle = computed(() => ({
     <div class="node-tooltip" :style="tooltipStyle">
       <div class="tooltip-header">
         <span class="node-name">{{ hoverInfo.name }}</span>
-        <span class="node-kind">{{ formatKind(hoverInfo.kind) }}</span>
       </div>
       <div v-if="hoverInfo.stats.length" class="tooltip-stats">
         <div v-for="(stat, i) in hoverInfo.stats" :key="i" class="stat-line">
@@ -74,5 +69,9 @@ const tooltipStyle = computed(() => ({
   font-size: 13px;
   line-height: 1.4;
   border-radius: 4px;
+}
+
+.node-name {
+  font-weight: bold;
 }
 </style>

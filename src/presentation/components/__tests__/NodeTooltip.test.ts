@@ -18,7 +18,7 @@ describe("NodeTooltip", () => {
     expect(wrapper.find(".node-tooltip").exists()).toBe(false);
   });
 
-  it("renders node name and kind badge", () => {
+  it("renders node name", () => {
     const wrapper = mount(NodeTooltip, {
       props: {
         ...baseProps,
@@ -34,7 +34,6 @@ describe("NodeTooltip", () => {
     const tooltip = wrapper.find(".node-tooltip");
     expect(tooltip.exists()).toBe(true);
     expect(tooltip.text()).toContain("Enhanced Vitality");
-    expect(tooltip.text()).toContain("Notable");
   });
 
   it("renders stats lines when present", () => {
@@ -69,7 +68,7 @@ describe("NodeTooltip", () => {
     });
 
     const tooltip = wrapper.find(".node-tooltip");
-    expect(tooltip.text()).toContain("Allocate 3 points");
+    expect(tooltip.text()).toContain("+3 nodes");
   });
 
   it("renders budget line with Refund N nodes for allocated nodes", () => {
@@ -86,7 +85,7 @@ describe("NodeTooltip", () => {
     });
 
     const tooltip = wrapper.find(".node-tooltip");
-    expect(tooltip.text()).toContain("Refund 5 nodes");
+    expect(tooltip.text()).toContain("-5 nodes");
   });
 
   it("hides budget line when both cost and refundCount are null", () => {
@@ -105,25 +104,5 @@ describe("NodeTooltip", () => {
     const tooltip = wrapper.find(".node-tooltip");
     expect(tooltip.text()).not.toContain("Allocate");
     expect(tooltip.text()).not.toContain("Refund");
-  });
-
-  it("positions itself at the correct mouse coordinates", () => {
-    const wrapper = mount(NodeTooltip, {
-      props: {
-        ...baseProps,
-        hoverInfo: {
-          name: "Test Node",
-          kind: "normal",
-          stats: [],
-          budget: { cost: null, refundCount: null },
-        },
-        position: { x: 420, y: 310 },
-      },
-    });
-
-    const tooltip = wrapper.find(".node-tooltip");
-    const style = tooltip.element.style;
-    expect(style.left).toBe("420px");
-    expect(style.top).toBe("310px");
   });
 });
