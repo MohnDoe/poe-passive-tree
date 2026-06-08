@@ -11,11 +11,11 @@ export interface BuildStoreState {
   build: BuildState;
 }
 
-export function createEmptyBuild(): BuildState {
+export function createDefaultBuild(): BuildState {
   return {
     allocatedNodeIds: new Set(),
-    activeClassId: null,
-    activeAscendancy: null,
+    activeClassId: 3,
+    activeAscendancy: "Necromancer",
     passivePointsBudget: 123, // TODO: better
     ascendancyPointsBudget: 8,
   };
@@ -37,20 +37,23 @@ export function resetAllocations(build: BuildState): BuildState {
 
 export const useBuildStore = defineStore("build", {
   state: (): BuildStoreState => ({
-    build: createEmptyBuild(),
+    build: createDefaultBuild(),
   }),
 
   getters: {},
   actions: {
     resetBuild() {
-      this.build = createEmptyBuild();
+      this.build = createDefaultBuild();
     },
     setClass(classId: ClassId): Result<BuildState, BuildFailureReason> {
       const result = Build.setClass(this.build, classId);
       if (result.isOk()) this.build = result.value;
       return result;
     },
-    setAscendancy(graph: PassiveGraph, ascendancyId: AscendancyId | null): Result<BuildState, BuildFailureReason> {
+    setAscendancy(
+      graph: PassiveGraph,
+      ascendancyId: AscendancyId | null,
+    ): Result<BuildState, BuildFailureReason> {
       const result = Build.setAscendancy(graph, this.build, ascendancyId);
       if (result.isOk()) this.build = result.value;
       return result;
