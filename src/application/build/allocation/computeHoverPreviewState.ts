@@ -32,7 +32,7 @@ export function computeHoverPreviewState({
     tooltip: null,
   };
 
-  if (!allocationState || !hoveredNodeId || !graph) {
+  if (!hoveredNodeId || !graph) {
     return defaultPreviewState;
   }
 
@@ -46,8 +46,8 @@ export function computeHoverPreviewState({
     budget: { cost: budgetCost, refundCount: budgetRefundCount },
   });
 
-  const hoveredNodeState = allocationState.nodeStateById.get(hoveredNodeId);
-  if (!hoveredNodeState) {
+  const hoveredNodeState = allocationState?.nodeStateById.get(hoveredNodeId);
+  if (!allocationState || !hoveredNodeState) {
     return { ...defaultPreviewState, tooltip: makeTooltip(null, null) };
   }
   if (!hoveredNodeState.reachable && !hoveredNodeState.allocated) {
