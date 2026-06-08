@@ -173,7 +173,7 @@ describe("mapPassiveNodeDto", () => {
         activeIcon: "icon.png",
         inactiveIcon: "icon-inactive.png",
         activeEffectImage: "effect.png",
-        masteryEffects: { fireDamage: 10 },
+        masteryEffects: [{ effect: 48385, stats: ["+10% Fire Damage"] }],
       };
       const tree = makeTreeDto();
       const result = mapPassiveNodeDto("67890", dto, tree);
@@ -184,7 +184,7 @@ describe("mapPassiveNodeDto", () => {
       expect(result.activeIcon).toBe("icon.png");
       expect(result.inactiveIcon).toBe("icon-inactive.png");
       expect(result.activeEffectImage).toBe("effect.png");
-      expect(result.masteryEffects).toEqual({ fireDamage: 10 });
+      expect(result.masteryEffects).toEqual([{ effect: 48385, stats: ["+10% Fire Damage"] }]);
     });
   });
 

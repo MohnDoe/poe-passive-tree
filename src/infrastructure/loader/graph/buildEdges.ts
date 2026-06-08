@@ -47,11 +47,11 @@ function isAscendancyTransition(sourceNode: PassiveNode, targetNode: PassiveNode
     (!sourceHasAscendancy && targetHasAscendancy);
 }
 
-function hasAscendancyName(node: PassiveNode): boolean {
-  if (node.kind === "notable" || node.kind === "normal" || node.kind === "jewel" || node.kind === "ascendancyStart") {
-    return !!node.ascendancyName;
-  }
-  return false;
+/** Nodes in the union that carry an optional `ascendancyName` property. */
+type PassiveNodeWithAscendancyName = Extract<PassiveNode, { ascendancyName?: unknown }>;
+
+function hasAscendancyName(node: PassiveNode): node is PassiveNodeWithAscendancyName {
+  return "ascendancyName" in node && !!node.ascendancyName;
 }
 
 function isProxyTransition(sourceNode: PassiveNode, targetNode: PassiveNode): boolean {

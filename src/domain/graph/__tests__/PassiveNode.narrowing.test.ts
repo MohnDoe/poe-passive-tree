@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import type { PassiveNode, PassiveMasteryNode, PassiveNormalNode, PassiveKeystoneNode, PassiveProxyNode } from "../PassiveNode";
 
 describe("discriminated union type narrowing", () => {
@@ -31,6 +31,7 @@ describe("discriminated union type narrowing", () => {
     if (node.kind === "mastery") {
       // activeIcon is string | undefined, so toUpperCase() would error on undefined
       // but accessing the property itself should compile
+      expectTypeOf(node.activeIcon).toEqualTypeOf<string | undefined>();
       const icon: string | undefined = node.activeIcon;
       expect(icon).toBeUndefined();
     }
@@ -48,6 +49,7 @@ describe("discriminated union type narrowing", () => {
       in: [],
     };
     if (node.kind === "keystone") {
+      expectTypeOf(node.flavourText).toEqualTypeOf<string[] | undefined>();
       const text: string[] | undefined = node.flavourText;
       expect(text).toBeUndefined();
     }
@@ -65,6 +67,7 @@ describe("discriminated union type narrowing", () => {
       in: [],
     };
     if (node.kind === "normal") {
+      expectTypeOf(node.grantedStrength).toEqualTypeOf<number | undefined>();
       const strength: number | undefined = node.grantedStrength;
       expect(strength).toBeUndefined();
     }
