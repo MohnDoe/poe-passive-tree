@@ -1,11 +1,15 @@
-import {
-  buildGraph,
-  makeDiamondGraph,
-  makeLineGraph,
-  makeNode,
-} from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
 import { describe, expect, it } from "vitest";
-import { computeWeightedPaths, materializePath } from "../pathfinding.ts";
+import {
+  makeLineGraph,
+  makeDiamondGraph,
+  makeForkGraph,
+  makeNode,
+  buildGraph,
+} from "@/domain/graph/__tests__/PassiveGraph.fixtures.ts";
+import {
+  computeWeightedPaths,
+  materializePath,
+} from "../pathfinding.ts";
 import type { NodeId } from "@/domain/graph/PassiveNode.ts";
 
 describe("computeWeightedPaths", () => {
@@ -35,41 +39,55 @@ describe("computeWeightedPaths", () => {
     expect(distanceByNodeId.get(nodes.sixth.id)).toBe(0);
   });
 
-  it("each unallocated hop costs 1", () => {
+  it("costs 1 per unallocated hop", () => {
     const { graph, nodes } = makeLineGraph();
 
-    const { distanceByNodeId } = computeWeightedPaths({
+    const result = computeWeightedPaths({
       graph,
       startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set(),
     });
 
-    expect(distanceByNodeId.get(nodes.first.id)).toBe(1);
-    expect(distanceByNodeId.get(nodes.second.id)).toBe(2);
-    expect(distanceByNodeId.get(nodes.third.id)).toBe(3);
+    expect(result.distanceByNodeId.get(nodes.first.id)).toBe(1);
+    expect(result.distanceByNodeId.get(nodes.second.id)).toBe(2);
+    expect(result.distanceByNodeId.get(nodes.third.id)).toBe(3);
   });
 
-  it("allocated nodes cost 0", () => {
+  it("treats allocated nodes as free to traverse", () => {
     const { graph, nodes } = makeLineGraph();
 
-    // first and second are already allocated — they cost 0 to traverse
-    const { distanceByNodeId } = computeWeightedPaths({
+    const result = computeWeightedPaths({
       graph,
       startNodeIds: new Set([nodes.start.id]),
       allocatedNodeIds: new Set([nodes.first.id, nodes.second.id]),
     });
 
-    expect(distanceByNodeId.get(nodes.first.id)).toBe(0);
-    expect(distanceByNodeId.get(nodes.second.id)).toBe(0);
-    // third is unallocated — costs 1 from second
-    expect(distanceByNodeId.get(nodes.third.id)).toBe(1);
+    // first and second are free (cost 0), third costs 1
+    expect(result.distanceByNodeId.get(nodes.first.id)).toBe(0);
+    expect(result.distanceByNodeId.get(nodes.second.id)).toBe(0);
+    expect(result.distanceByNodeId.get(nodes.third.id)).toBe(1);
+  });
+
+  it("prefers shorter path in a diamond when both paths are unallocated", () => {
+    const { graph, nodes } = makeDiamondGraph();
+
+    const result = computeWeightedPaths({
+      graph,
+      startNodeIds: new Set([nodes.start.id]),
+      allocatedNodeIds: new Set(),
+    });
+
+    // left path: start -> left.first -> end = cost 2
+    // right path: start -> right.first -> right.second -> end = cost 3
+    expect(result.distanceByNodeId.get(nodes.left.first.id)).toBe(1);
+    expect(result.distanceByNodeId.get(nodes.end.id)).toBe(2);
   });
 
   it("a gap of unallocated nodes in an otherwise allocated chain accumulates correctly", () => {
     const { graph, nodes } = makeLineGraph();
 
     // start -- first(alloc) -- second(unalloc) -- third(unalloc) -- fourth(alloc) --
-    // fith(unalloc) -- sixth(unalloc )
+    // fifth(unalloc) -- sixth(unalloc)
     const { distanceByNodeId } = computeWeightedPaths({
       graph,
       startNodeIds: new Set([nodes.start.id]),
@@ -108,46 +126,6 @@ describe("computeWeightedPaths", () => {
     expect(distanceByNodeId.get(nodes.fifth.id)).toBe(0);
   });
 
-  // ─── Shortest path preference ────────────────────────────────────────────────
-
-  it("diamond: picks the shorter path to the convergence node", () => {
-    const { graph, nodes } = makeDiamondGraph();
-
-    // start -- left-1 -- end (2 hops)
-    //       -- right-1 -- right-2 -- end (3 hops)
-    // BFS should prefer left path to end
-    const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
-      graph,
-      startNodeIds: new Set([nodes.start.id]),
-      allocatedNodeIds: new Set(),
-    });
-
-    expect(distanceByNodeId.get(nodes.end.id)).toBe(2);
-    expect(predecessorByNodeId.get(nodes.end.id)).toBe(nodes.left.first.id);
-  });
-
-  it("diamond: prefers path through allocated nodes even when it is longer in hops", () => {
-    const { graph, nodes } = makeDiamondGraph();
-
-    // start -- left-1 -- end
-    //       -- right-1 -- right-2 -- end
-    //
-    // right-1 and right-2 are allocated (cost 0 each)
-    // left path cost:  1 (left-1) + 1 (end) = 2
-    // right path cost: 0 (right-1) + 0 (right-2) + 1 (end) = 1
-    // right path is cheaper despite more hops
-    const { distanceByNodeId, predecessorByNodeId } = computeWeightedPaths({
-      graph,
-      startNodeIds: new Set([nodes.start.id]),
-      allocatedNodeIds: new Set([nodes.right.first.id, nodes.right.second.id]),
-    });
-
-    expect(distanceByNodeId.get(nodes.end.id)).toBe(1);
-    expect(predecessorByNodeId.get(nodes.end.id)).toBe(nodes.right.second.id);
-  });
-
-  // ─── Unreachable nodes ───────────────────────────────────────────────────────
-
   it("disconnected nodes have no entry in distanceByNodeId", () => {
     const root = makeNode({ id: "root", kind: "classStart" });
     const connected = makeNode({ id: "connected" });
@@ -169,20 +147,63 @@ describe("computeWeightedPaths", () => {
 
     expect(distanceByNodeId.has(island.id)).toBe(false);
   });
+
+  it("prefers path through allocated nodes even if longer in hops", () => {
+    const { graph, nodes } = makeDiamondGraph();
+
+    const result = computeWeightedPaths({
+      graph,
+      startNodeIds: new Set([nodes.start.id]),
+      allocatedNodeIds: new Set([nodes.right.first.id, nodes.right.second.id]),
+    });
+
+    // right path is free (allocated), left path costs 1
+    expect(result.distanceByNodeId.get(nodes.right.first.id)).toBe(0);
+    expect(result.distanceByNodeId.get(nodes.right.second.id)).toBe(0);
+    expect(result.distanceByNodeId.get(nodes.end.id)).toBe(1); // only left.first costs 1
+  });
+
+  it("returns empty path for unreachable node", () => {
+    const rootA = makeNode({ id: "root-a", kind: "classStart" });
+    const island = makeNode({ id: "island" });
+
+    const graph = buildGraph({
+      nodes: [rootA, island],
+      edgePairs: [],
+    });
+
+    const path = materializePath(island.id, new Map());
+    expect(path).toEqual([]);
+  });
 });
 
 describe("materializePath", () => {
-  it("returns an empty array for an unreachable node", () => {
-    const emptyPredecessorByNodeId = new Map<NodeId, NodeId | null>();
-    // "C" has no entry at all
+  it("reconstructs path from predecessor map", () => {
+    const { graph, nodes } = makeLineGraph();
 
-    expect(materializePath("C", emptyPredecessorByNodeId)).toEqual([]);
+    const { predecessorByNodeId } = computeWeightedPaths({
+      graph,
+      startNodeIds: new Set([nodes.start.id]),
+      allocatedNodeIds: new Set(),
+    });
+
+    const path = materializePath(nodes.third.id, predecessorByNodeId);
+
+    expect(path).toEqual([nodes.start.id, nodes.first.id, nodes.second.id, nodes.third.id]);
   });
 
-  it("returns only the root when target is a root node", () => {
-    const predecessorByNodeId = new Map<NodeId, NodeId | null>([["root", null]]);
+  it("returns single-node path for a root node", () => {
+    const { graph, nodes } = makeLineGraph();
 
-    expect(materializePath("root", predecessorByNodeId)).toEqual(["root"]);
+    const { predecessorByNodeId } = computeWeightedPaths({
+      graph,
+      startNodeIds: new Set([nodes.start.id]),
+      allocatedNodeIds: new Set(),
+    });
+
+    const path = materializePath(nodes.start.id, predecessorByNodeId);
+
+    expect(path).toEqual([nodes.start.id]);
   });
 
   it("returns [root, target] for a direct neighbour of root", () => {

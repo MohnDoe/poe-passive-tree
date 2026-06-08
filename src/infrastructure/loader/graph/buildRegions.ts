@@ -1,4 +1,4 @@
-import { isAscendancyTraversalNode } from "@/domain/build/algorithms/rules/traversal";
+import { isAscendancyTraversalNode } from "@/domain/build/internal/traversal";
 import type { PassiveGraph, PassiveTreeAdjacency } from "@/domain/graph/PassiveGraph";
 import type {
   NodeId,
@@ -31,6 +31,7 @@ export function buildRegionIndexes(
     const seedNode = input.nodesById.get(seedId);
     if (!seedNode) continue;
 
+    if (seedNode.kind !== "ascendancyStart") continue;
     const subregion = seedNode.ascendancyName;
     if (!subregion) continue;
 

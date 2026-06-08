@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { HoverPreviewState } from "@/domain/build/models/allocation/HoverPreviewState";
+import NodeTooltip from "./NodeTooltip.vue";
 import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
+import { useMousePosition } from "../composables/useMousePosition";
 import { usePassiveTreeVisualState } from "../composables/usePassiveTreeVisualState";
 import { useTreeInteraction } from "../composables/useTreeInteraction";
 import { createTreeSceneModel } from "../pixi/scene/createTreeSceneModel";
@@ -20,6 +22,7 @@ const { hoverPreviewState } = storeToRefs(useAllocationStore());
 
 const hostRef = ref<HTMLDivElement | null>(null);
 const stage = shallowRef<PassiveTreeStage | null>(null);
+const { x: mouseX, y: mouseY, setup: setupMouse } = useMousePosition();
 
 const defaultHoverPreviewState: HoverPreviewState = {
   hoveredNodeId: null,
@@ -31,10 +34,13 @@ const defaultHoverPreviewState: HoverPreviewState = {
     edgeKeys: new Set(),
     nodeIds: new Set(),
   },
+  tooltip: null,
 };
 
 onMounted(async () => {
   if (!hostRef.value || !graph.value) return;
+
+  setupMouse(hostRef.value);
 
   const nextStage = new PassiveTreeStage();
 
@@ -93,7 +99,9 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <div ref="hostRef" class="the-tree"></div>
+  <div ref="hostRef" class="the-tree">
+    <NodeTooltip :hover-info="hoverPreviewState.tooltip" :position="{ x: mouseX, y: mouseY }" />
+  </div>
 </template>
 <style scoped>
 .the-tree {

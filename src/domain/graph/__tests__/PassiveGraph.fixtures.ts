@@ -3,10 +3,11 @@ import type { EdgeKey, GraphEdge } from "../GraphEdge";
 import type { AscendancyId } from "../PassiveAscendancy";
 import type { ClassId } from "../PassiveClass";
 import type { PassiveGraph } from "../PassiveGraph";
-import type { NodeId, PassiveNode, PassiveNodeRegion, PassiveNodeSubregion } from "../PassiveNode";
+import { PassiveNode, type NodeId, type PassiveNodeRegion, type PassiveNodeSubregion } from "../PassiveNode";
 
 export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): PassiveNode {
-  return {
+  const kind = partial.kind ?? "normal";
+  const base = {
     id: partial.id,
     name: partial.name ?? `node-${partial.id}`,
     stats: partial.stats ?? [],
@@ -14,14 +15,79 @@ export function makeNode(partial: Partial<PassiveNode> & { id: NodeId }): Passiv
     orbitIndex: partial.orbitIndex ?? 0,
     out: partial.out ?? [],
     in: partial.in ?? [],
-    kind: partial.kind ?? "normal",
-    isMultipleChoice: partial.isMultipleChoice ?? false,
-    isMultipleChoiceOption: partial.isMultipleChoiceOption ?? false,
+    kind,
     groupId: partial.groupId,
     position: partial.position,
-    ascendancyName: partial.ascendancyName,
-    classStartIndex: partial.classStartIndex,
   };
+
+  switch (kind) {
+    case "normal": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+        reminderText: partial.reminderText,
+        grantedStrength: partial.grantedStrength,
+        grantedDexterity: partial.grantedDexterity,
+        grantedIntelligence: partial.grantedIntelligence,
+        grantedPassivePoints: partial.grantedPassivePoints,
+        isMultipleChoiceOption: partial.isMultipleChoiceOption,
+      };
+    }
+    case "notable": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+        reminderText: partial.reminderText,
+        isBlighted: partial.isBlighted,
+        recipe: partial.recipe,
+        grantedStrength: partial.grantedStrength,
+        grantedDexterity: partial.grantedDexterity,
+        grantedIntelligence: partial.grantedIntelligence,
+        grantedPassivePoints: partial.grantedPassivePoints,
+        isMultipleChoice: partial.isMultipleChoice,
+      };
+    }
+    case "keystone": {
+      return {
+        ...base,
+        isBlighted: partial.isBlighted,
+        recipe: partial.recipe,
+        flavourText: partial.flavourText,
+        reminderText: partial.reminderText,
+      };
+    }
+    case "jewel": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+        expansionJewel: partial.expansionJewel,
+      };
+    }
+    case "mastery": {
+      return {
+        ...base,
+        activeIcon: partial.activeIcon,
+        inactiveIcon: partial.inactiveIcon,
+        activeEffectImage: partial.activeEffectImage,
+        masteryEffects: partial.masteryEffects,
+      };
+    }
+    case "proxy": {
+      return base;
+    }
+    case "classStart": {
+      return {
+        ...base,
+        classStartIndex: partial.classStartIndex as ClassId,
+      };
+    }
+    case "ascendancyStart": {
+      return {
+        ...base,
+        ascendancyName: partial.ascendancyName,
+      };
+    }
+  }
 }
 
 function makeEdge(edge: Partial<GraphEdge> & { source: NodeId; target: NodeId }): GraphEdge {
@@ -66,7 +132,7 @@ export function buildGraph(params: {
   const subregionByNodeId =
     params.subregionByNodeId ??
     new Map<NodeId, PassiveNodeSubregion>(params.nodes.map((n) => [n.id, null]));
-  const startNodes = params.nodes.filter((n) => n.kind === "classStart");
+  const startNodes = params.nodes.filter((n) => PassiveNode.isClassStart(n));
 
   const startNodeIdsByClassId = new Map<ClassId, Set<NodeId>>();
   const ascendancyIdsByClassId = new Map<ClassId, Set<AscendancyId>>();
@@ -81,7 +147,7 @@ export function buildGraph(params: {
 
   const allStartNodeIds = new Set<NodeId>([...firstClassStartNodeIds, ...secondClassStartNodeIds]);
 
-  const ascendancyStartNodes = params.nodes.filter((n) => n.kind === "ascendancyStart");
+  const ascendancyStartNodes = params.nodes.filter((n) => PassiveNode.isAscendancyStart(n));
   const ascendancyStartNodeIds = new Set<NodeId>(ascendancyStartNodes.map((n) => n.id));
 
   const ascendancyStartNodeIdsByAscendancyId = new Map<AscendancyId, ReadonlySet<NodeId>>();
